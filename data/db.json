@@ -1,0 +1,456 @@
+{
+  "inquiries": [
+    {
+      "id": "GPUC-2026-INQ-1009",
+      "name": "What is the admission process for academic year 2026-2027? (Parent: asdfghjkl;)",
+      "mobile": "8123456789",
+      "userType": "parent",
+      "courseInterest": "12th Class (2nd PU)",
+      "intendedYear": "2026-2027",
+      "category": "ADMISSIONS_2026-27",
+      "preferredContact": "phone",
+      "summary": "Topic: Admissions for Academic Year 2026–27 | Class: 12th Class (2nd PU) | Inquiry: Admissions 2026-27 | Student: What is the admission process for academic year 2026-2027? | Parent: asdfghjkl; | Note: Query: Which documents are required for admission?",
+      "assignedTeam": "Admissions",
+      "assignedStaff": "Mr. Aravind J",
+      "status": "NEW",
+      "consentGiven": true,
+      "consentPurpose": "Inquiry guidance and admission assistance",
+      "consentTimestamp": "2026-10-14T11:29:42.614Z",
+      "createdAt": "2026-10-14T11:29:42.614Z",
+      "updatedAt": "2026-10-14T11:29:42.614Z"
+    },
+    {
+      "id": "GPUC-2026-INQ-1008",
+      "name": "qwertyu (Parent: qwertyu)",
+      "mobile": "8123456789",
+      "userType": "parent",
+      "courseInterest": "11th/12th PU",
+      "intendedYear": "2026-2027",
+      "category": "CAMPUS_VISIT",
+      "preferredContact": "phone",
+      "summary": "Topic: Admissions for Academic Year 2026–27 | Class: 11th/12th PU | Inquiry: Campus Visit | Student: qwertyu | Parent: qwertyu | Note: Query: What is the admission process for academic year 2026-2027?",
+      "assignedTeam": "Administration",
+      "assignedStaff": "Mr. Aravind J",
+      "status": "NEW",
+      "consentGiven": true,
+      "consentPurpose": "Inquiry guidance and admission assistance",
+      "consentTimestamp": "2026-10-14T11:14:22.792Z",
+      "createdAt": "2026-10-14T11:14:22.792Z",
+      "updatedAt": "2026-10-14T11:14:22.792Z"
+    },
+    {
+      "id": "GPUC-2026-INQ-1007",
+      "name": "qwertyui (Parent: qwertyuio)",
+      "mobile": "8123456789",
+      "userType": "parent",
+      "courseInterest": "General PU",
+      "intendedYear": "2026-2027",
+      "category": "ADMISSIONS_2026-27",
+      "preferredContact": "phone",
+      "summary": "Topic: what is the fee | Class: General PU | Inquiry: Admissions 2026-27 | Student: qwertyui | Parent: qwertyuio | Note: Query: what is the fee",
+      "assignedTeam": "Admissions",
+      "assignedStaff": "Mr. Aravind J",
+      "status": "NEW",
+      "consentGiven": true,
+      "consentPurpose": "Inquiry guidance and admission assistance",
+      "consentTimestamp": "2026-10-14T11:09:36.622Z",
+      "createdAt": "2026-10-14T11:09:36.622Z",
+      "updatedAt": "2026-10-14T11:09:36.622Z"
+    },
+    {
+      "id": "GPUC-2026-INQ-1006",
+      "name": "Aditi Rao (Parent: Mr. Rao)",
+      "mobile": "9845012345",
+      "userType": "parent",
+      "courseInterest": "11th Class (1st PU)",
+      "intendedYear": "2026-2027",
+      "category": "ADMISSIONS_2026-27",
+      "preferredContact": "phone",
+      "summary": "Topic: Combinations | Class: 11th Class (1st PU) | Inquiry: Admissions 2026-27 | Student: Aditi Rao | Parent: Mr. Rao | Note: Interested in PCMC with Computer Science",
+      "assignedTeam": "Admissions",
+      "assignedStaff": "Mr. Aravind J",
+      "status": "NEW",
+      "consentGiven": true,
+      "consentPurpose": "Inquiry guidance and admission assistance",
+      "consentTimestamp": "2026-10-14T10:55:42.009Z",
+      "createdAt": "2026-10-14T10:55:42.009Z",
+      "updatedAt": "2026-10-14T10:55:42.009Z"
+    },
+    {
+      "id": "GPUC-2026-INQ-1005",
+      "name": "Rahul Sharma (Parent: Suresh Sharma)",
+      "mobile": "9845012345",
+      "userType": "parent",
+      "courseInterest": "12th Class (2nd PU)",
+      "intendedYear": "2026-2027",
+      "category": "ADMISSIONS_2026-27",
+      "preferredContact": "phone",
+      "summary": "Topic: Science Stream Combinations | Class: 12th Class (2nd PU) | Inquiry: Admissions 2026-27 | Student: Rahul Sharma | Parent: Suresh Sharma | Chat update: Interested in hostel facility as well",
+      "assignedTeam": "Admissions",
+      "assignedStaff": "Mr. Aravind J",
+      "status": "NEW",
+      "consentGiven": true,
+      "consentPurpose": "Inquiry guidance and admission assistance",
+      "consentTimestamp": "2026-10-14T10:34:23.086Z",
+      "createdAt": "2026-10-14T10:34:23.086Z",
+      "updatedAt": "2026-10-14T10:34:27.623Z"
+    },
+    {
+      "id": "GPUC-2026-INQ-1004",
+      "name": "Pooja Sharma (Parent: Rajesh Sharma)",
+      "mobile": "9845098765",
+      "userType": "parent",
+      "courseInterest": "12th Class (2nd PU)",
+      "intendedYear": "2026-2027",
+      "category": "ADMISSIONS_2026-27",
+      "preferredContact": "phone",
+      "summary": "Topic: Science Stream Combinations (PCMB / PCMC) | Class: 12th Class (2nd PU) | Inquiry: Admissions 2026-27 | Student: Pooja Sharma | Parent: Rajesh Sharma | Note: Initial query: Science combinations | Chat update: Interested in hostel facility and lab timings",
+      "assignedTeam": "Admissions",
+      "assignedStaff": "Mr. Aravind J",
+      "status": "NEW",
+      "consentGiven": true,
+      "consentPurpose": "Inquiry guidance and admission assistance",
+      "consentTimestamp": "2026-10-14T10:10:41.706Z",
+      "createdAt": "2026-10-14T10:10:41.706Z",
+      "updatedAt": "2026-10-14T10:10:48.451Z"
+    },
+    {
+      "id": "GPUC-2026-INQ-1003",
+      "name": "Ananya Rao (Parent: Venkat Rao)",
+      "mobile": "9845012345",
+      "userType": "parent",
+      "courseInterest": "12th Class (2nd PU)",
+      "intendedYear": "2026-2027",
+      "category": "CAMPUS_VISIT",
+      "preferredContact": "phone",
+      "summary": "Topic: Science PCMC | Class: 12th Class (2nd PU) | Inquiry: Campus Visit | Student: Ananya Rao | Parent: Venkat Rao",
+      "assignedTeam": "Administration",
+      "assignedStaff": "Mr. Aravind J",
+      "status": "NEW",
+      "consentGiven": true,
+      "consentPurpose": "Inquiry guidance and admission assistance",
+      "consentTimestamp": "2026-10-14T10:05:50.782Z",
+      "createdAt": "2026-10-14T10:05:50.782Z",
+      "updatedAt": "2026-10-14T10:05:50.782Z"
+    },
+    {
+      "id": "GPUC-2026-INQ-5459",
+      "name": "Rajesh Sharma",
+      "mobile": "+91 98765 43210",
+      "userType": "parent",
+      "courseInterest": "PCMC",
+      "intendedYear": "2026-2027",
+      "category": "ADMISSIONS",
+      "preferredContact": "phone",
+      "summary": "Admission inquiry for son for PCMC stream.",
+      "assignedTeam": "Admissions",
+      "status": "RESOLVED",
+      "consentGiven": true,
+      "consentPurpose": "Admission inquiry follow-up and college updates",
+      "consentTimestamp": "2026-10-14T09:24:41.498Z",
+      "createdAt": "2026-10-14T09:24:41.498Z",
+      "updatedAt": "2026-10-14T09:27:04.966Z"
+    },
+    {
+      "id": "GPUC-2026-INQ-1001",
+      "name": "Suresh Kumar",
+      "mobile": "+91 98450 12345",
+      "userType": "parent",
+      "courseInterest": "Science (PCMC)",
+      "intendedYear": "2026-2027",
+      "category": "ADMISSION_PROCESS",
+      "preferredContact": "phone",
+      "summary": "Enquiring about PCMC combination, laboratory facilities, and admission requirements for daughter.",
+      "assignedTeam": "Admissions",
+      "assignedStaff": "Mr. Aravind J",
+      "status": "RESOLVED",
+      "consentGiven": true,
+      "consentPurpose": "Inquiry response and admission guidance",
+      "consentTimestamp": "2026-10-14T09:21:40.268Z",
+      "createdAt": "2026-10-13T09:21:40.268Z",
+      "updatedAt": "2026-10-14T09:27:10.608Z"
+    }
+  ],
+  "appointments": [
+    {
+      "id": "GPUC-2026-APT-861",
+      "name": "Priya Patel",
+      "mobile": "+91 99887 76655",
+      "mode": "campus_visit",
+      "date": "2026-10-15",
+      "timeSlot": "10:00 AM",
+      "purpose": "laboratory inspection",
+      "assignedStaff": "Admissions Officer / Counselor",
+      "assignedDepartment": "Admissions",
+      "status": "CONFIRMED",
+      "meetingLinkOrVenue": "Gopalan PU College Campus, 181/1, Hoodi, Whitefield, Bengaluru - 560048",
+      "createdAt": "2026-10-14T09:25:17.722Z"
+    },
+    {
+      "id": "GPUC-2026-APT-501",
+      "inquiryId": "GPUC-2026-INQ-1001",
+      "name": "Suresh Kumar",
+      "mobile": "+91 98450 12345",
+      "mode": "campus_visit",
+      "date": "2026-10-16",
+      "timeSlot": "11:30 AM",
+      "purpose": "Campus tour and laboratory inspection",
+      "assignedStaff": "Admissions Office",
+      "assignedDepartment": "Admissions",
+      "status": "CONFIRMED",
+      "meetingLinkOrVenue": "GPUC Campus Administrative Block, 181/1, Hoodi, Bengaluru",
+      "createdAt": "2026-10-14T09:21:40.268Z"
+    }
+  ],
+  "slots": [
+    {
+      "id": "slot_2026-10-15_0",
+      "date": "2026-10-15",
+      "time": "10:00 AM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": true,
+      "bookedBy": "Priya Patel"
+    },
+    {
+      "id": "slot_2026-10-15_1",
+      "date": "2026-10-15",
+      "time": "11:30 AM",
+      "department": "Academic Coordinator",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-15_2",
+      "date": "2026-10-15",
+      "time": "02:00 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-15_3",
+      "date": "2026-10-15",
+      "time": "03:30 PM",
+      "department": "Academic Coordinator",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-16_0",
+      "date": "2026-10-16",
+      "time": "10:00 AM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-16_1",
+      "date": "2026-10-16",
+      "time": "11:30 AM",
+      "department": "Academic Coordinator",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-16_2",
+      "date": "2026-10-16",
+      "time": "02:00 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-16_3",
+      "date": "2026-10-16",
+      "time": "03:30 PM",
+      "department": "Academic Coordinator",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-17_0",
+      "date": "2026-10-17",
+      "time": "10:00 AM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-17_1",
+      "date": "2026-10-17",
+      "time": "11:30 AM",
+      "department": "Academic Coordinator",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-17_2",
+      "date": "2026-10-17",
+      "time": "02:00 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-17_3",
+      "date": "2026-10-17",
+      "time": "03:30 PM",
+      "department": "Academic Coordinator",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-19_0",
+      "date": "2026-10-19",
+      "time": "10:00 AM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-19_1",
+      "date": "2026-10-19",
+      "time": "11:30 AM",
+      "department": "Academic Coordinator",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-19_2",
+      "date": "2026-10-19",
+      "time": "02:00 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-19_3",
+      "date": "2026-10-19",
+      "time": "03:30 PM",
+      "department": "Academic Coordinator",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-20_0",
+      "date": "2026-10-20",
+      "time": "10:00 AM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-20_1",
+      "date": "2026-10-20",
+      "time": "11:30 AM",
+      "department": "Academic Coordinator",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-20_2",
+      "date": "2026-10-20",
+      "time": "02:00 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-20_3",
+      "date": "2026-10-20",
+      "time": "03:30 PM",
+      "department": "Academic Coordinator",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-21_0",
+      "date": "2026-10-21",
+      "time": "10:00 AM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-21_1",
+      "date": "2026-10-21",
+      "time": "11:30 AM",
+      "department": "Academic Coordinator",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-21_2",
+      "date": "2026-10-21",
+      "time": "02:00 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-21_3",
+      "date": "2026-10-21",
+      "time": "03:30 PM",
+      "department": "Academic Coordinator",
+      "mode": "all",
+      "isBooked": false
+    }
+  ],
+  "feedback": [
+    {
+      "id": "FB-01",
+      "inquiryId": "GPUC-2026-INQ-1001",
+      "rating": 5,
+      "comment": "Very helpful and polite assistant!",
+      "createdAt": "2026-10-14T09:21:40.268Z"
+    }
+  ],
+  "messages": [
+    {
+      "id": "MSG-1791969918601",
+      "type": "whatsapp",
+      "recipient": "+91 99887 76655",
+      "templateId": "appointment_confirmation",
+      "content": "Hello, your consultation appointment is confirmed for undefined at undefined. Reference: undefined",
+      "status": "DELIVERED",
+      "timestamp": "2026-10-14T09:25:18.601Z"
+    },
+    {
+      "id": "MSG-1791969917722",
+      "type": "whatsapp",
+      "recipient": "+91 99887 76655",
+      "templateId": "appointment_confirmation",
+      "content": "Dear Priya Patel, your campus visit at Gopalan PU College is confirmed for 2026-10-15 at 10:00 AM. Ref: GPUC-2026-APT-861. Venue/Details: Gopalan PU College Campus, 181/1, Hoodi, Whitefield, Bengaluru - 560048",
+      "status": "DELIVERED",
+      "timestamp": "2026-10-14T09:25:17.722Z"
+    },
+    {
+      "id": "MSG-1791969882513",
+      "type": "whatsapp",
+      "recipient": "+91 98765 43210",
+      "templateId": "inquiry_ack",
+      "content": "Hello, your inquiry with Gopalan PU College is acknowledged. Reference: N/A",
+      "status": "DELIVERED",
+      "timestamp": "2026-10-14T09:24:42.513Z"
+    },
+    {
+      "id": "MSG-1791969881498",
+      "type": "whatsapp",
+      "recipient": "+91 98765 43210",
+      "templateId": "inquiry_ack",
+      "content": "Namaste Rajesh Sharma, your inquiry with Gopalan PU College has been registered. Reference: GPUC-2026-INQ-5459. Our Admissions team will assist you shortly.",
+      "status": "DELIVERED",
+      "timestamp": "2026-10-14T09:24:41.498Z"
+    },
+    {
+      "id": "MSG-001",
+      "type": "whatsapp",
+      "recipient": "+91 98450 12345",
+      "templateId": "appointment_confirmation",
+      "content": "Dear Suresh Kumar, your Campus Visit at Gopalan PU College is confirmed for 11:30 AM. Ref: GPUC-2026-APT-501.",
+      "status": "DELIVERED",
+      "timestamp": "2026-10-14T09:21:40.268Z"
+    }
+  ]
+}

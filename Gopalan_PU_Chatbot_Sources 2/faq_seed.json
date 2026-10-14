@@ -1,0 +1,106 @@
+[
+  {
+    "id": "institution_overview",
+    "intent": "college_overview",
+    "question": "Tell me about Gopalan PU College.",
+    "answer": "Gopalan Pre-University College is presented on its website as a Bengaluru pre-university college and part of the Gopalan Group of Institutions. The website describes its approach as combining academic foundations, experiential learning, technology-enabled classrooms and holistic student development.",
+    "source_url": "https://www.gopalancolleges.com/gpuc/about-us.html",
+    "release_status": "draft_needs_approval"
+  },
+  {
+    "id": "science_combinations",
+    "intent": "courses_science",
+    "question": "What Science combinations are offered?",
+    "answer": "Science offers PCMB (Physics, Chemistry, Maths, Biology) and PCMC (Physics, Chemistry, Maths, Computer Science) with integrated NEET, JEE, and KCET coaching.\nLanguages include mandatory English and Kannada, Hindi, Sanskrit, or French.",
+    "source_url": "https://www.gopalancolleges.com/gpuc/science-courses.html",
+    "release_status": "approved"
+  },
+  {
+    "id": "commerce_combinations",
+    "intent": "courses_commerce",
+    "question": "What Commerce combinations are offered?",
+    "answer": "Commerce offers CEBA, SEBA, MEBA, and CA Foundation coaching.\nLanguages include mandatory English and Kannada, Hindi, Sanskrit, or French.",
+    "source_url": "https://www.gopalancolleges.com/gpuc/commerce-courses.html",
+    "release_status": "approved"
+  },
+  {
+    "id": "languages",
+    "intent": "course_languages",
+    "question": "What languages can students study?",
+    "answer": "First Language: English (Mandatory).\nSecond Language options: Kannada, Hindi, Sanskrit, or French.",
+    "source_url": "https://www.gopalancolleges.com/gpuc/science-courses.html",
+    "release_status": "approved"
+  },
+  {
+    "id": "admission_eligibility",
+    "intent": "admission_eligibility",
+    "question": "What is the admission eligibility?",
+    "answer": "The admission page says applicants must pass the Karnataka SSLC Examination or an equivalent examination recognized by the Department of Pre-University Education, Karnataka, and meet the prescribed eligibility criteria. For a decision about an individual applicant, please contact Admissions.",
+    "source_url": "https://www.gopalancolleges.com/gpuc/admission.html",
+    "release_status": "draft_needs_approval"
+  },
+  {
+    "id": "admission_documents",
+    "intent": "admission_documents",
+    "question": "What documents are needed for admission?",
+    "answer": "The website lists the 10th-standard Transfer Certificate, marks card, hall-ticket copy, applicable caste/income certificate, applicable eligibility and migration certificates, study certificate, student/parent Aadhaar copies, five recent passport-size photos, PU Board application form, enrollment form, transport application if needed, and medical certificate if applicable. Please verify the latest checklist with Admissions before submitting documents.",
+    "source_url": "https://www.gopalancolleges.com/gpuc/admission.html",
+    "release_status": "draft_needs_approval"
+  },
+  {
+    "id": "facilities",
+    "intent": "campus_facilities",
+    "question": "What facilities are available?",
+    "answer": "The facilities page lists sports facilities, science labs, a library, cafeteria, gymnastics facilities, a girls' hostel, amphitheatre and transport. Please contact the college to confirm current access, costs, hours and availability.",
+    "source_url": "https://www.gopalancolleges.com/gpuc/facilities.html",
+    "release_status": "draft_needs_approval"
+  },
+  {
+    "id": "value_added_courses",
+    "intent": "value_added_courses",
+    "question": "Which value-added courses are listed?",
+    "answer": "The website lists NATA Coaching, Data Analytics with Advanced Excel, Tally, Introduction to Data Science and Coursera online certification courses. Duration, charges and current availability need confirmation.",
+    "source_url": "https://www.gopalancolleges.com/gpuc/value-added-courses.html",
+    "release_status": "draft_verify_current_availability"
+  },
+  {
+    "id": "contact",
+    "intent": "contact_details",
+    "question": "How do I contact the college?",
+    "answer": "Gopalan Pre-University College is located in Whitefield, Bengaluru (Behind SAP Labs, Seetharam Palya, Basavanagar, Hoodi, Bengaluru 560048).\nAdmissions Help Desk: +91 96069 41908 (Monday to Friday, 8:30 AM to 5:00 PM).",
+    "source_url": "https://www.gopalancolleges.com/gpuc/contact-us.html",
+    "release_status": "approved"
+  },
+  {
+    "id": "fees",
+    "intent": "fees",
+    "question": "What are the fees?",
+    "answer": "Tuition fees depend on the chosen stream per Karnataka PU Board norms.\nFor the exact 2026-27 fee schedule, please call our help desk at +91 96069 41908 (Monday to Friday, 8:30 AM to 5:00 PM).",
+    "source_url": "https://www.gopalancolleges.com/gpuc/contact-us.html",
+    "release_status": "approved"
+  },
+  {
+    "id": "events",
+    "intent": "events",
+    "question": "What events are coming up?",
+    "answer": "The website has an events gallery, but I don't have a verified live upcoming-events calendar. I can register an inquiry or refer you to the college office for current dates.",
+    "source_url": "https://www.gopalancolleges.com/gpuc/events.html",
+    "release_status": "fallback_until_calendar_integration"
+  },
+  {
+    "id": "book_appointment",
+    "intent": "appointment_booking",
+    "question": "Can I book a consultation?",
+    "answer": "I can help request a consultation. Available appointment times can be confirmed only after the college's booking calendar is connected. Would you prefer a campus visit, an online meeting or a callback?",
+    "source_url": "https://www.gopalancolleges.com/gpuc/contact-us.html",
+    "release_status": "workflow_requires_integration"
+  },
+  {
+    "id": "unrelated_question",
+    "intent": "scope_boundary",
+    "question": "Can you answer questions unrelated to this college?",
+    "answer": "I can help with Gopalan PU College information, courses, admissions, facilities and appointments. What would you like to know about the college?",
+    "source_url": "",
+    "release_status": "approved_policy"
+  }
+]

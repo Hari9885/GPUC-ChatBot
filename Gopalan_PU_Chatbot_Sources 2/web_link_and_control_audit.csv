@@ -1,0 +1,35 @@
+﻿control_area,label,target_or_page,type,audit_result,notes
+Global navigation,About Us / Overview,https://www.gopalancolleges.com/gpuc/about-us.html,Internal page,Opened and reviewed,In scope
+Global navigation,Vision & Mission,https://www.gopalancolleges.com/gpuc/vision-mission.html,Internal page,Opened and reviewed,In scope
+Global navigation,Why Choose Us,https://www.gopalancolleges.com/gpuc/why-choose-us.html,Internal page,Opened and reviewed,"In scope, coaching claims require review"
+Global navigation,Director's Message,https://www.gopalancolleges.com/gpuc/director-message.html,Internal page,Opened and reviewed,"In scope, name not clear in text"
+Global navigation,Principal's Message,https://www.gopalancolleges.com/gpuc/principal-message.html,Internal page,Opened and reviewed,"In scope, confirm current principal"
+Global navigation,Faculty,https://www.gopalancolleges.com/gpuc/faculty.html,Internal page,Opened and roster transcribed,Staff data must be reviewed
+Global navigation,Facilities,https://www.gopalancolleges.com/gpuc/facilities.html,Internal page,Opened and reviewed,Football caption has likely copy error
+Global navigation,Rules & Regulations,https://www.gopalancolleges.com/gpuc/rules-regulations.html,Internal page,Opened and reviewed,Policy/penalty review required
+Global navigation,Science Courses,https://www.gopalancolleges.com/gpuc/science-courses.html,Internal page,Opened and reviewed,Competitive-coaching wording hold
+Global navigation,Commerce Courses,https://www.gopalancolleges.com/gpuc/commerce-courses.html,Internal page,Opened and reviewed,Course availability verify
+Global navigation,Value Added Courses,https://www.gopalancolleges.com/gpuc/value-added-courses.html,Internal page,Opened and reviewed,Availability/cost details missing
+Global navigation,Admission,https://www.gopalancolleges.com/gpuc/admission.html,Internal page,Opened and reviewed,No live seats/fees/deadlines
+Global navigation,Gallery,https://www.gopalancolleges.com/gpuc/gallery.html,Internal page,Opened; image content limited in text view,No 360 tour verified
+Global navigation,Events,https://www.gopalancolleges.com/gpuc/events.html,Internal page,Opened; every event-title link opened,Not a future calendar
+Global navigation,Contact Us,https://www.gopalancolleges.com/gpuc/contact-us.html,Internal page,Opened; map iframe opened; form not submitted,Contact details need verification
+Home CTA,Explore,https://www.gopalancolleges.com/gpuc/contact.html,Internal target redirecting externally/internally,Followed; redirects to https://www.gopalancolleges.com/,Possible broken target
+Home CTA,E-Brochure,YouTube URL (destination not exposed as a reliable full URL),External/media,Click attempt failed in current access tool,Ask college for working canonical link
+Home CTA,Download Now,Unknown destination,Button/link text visible,Not exposed by accessible page reader,Manual browser/source inspection needed
+Footer CTA,Fee Payment,gcc.pupilpod.net,External payment portal,Open attempt inaccessible,Do not use until GPUC confirms portal
+Contact form,Full Name,contact-us.html form,Form input,Not submitted,Do not submit user data during crawl
+Contact form,Email Address,contact-us.html form,Form input,Not submitted,Do not submit user data during crawl
+Contact form,Phone Number,contact-us.html form,Form input,Not submitted,Do not submit user data during crawl
+Contact form,Message,contact-us.html form,Form input,Not submitted,Do not submit user data during crawl
+Contact form,Privacy policy / terms checkbox,Exact policy/terms URLs not exposed,Consent checkbox,Not toggled/submitted,Need exact policy URLs from site owner
+Contact form,Submit Now,contact-us.html form,Submit button,Not clicked/submitted,Would create external record
+Admission popup,Student's Name,Repeated site popup,Form input,Not submitted,Options on select controls not exposed
+Admission popup,Email Address,Repeated site popup,Form input,Not submitted,Options on select controls not exposed
+Admission popup,Phone Number,Repeated site popup,Form input,Not submitted,Options on select controls not exposed
+Admission popup,Select control(s),Repeated site popup,Dropdown,Options not exposed by page reader,Inspect in browser before implementing
+Admission popup,Submit,Repeated site popup,Submit button,Not clicked/submitted,Would create external lead
+Admission popup,Close (×),Repeated site popup,UI control,Not interacted with,Modal UI behaviour should be manually QA'd
+Contact page map,Google Maps iframe,https://www.google.com/maps/embed?pb=...,External iframe,Opened embed target,"Approx. coordinates 12.9860799, 77.714677"
+Event link,All 18 event-title links,See event_archive.csv,Internal event detail pages,Each title link opened,Most details contain little/no narrative
+Footer other institutions,"Yelahanka PU, GCC, Architecture, Engineering, Skill Academy, schools",Multiple external/sibling domains,Sibling institutions,Destination inventory visible; not crawled as GPUC content,Exclude from GPUC knowledge base unless separately requested
