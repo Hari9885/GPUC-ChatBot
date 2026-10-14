@@ -644,6 +644,12 @@ export default function Home() {
         {/* EXPANDED CHAT WIDGET WINDOW */}
         {isChatOpen && (
           <div
+            id="gpuc-chat-window"
+            className="chat-widget-window"
+            onWheel={(e) => {
+              // Contain wheel events within the chat window so background page never scrolls
+              e.stopPropagation();
+            }}
             style={{
               width: '420px',
               maxWidth: 'calc(100vw - 32px)',
@@ -657,11 +663,14 @@ export default function Home() {
               boxShadow: '0 16px 48px rgba(0, 0, 0, 0.18), 0 2px 10px rgba(0, 0, 0, 0.08)',
               animation: 'fadeIn 0.25s ease-out',
               overflow: 'hidden',
+              overscrollBehavior: 'contain',
+              position: 'relative',
             }}
           >
             {/* Widget Header */}
             <div
               style={{
+                flexShrink: 0,
                 padding: '14px 18px',
                 background: 'linear-gradient(135deg, #1E3A8A, #0F172A)',
                 borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
@@ -754,6 +763,7 @@ export default function Home() {
             {userLead && (
               <div
                 style={{
+                  flexShrink: 0,
                   padding: '8px 16px',
                   background: '#F0FDF4',
                   borderBottom: '1px solid #BBF7D0',
@@ -776,9 +786,14 @@ export default function Home() {
 
             {/* Messages Feed */}
             <div
+              id="gpuc-chat-messages"
+              className="chat-messages-container"
               style={{
-                flex: 1,
+                flex: '1 1 0%',
+                minHeight: 0,
                 overflowY: 'auto',
+                overscrollBehavior: 'contain',
+                WebkitOverflowScrolling: 'touch',
                 padding: '16px',
                 display: 'flex',
                 flexDirection: 'column',
@@ -1310,10 +1325,12 @@ export default function Home() {
             {/* Quick Horizontal Presets Bar */}
             <div
               style={{
+                flexShrink: 0,
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
                 overflowX: 'auto',
+                overscrollBehavior: 'contain',
                 padding: '8px 12px',
                 background: '#FFFFFF',
                 borderTop: '1px solid #E2E8F0',
@@ -1351,6 +1368,7 @@ export default function Home() {
                 handleSend();
               }}
               style={{
+                flexShrink: 0,
                 padding: '10px 12px',
                 background: '#FFFFFF',
                 borderTop: '1px solid #E2E8F0',

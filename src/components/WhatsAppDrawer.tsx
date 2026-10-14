@@ -47,6 +47,7 @@ export default function WhatsAppDrawer({ isOpen, onClose }: WhatsAppDrawerProps)
 
   return (
     <div
+      onWheel={(e) => e.stopPropagation()}
       style={{
         position: 'fixed',
         top: 0,
@@ -62,6 +63,7 @@ export default function WhatsAppDrawer({ isOpen, onClose }: WhatsAppDrawerProps)
         borderLeft: '1px solid rgba(255,255,255,0.1)',
         fontFamily: 'var(--font-body)',
         animation: 'slideIn 0.25s ease-out',
+        overscrollBehavior: 'contain',
       }}
     >
       <style>{`
@@ -162,8 +164,11 @@ export default function WhatsAppDrawer({ isOpen, onClose }: WhatsAppDrawerProps)
       {/* Messages Feed */}
       <div
         style={{
-          flex: 1,
+          flex: '1 1 0%',
+          minHeight: 0,
           overflowY: 'auto',
+          overscrollBehavior: 'contain',
+          WebkitOverflowScrolling: 'touch',
           padding: '20px 16px',
           display: 'flex',
           flexDirection: 'column',

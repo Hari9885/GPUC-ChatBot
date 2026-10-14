@@ -307,3 +307,30 @@ h1, h2, h3, h4, h5, h6 {
 .prose-chat-user a {
   color: #fde68a;
 }
+
+/* Chat Widget Scroll Containment & Styling */
+.chat-widget-window {
+  overscroll-behavior: contain !important;
+}
+
+.chat-messages-container {
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+  -webkit-overflow-scrolling: touch !important;
+  touch-action: pan-y !important;
+}
+
+.chat-messages-container::-webkit-scrollbar {
+  width: 6px;
+}
+.chat-messages-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+.chat-messages-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+.chat-messages-container::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
