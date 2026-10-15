@@ -38,7 +38,7 @@ if ( ! function_exists( 'gpuc_north_render_ai_chatbot_widget' ) ) {
         <script>
             window.GPUC_CHATBOT_URL = window.GPUC_CHATBOT_URL || 'http://localhost:3000';
         </script>
-        <script src="http://localhost:3000/gpuc-chatbot-embed.js?v=6" async></script>
+        <script src="http://localhost:3000/gpuc-chatbot-embed.js?v=7" async></script>
         <?php
     }
 }

@@ -286,40 +286,23 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
       };
       window.addEventListener('message', handleMsg);
 
-      // Auto bounce after 1s, bounce for 3s, then auto-open (total 4s active stay, once per session)
-      let bounceTimer: NodeJS.Timeout | null = null;
+      // Auto 3 bounces on load, then auto-open the chat bot
+      let startTimer: NodeJS.Timeout | null = null;
       let openTimer: NodeJS.Timeout | null = null;
-      try {
-        const alreadyPopped = sessionStorage.getItem('gpuc_ai_popped');
-        if (!alreadyPopped) {
-          // Step 1: Start bouncing after 1 second (1000ms)
-          bounceTimer = setTimeout(() => {
-            setIsBouncing(true);
 
-            // Step 2: Bounce for 3 seconds (1000ms to 4000ms), then stop bouncing and auto-open
-            openTimer = setTimeout(() => {
-              setIsBouncing(false);
-              try {
-                if (sessionStorage.getItem('gpuc_ai_popped') === 'true') return;
-                sessionStorage.setItem('gpuc_ai_popped', 'true');
-              } catch (e) {}
-              setIsChatOpen(true);
-            }, 3000);
-          }, 1000);
-        }
-      } catch (e) {
-        bounceTimer = setTimeout(() => {
-          setIsBouncing(true);
-          openTimer = setTimeout(() => {
-            setIsBouncing(false);
-            setIsChatOpen(true);
-          }, 3000);
-        }, 1000);
-      }
+      startTimer = setTimeout(() => {
+        setIsBouncing(true);
+
+        // 3 bounces * 650ms = 1950ms, then stop bouncing and open chat
+        openTimer = setTimeout(() => {
+          setIsBouncing(false);
+          setIsChatOpen(true);
+        }, 1950);
+      }, 600);
 
       return () => {
         window.removeEventListener('message', handleMsg);
-        if (bounceTimer) clearTimeout(bounceTimer);
+        if (startTimer) clearTimeout(startTimer);
         if (openTimer) clearTimeout(openTimer);
       };
     }
@@ -1099,6 +1082,10 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                 try {
                   sessionStorage.setItem('gpuc_ai_popped', 'true');
                 } catch (e) {}
+                setIsBouncing(false);
+                setIsChatOpen(true);
+              }}
+              onAnimationEnd={() => {
                 setIsBouncing(false);
                 setIsChatOpen(true);
               }}

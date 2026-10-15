@@ -26,7 +26,7 @@ export default function GlobalChatLoader() {
 
     const script = document.createElement('script');
     script.id = 'gpuc-global-chatbot-script';
-    script.src = `${window.location.origin}/gpuc-chatbot-embed.js?v=6`;
+    script.src = `${window.location.origin}/gpuc-chatbot-embed.js?v=7`;
     script.async = true;
     document.body.appendChild(script);
 

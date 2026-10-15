@@ -180,26 +180,29 @@
       100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
     }
 
-    @keyframes gpuc-launcher-bounce {
-      0%, 100% {
-        transform: translateY(0) scale(1);
+    @keyframes gpuc-3-bounces {
+      0% {
+        transform: translateY(0) scale(1, 1);
       }
-      25% {
-        transform: translateY(-16px) scale(1.08);
+      15% {
+        transform: translateY(2px) scale(1.08, 0.92);
       }
       45% {
-        transform: translateY(0) scale(0.96);
+        transform: translateY(-24px) scale(0.94, 1.08);
       }
-      65% {
-        transform: translateY(-8px) scale(1.03);
+      75% {
+        transform: translateY(0) scale(1.10, 0.90);
       }
-      82% {
-        transform: translateY(0) scale(0.98);
+      88% {
+        transform: translateY(-4px) scale(0.98, 1.02);
+      }
+      100% {
+        transform: translateY(0) scale(1, 1);
       }
     }
 
     #gpuc-widget-launcher.gpuc-bouncing {
-      animation: gpuc-launcher-bounce 1s cubic-bezier(0.28, 0.84, 0.42, 1) infinite !important;
+      animation: gpuc-3-bounces 0.65s cubic-bezier(0.28, 0.84, 0.42, 1) 3 !important;
     }
 
     @media (max-width: 640px) {
@@ -325,38 +328,36 @@
     toggle: toggleChat,
   };
 
-  // Auto bounce after 1st sec, bounce for 3 sec, then auto-open (total 4s active stay, once per session)
+  // Exactly 3 bounces on page load, then auto-open the chat bot
   function triggerAutoPopup() {
-    try {
-      if (sessionStorage.getItem('gpuc_ai_popped') === 'true') {
-        return; // Never repeat if already shown or dismissed in this session
-      }
-    } catch (e) {}
+    if (isOpen) return;
 
-    // Step 1: Start bouncing after the 1st second (1000ms)
+    // Gentle 600ms pause on page load so user sees launcher at rest before bouncing
     setTimeout(() => {
       if (isOpen) return;
-      try {
-        if (sessionStorage.getItem('gpuc_ai_popped') === 'true') return;
-      } catch (e) {}
 
       launcherBtn.classList.add('gpuc-bouncing');
       tooltipEl.classList.add('visible');
 
-      // Step 2: Bounce for 3 seconds (from 1s to 4s total), then stop bouncing and auto-open
-      setTimeout(() => {
+      let autoOpened = false;
+      function onBouncesFinished() {
+        if (autoOpened) return;
+        autoOpened = true;
+        launcherBtn.removeEventListener('animationend', onBouncesFinished);
         launcherBtn.classList.remove('gpuc-bouncing');
         tooltipEl.classList.remove('visible');
 
         if (!isOpen) {
-          try {
-            if (sessionStorage.getItem('gpuc_ai_popped') === 'true') return;
-            sessionStorage.setItem('gpuc_ai_popped', 'true');
-          } catch (e) {}
           openChat();
         }
-      }, 3000); // 3 seconds of bouncing
-    }, 1000); // starts after 1st second
+      }
+
+      // Listen for when all 3 bounces finish
+      launcherBtn.addEventListener('animationend', onBouncesFinished);
+
+      // Reliable fallback: 3 bounces * 650ms + 100ms buffer = 2050ms
+      setTimeout(onBouncesFinished, 2050);
+    }, 600);
   }
 
   if (document.readyState === 'complete') {
