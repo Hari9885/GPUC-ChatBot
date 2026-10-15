@@ -150,24 +150,46 @@ function getTopicFromQuery(query: string): string {
 
 const FAQ_PRESETS = [
   {
+    icon: '🎓',
+    title: 'Admissions 2026–27',
+    tag: 'Process & Eligibility',
     label: '🎓 Admission for 2026–27',
     query: 'What is the admission process for academic year 2026-2027?',
   },
   {
+    icon: '🔬',
+    title: 'Science Combinations',
+    tag: 'PCMB / PCMC + NEET/JEE',
     label: '🔬 Science (PCMB / PCMC)',
     query: 'What Science combinations are offered at Gopalan PU College?',
   },
   {
+    icon: '📊',
+    title: 'Commerce Streams',
+    tag: 'CEBA, SEBA & MEBA',
     label: '📊 Commerce Streams',
     query: 'What Commerce combinations are offered at Gopalan PU College?',
   },
   {
+    icon: '📅',
+    title: 'Book Campus Visit',
+    tag: 'Offline Tour & Meeting',
     label: '📅 Book a Campus Visit',
     query: 'How can I book a campus visit or consultation?',
   },
   {
+    icon: '📄',
+    title: 'Required Documents',
+    tag: 'Certificates Checklist',
     label: '📄 Required Documents',
     query: 'Which documents are required for admission?',
+  },
+  {
+    icon: '💰',
+    title: 'Fee Structure & Desk',
+    tag: 'PU Board Norms & Desk',
+    label: '💰 Fee Structure & Desk',
+    query: 'What is the tuition fee structure for Gopalan PU College?',
   },
 ];
 
@@ -1147,8 +1169,8 @@ export default function Home() {
                       display: 'flex',
                       flexDirection: 'column',
                       alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
-                      maxWidth: msg.step ? '100%' : '90%',
-                      width: msg.step ? '100%' : 'auto',
+                      maxWidth: (msg.step || showPresetsUnderMsg) ? '100%' : '90%',
+                      width: (msg.step || showPresetsUnderMsg) ? '100%' : 'auto',
                       boxSizing: 'border-box',
                     }}
                   >
@@ -1172,52 +1194,141 @@ export default function Home() {
                           msg.role === 'user'
                             ? '16px 16px 4px 16px'
                             : '16px 16px 16px 4px',
-                        padding: '10px 14px',
+                        padding: '12px 14px',
                         color: msg.role === 'user' ? '#FFFFFF' : '#0F172A',
                         fontSize: '0.83rem',
                         lineHeight: 1.55,
                         border: msg.role === 'user' ? 'none' : '1px solid #E2E8F0',
-                        boxShadow: msg.role === 'user' ? '0 2px 8px rgba(30, 58, 138, 0.25)' : '0 2px 8px rgba(0, 0, 0, 0.05)',
+                        boxShadow: msg.role === 'user' ? '0 2px 8px rgba(30, 58, 138, 0.25)' : '0 2px 10px rgba(0, 0, 0, 0.05)',
                         whiteSpace: 'pre-line',
                         wordBreak: 'break-word',
-                        width: msg.step ? '100%' : 'auto',
+                        width: (msg.step || showPresetsUnderMsg) ? '100%' : 'auto',
                         boxSizing: 'border-box',
                       }}
                       className={msg.role === 'user' ? 'prose-chat prose-chat-user' : 'prose-chat prose-chat-bot'}
                     >
                       {formatPhoneNumbers(stripStarsAndAsterisks(msg.content))}
 
-                      {/* Clickable Preset Chips inside bubble */}
+                      {/* Clickable Preset Quick Actions Grid (Uses full width in 2-column layout) */}
                       {showPresetsUnderMsg && (
                         <div
                           style={{
-                            display: 'flex',
-                            flexWrap: 'wrap',
-                            gap: '6px',
                             marginTop: '12px',
-                            paddingTop: '10px',
+                            paddingTop: '12px',
                             borderTop: '1px solid #E2E8F0',
+                            width: '100%',
+                            boxSizing: 'border-box',
                           }}
                         >
-                          {FAQ_PRESETS.map((preset, pIdx) => (
-                            <button
-                              key={pIdx}
-                              type="button"
-                              onClick={() => handleSend(preset.query)}
-                              disabled={loading || isTyping}
-                              className="chip-btn"
-                              style={{
-                                background: '#FEF3C7',
-                                borderColor: '#F59E0B',
-                                color: '#92400E',
-                                fontWeight: 600,
-                                fontSize: '0.78rem',
-                                padding: '6px 11px',
-                              }}
-                            >
-                              {preset.label}
-                            </button>
-                          ))}
+                          <div
+                            style={{
+                              fontSize: '0.72rem',
+                              fontWeight: 700,
+                              color: '#92400E',
+                              marginBottom: '8px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                            }}
+                          >
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                              <Sparkles size={13} color="#D97706" /> Popular Inquiries &amp; Services
+                            </span>
+                            <span style={{ fontSize: '0.66rem', color: '#64748B', fontWeight: 500 }}>
+                              Tap to explore
+                            </span>
+                          </div>
+
+                          <div
+                            style={{
+                              display: 'grid',
+                              gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+                              gap: '8px',
+                              width: '100%',
+                              boxSizing: 'border-box',
+                            }}
+                          >
+                            {FAQ_PRESETS.map((preset, pIdx) => (
+                              <button
+                                key={pIdx}
+                                type="button"
+                                onClick={() => handleSend(preset.query)}
+                                disabled={loading || isTyping}
+                                style={{
+                                  width: '100%',
+                                  boxSizing: 'border-box',
+                                  padding: '8px 10px',
+                                  borderRadius: '10px',
+                                  background: 'linear-gradient(135deg, #FFFFFF, #FFFBEB)',
+                                  border: '1.5px solid #FDE68A',
+                                  color: '#78350F',
+                                  textAlign: 'left',
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '8px',
+                                  transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
+                                  boxShadow: '0 1px 3px rgba(245, 158, 11, 0.08)',
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.borderColor = '#F59E0B';
+                                  e.currentTarget.style.background = '#FEF3C7';
+                                  e.currentTarget.style.transform = 'translateY(-1.5px)';
+                                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.18)';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.borderColor = '#FDE68A';
+                                  e.currentTarget.style.background = 'linear-gradient(135deg, #FFFFFF, #FFFBEB)';
+                                  e.currentTarget.style.transform = 'translateY(0)';
+                                  e.currentTarget.style.boxShadow = '0 1px 3px rgba(245, 158, 11, 0.08)';
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    width: '28px',
+                                    height: '28px',
+                                    borderRadius: '7px',
+                                    background: '#FEF3C7',
+                                    border: '1px solid #FCD34D',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '0.95rem',
+                                    flexShrink: 0,
+                                  }}
+                                >
+                                  {preset.icon}
+                                </div>
+                                <div style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
+                                  <div
+                                    style={{
+                                      fontSize: '0.76rem',
+                                      fontWeight: 700,
+                                      color: '#92400E',
+                                      lineHeight: 1.25,
+                                      whiteSpace: 'nowrap',
+                                      overflow: 'hidden',
+                                      textOverflow: 'ellipsis',
+                                    }}
+                                  >
+                                    {preset.title}
+                                  </div>
+                                  <div
+                                    style={{
+                                      fontSize: '0.66rem',
+                                      color: '#A16207',
+                                      marginTop: '2px',
+                                      whiteSpace: 'nowrap',
+                                      overflow: 'hidden',
+                                      textOverflow: 'ellipsis',
+                                    }}
+                                  >
+                                    {preset.tag}
+                                  </div>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
                         </div>
                       )}
 
@@ -2154,16 +2265,20 @@ export default function Home() {
                   style={{
                     flexShrink: 0,
                     fontSize: '0.74rem',
-                    padding: '5px 11px',
+                    padding: '5px 10px',
                     whiteSpace: 'nowrap',
-                    background: '#F8FAFC',
-                    border: '1px solid #CBD5E1',
-                    color: '#1E3A8A',
+                    background: '#FFFDF5',
+                    border: '1px solid #FDE68A',
+                    color: '#92400E',
                     fontWeight: 600,
                     borderRadius: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
                   }}
                 >
-                  {preset.label}
+                  <span>{preset.icon}</span>
+                  <span>{preset.title}</span>
                 </button>
               ))}
             </div>
