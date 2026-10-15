@@ -248,20 +248,49 @@ export default function Home() {
     }
   }, [messages, loading, isTyping, isChatOpen]);
 
+  const [isEmbedded, setIsEmbedded] = useState(false);
+
+  // Check if running in embedded iframe mode
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const isEmb = params.get('embedded') === 'true' || window.self !== window.top;
+      if (isEmb) {
+        setIsEmbedded(true);
+        setIsChatOpen(true);
+      }
+
+      const handleMsg = (e: MessageEvent) => {
+        if (e.data && typeof e.data === 'object' && e.data.type === 'GPUC_WIDGET_SET_OPEN') {
+          setIsChatOpen(!!e.data.isOpen);
+        }
+      };
+      window.addEventListener('message', handleMsg);
+      return () => window.removeEventListener('message', handleMsg);
+    }
+  }, []);
+
   // Handle Escape key to restore maximized view or close chat
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isChatOpen) {
         if (isMaximized) {
           setIsMaximized(false);
+          if (isEmbedded) {
+            window.parent?.postMessage({ type: 'GPUC_CHAT_MAXIMIZE' }, '*');
+          }
         } else {
-          setIsChatOpen(false);
+          if (isEmbedded) {
+            window.parent?.postMessage({ type: 'GPUC_CHAT_CLOSE' }, '*');
+          } else {
+            setIsChatOpen(false);
+          }
         }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isChatOpen, isMaximized]);
+  }, [isChatOpen, isMaximized, isEmbedded]);
 
   // Step 1: Submit Student Name (with 1.5s bouncing dots)
   const handleStudentNameSubmit = (nameVal?: string) => {
@@ -906,29 +935,73 @@ export default function Home() {
     }
   };
 
+  const handleWidgetClose = () => {
+    if (isEmbedded) {
+      window.parent?.postMessage({ type: 'GPUC_CHAT_CLOSE' }, '*');
+    } else {
+      setIsChatOpen(false);
+    }
+  };
+
+  const handleWidgetMinimize = () => {
+    if (isEmbedded) {
+      window.parent?.postMessage({ type: 'GPUC_CHAT_MINIMIZE' }, '*');
+    } else {
+      setIsChatOpen(false);
+    }
+  };
+
+  const handleWidgetMaximize = () => {
+    if (isEmbedded) {
+      window.parent?.postMessage({ type: 'GPUC_CHAT_MAXIMIZE' }, '*');
+    }
+    setIsMaximized((prev) => !prev);
+  };
+
   return (
-    <div style={{ position: 'relative', minHeight: '100vh', overflowX: 'hidden' }}>
-      {/* Background: Actual Gopalan PU College Website */}
-      <GpucWebsite onOpenChatWithQuery={(query) => handleSend(query)} />
+    <div
+      style={
+        isEmbedded
+          ? { position: 'relative', width: '100vw', height: '100vh', overflow: 'hidden', background: '#FFFFFF' }
+          : { position: 'relative', minHeight: '100vh', overflowX: 'hidden' }
+      }
+    >
+      {/* Background: Actual Gopalan PU College Website (hidden when embedded) */}
+      {!isEmbedded && <GpucWebsite onOpenChatWithQuery={(query) => handleSend(query)} />}
 
       {/* FLOATING CORNER CHATBOT WIDGET */}
       <div
         id="gpuc-ai-assistant-container"
-        style={{
-          position: 'fixed',
-          bottom: 'var(--assistant-bottom, 20px)',
-          right: 'var(--assistant-right, 20px)',
-          zIndex: 1000,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-end',
-          maxWidth: '100vw',
-          maxHeight: '100vh',
-          pointerEvents: 'none',
-        }}
+        style={
+          isEmbedded
+            ? {
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                pointerEvents: 'auto',
+              }
+            : {
+                position: 'fixed',
+                bottom: 'var(--assistant-bottom, 20px)',
+                right: 'var(--assistant-right, 20px)',
+                zIndex: 1000,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-end',
+                maxWidth: '100vw',
+                maxHeight: '100vh',
+                pointerEvents: 'none',
+              }
+        }
       >
-        {/* Floating Chatbot Circular Button (when chat is closed - responsive sizing) */}
-        {!isChatOpen && (
+        {/* Floating Chatbot Circular Button (when chat is closed - responsive sizing, omitted in embedded mode) */}
+        {!isChatOpen && !isEmbedded && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', pointerEvents: 'auto' }}>
             {/* Optional lightweight tooltip shown ONLY when actively hovering */}
             {isHovered && (
@@ -1019,23 +1092,29 @@ export default function Home() {
               e.stopPropagation();
             }}
             style={{
-              width: isMaximized
+              width: isEmbedded
+                ? '100%'
+                : isMaximized
                 ? 'min(1040px, calc(100vw - 36px))'
                 : 'var(--assistant-width)',
-              maxWidth: 'calc(100vw - 20px)',
-              height: isMaximized
+              maxWidth: isEmbedded ? '100%' : 'calc(100vw - 20px)',
+              height: isEmbedded
+                ? '100%'
+                : isMaximized
                 ? 'calc(100vh - 40px)'
                 : 'var(--assistant-height)',
-              maxHeight: 'calc(100dvh - 32px)',
+              maxHeight: isEmbedded ? '100%' : 'calc(100dvh - 32px)',
               display: 'flex',
               flexDirection: 'column',
               background: '#FFFFFF',
-              border: '1px solid #E2E8F0',
-              borderRadius: isMaximized ? '20px' : 'var(--assistant-border-radius, 20px)',
-              boxShadow: isMaximized
+              border: isEmbedded ? 'none' : '1px solid #E2E8F0',
+              borderRadius: isEmbedded ? '0px' : isMaximized ? '20px' : 'var(--assistant-border-radius, 20px)',
+              boxShadow: isEmbedded
+                ? 'none'
+                : isMaximized
                 ? '0 24px 64px rgba(0, 0, 0, 0.35), 0 4px 16px rgba(0, 0, 0, 0.15)'
                 : '0 16px 48px rgba(0, 0, 0, 0.18), 0 2px 10px rgba(0, 0, 0, 0.08)',
-              animation: 'fadeIn 0.25s ease-out',
+              animation: isEmbedded ? 'none' : 'fadeIn 0.25s ease-out',
               overflow: 'hidden',
               overscrollBehavior: 'contain',
               position: 'relative',
@@ -1141,7 +1220,7 @@ export default function Home() {
 
                 {/* Maximize / Restore Button */}
                 <button
-                  onClick={() => setIsMaximized((prev) => !prev)}
+                  onClick={handleWidgetMaximize}
                   title={isMaximized ? 'Restore Standard Size' : 'Maximize Assistant'}
                   aria-label={isMaximized ? 'Restore Standard Size' : 'Maximize Assistant'}
                   style={{
@@ -1164,7 +1243,7 @@ export default function Home() {
 
                 {/* Minimize to circular launcher */}
                 <button
-                  onClick={() => setIsChatOpen(false)}
+                  onClick={handleWidgetMinimize}
                   title="Minimize Chat"
                   style={{
                     background: 'transparent',
@@ -1186,7 +1265,7 @@ export default function Home() {
 
                 {/* Close Chat */}
                 <button
-                  onClick={() => setIsChatOpen(false)}
+                  onClick={handleWidgetClose}
                   title="Close Chat"
                   style={{
                     background: 'transparent',

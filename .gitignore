@@ -28,3 +28,17 @@ yarn-debug.log*
 yarn-error.log*
 .idea/
 .vscode/
+
+# Large WordPress assets & core folders in GPUC-NORTH
+GPUC-NORTH/wp-content/uploads/
+GPUC-NORTH/wp-content/plugins/
+GPUC-NORTH/wp-content/cache/
+GPUC-NORTH/wp-content/upgrade/
+GPUC-NORTH/wp-content/upgrade-temp-backup/
+GPUC-NORTH/wp-content/litespeed/
+GPUC-NORTH/wp-content/mu-plugins/
+GPUC-NORTH/wp-content/themes/twenty*
+GPUC-NORTH/wp-includes/
+GPUC-NORTH/wp-admin/
+*.mp4
+

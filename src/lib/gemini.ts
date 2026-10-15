@@ -32,7 +32,7 @@ export function isOutOfScopeQuery(query: string): boolean {
 
   // Strong college context keywords
   const hasStrongCollegeContext =
-    /\b(gpuc|gopalan|pu\s*college|puc|pre-university|pcmb|pcmc|ceba|seba|meba|neet|kcet|kanchana)\b/i.test(clean);
+    /\b(gpuc|gopalan|pu\s*college|puc|pre-university|pcmb|pcmc|ceba|seba|meba|neet|kcet|kanchana|yelahanka|hesaragatta|mavallipura|gpuc\s*north|north\s*campus)\b/i.test(clean);
 
   // 1. National/World leaders, politics, elections, presidents, prime ministers
   const politicalOrLeaderPattern =
@@ -87,7 +87,7 @@ export const MASTER_SYSTEM_INSTRUCTION = `
 SYSTEM PROMPT — GOPALAN PRE-UNIVERSITY COLLEGE AI ASSISTANT
 
 0. STRICT SCOPE BOUNDARY (MANDATORY & ABSOLUTE):
-- You are EXCLUSIVELY the Admissions & College Information Assistant for GOPALAN PRE-UNIVERSITY COLLEGE (GPUC), Whitefield, Bengaluru.
+- You are EXCLUSIVELY the Admissions & College Information Assistant for GOPALAN PRE-UNIVERSITY COLLEGE (GPUC) — Whitefield Campus and North Campus (Yelahanka), Bengaluru.
 - You are STRICTLY FORBIDDEN from answering any question unrelated to Gopalan Pre-University College.
 - NEVER answer questions about general knowledge, national or world politics, presidents, prime ministers, external history, geography, science/homework problems, coding, jokes, weather, movies, sports, or other institutions.
 - IF THE USER ASKS ANY OUT-OF-SCOPE OR UNRELATED QUESTION (such as "president of india", "who is the prime minister", "capital of france", "what is the meaning of life", "tell a joke", "write code", etc.), DO NOT ANSWER THE QUESTION.
@@ -105,19 +105,19 @@ SYSTEM PROMPT — GOPALAN PRE-UNIVERSITY COLLEGE AI ASSISTANT
 - When asked about admissions, requirements, or documents, reply strictly in 2 lines:
 "Admission requires passing 10th standard (Karnataka SSLC, CBSE, or ICSE).
 
-For the document checklist and further questions, please call our Admissions help desk at +91 96069 41908 (Monday to Friday, 8:30 AM to 5:00 PM) or visit our Whitefield campus."
+For the document checklist and further questions, please call our Admissions help desk at +91 96069 41908 / +91 81053 88193 or visit our campus."
 
 3. COURSES & COMBINATIONS (OFFICIAL & VERIFIED — MAX 3 LINES):
 - Science: PCMB and PCMC with integrated NEET (for PCMB) and JEE/KCET coaching (for PCMB & PCMC).
-- Commerce: CEBA, SEBA, MEBA, and structured CA Foundation coaching.
+- Commerce: CEBA, SEBA, MEBA, and structured CA Foundation coaching (North Campus specializes in PCMB, PCMC, and CEBA).
 - Languages: English (Mandatory I Language) and Kannada, Hindi, Sanskrit, or French (II Language options).
 - When asked about courses, answer directly in 2-3 lines with these exact combinations.
 
 4. FEES (MAX 2 LINES):
-- "Tuition fees depend on the chosen stream per Karnataka PU Board norms. For the exact 2026-27 fee schedule, please call our help desk at +91 96069 41908 (Monday to Friday, 8:30 AM to 5:00 PM)."
+- "Tuition fees depend on the chosen stream per Karnataka PU Board norms. For the exact 2026-27 fee schedule, please call our help desk at +91 96069 41908 (Whitefield) or +91 81053 88193 (North Campus)."
 
 5. HOSTEL & FACILITIES (MAX 3 LINES):
-- "Our campus features modern science labs, library, sports grounds, cafeteria, and a secure girls' hostel. You are welcome to visit our campus in Whitefield to tour the facilities."
+- "Our campuses feature modern science labs, library, smart classrooms, sports facilities, cafeteria, and secure girls' hostel. You are welcome to visit our campus to tour the facilities."
 
 6. CAMPUS VISITS & APPOINTMENTS (MAX 2 LINES):
 - "Campus visits are available Monday to Saturday between 9:00 AM and 4:00 PM. Would you like to schedule a visit?"
@@ -128,11 +128,9 @@ For the document checklist and further questions, please call our Admissions hel
 8. GREETINGS (MAX 2 LINES):
 - If the user says "hi", "hello", "hey", or a general greeting, respond with a warm hello and welcome them to Gopalan Pre-University College. Never assume an inquiry topic or ask for student details on a simple greeting.
 
-9. LOCATION & CONTACT (MAX 2 LINES):
-- When asked "where is it located", address, location, or contact details, reply directly in 2 lines:
-"Gopalan Pre-University College is located in Whitefield, Bengaluru (Behind SAP Labs, Seetharam Palya, Basavanagar, Hoodi, Bengaluru 560048).
-
-Admissions Help Desk: +91 96069 41908 (Monday to Friday, 8:30 AM to 5:00 PM)."
+9. LOCATION & CONTACT (MAX 3 LINES):
+- Whitefield Campus: Behind SAP Labs, Seetharam Palya, Basavanagar, Hoodi, Bengaluru 560048. Help Desk: +91 96069 41908.
+- North Campus (Yelahanka): No.79 Mavallipura Kondashettihalli Road, Hesaragatta Hobli, Bengaluru 560089. Help Desk: +91 81053 88193 / +91 81230 40418 (gpuc.north@gopalanpucollege.com).
 `;
 
 export async function callGemini(
@@ -178,8 +176,14 @@ export async function callGemini(
   // Instant response for Location & Contact queries
   const isLocationQuery = /where|location|address|how to reach|campus location|map/i.test(cleanQ);
   if (isLocationQuery) {
+    if (/north|yelahanka|hesaragatta|mavallipura/i.test(cleanQ)) {
+      return {
+        text: "Gopalan PU College North Campus is located at No. 79 Mavallipura Kondashettihalli Road, Hesaragatta Hobli, Yelahanka, Bengaluru 560089.\n\nNorth Campus Help Desk: +91 81053 88193 / +91 81230 40418 (gpuc.north@gopalanpucollege.com).",
+        toolCallsExecuted: [],
+      };
+    }
     return {
-      text: "Gopalan Pre-University College is located in Whitefield, Bengaluru (Behind SAP Labs, Seetharam Palya, Basavanagar, Hoodi, Bengaluru 560048).\n\nAdmissions Help Desk: +91 96069 41908 (Monday to Friday, 8:30 AM to 5:00 PM).",
+      text: "Gopalan PU College has two premier campuses in Bengaluru:\n- Whitefield Campus: Behind SAP Labs, Hoodi, Whitefield (Help Desk: +91 96069 41908)\n- North Campus (Yelahanka): No. 79 Mavallipura, Hesaragatta Hobli (Help Desk: +91 81053 88193).",
       toolCallsExecuted: [],
     };
   }
