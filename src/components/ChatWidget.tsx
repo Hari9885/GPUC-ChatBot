@@ -125,64 +125,72 @@ function getTopicOverview(text: string): { overview: string; followUp: string } 
 
   if (q.includes('science') || q.includes('pcmb') || q.includes('pcmc')) {
     return {
-      overview: `At Gopalan Pre-University College, North Campus (Yelahanka), we offer accredited Science stream combinations:
+      overview: `Science Streams Available:
 • PCMB: Physics, Chemistry, Mathematics, Biology
 • PCMC: Physics, Chemistry, Mathematics, Computer Science
-Both programs include integrated coaching for NEET, JEE (Main & Advanced), and KCET with experienced senior faculty and state-of-the-art laboratory facilities. Compulsory English is paired with Kannada or Hindi.`,
-      followUp: `Would you like full admission details, syllabus overview, or seat reservation? You can enter the student's name below (or skip to keep asking questions):`,
+• Integrated Coaching: NEET, JEE & KCET
+• Languages: English + Kannada / Hindi`,
+      followUp: `To apply or receive syllabus details, enter student name (or skip):`,
     };
   }
 
   if (q.includes('commerce') || q.includes('ceba')) {
     return {
-      overview: `At Gopalan PU College North Campus, we offer the comprehensive Commerce combination:
+      overview: `Commerce Stream Available:
 • CEBA: Computer Science, Economics, Business Studies, Accountancy
-Designed to build strong foundations in commerce principles, financial accounting, and modern computer applications for future CA, CS, B.Com, and corporate career pathways. Languages offered are English with Kannada or Hindi.`,
-      followUp: `Would you like curriculum guidance, subject breakdown, or seat availability? You can enter the student's name below (or skip to keep asking questions):`,
+• Focus: CA Foundation, CS & B.Com career pathways
+• Languages: English + Kannada / Hindi`,
+      followUp: `To apply or receive course details, enter student name (or skip):`,
     };
   }
 
   if (q.includes('fee') || q.includes('cost') || q.includes('scholarship') || q.includes('tuition')) {
     return {
-      overview: `For official fee structures, installment options, and scholarship details, please contact our North Campus Help Desk directly:
-• Admissions & Accounts Helpline: +91 81053 88193 / +91 81230 40418
+      overview: `Official Fee & Help Desk:
+• Helpline: +91 81053 88193 / +91 81230 40418
 • Email: gpuc.north@gopalanpucollege.com
-• Visiting & Office Hours: Monday to Saturday, 8:30 AM to 5:00 PM`,
-      followUp: `Please let us know which stream or facility you would like to explore, or if you would like to schedule a campus visit:`,
+• Timings: Mon–Sat, 8:30 AM to 5:00 PM`,
+      followUp: `Please let us know which stream or facility you would like to explore:`,
     };
   }
 
   if (q.includes('document') || q.includes('certif') || q.includes('marks card') || q.includes('tc')) {
     return {
-      overview: `The essential documents required for 2026–2027 admissions at North Campus are:
-1. Original 10th / SSLC Marks Card + 3 attested copies
-2. Transfer Certificate (TC) & Conduct Certificate from previous school
-3. Migration Certificate (for CBSE, ICSE, or other state boards)
-4. Student & Parent Aadhaar Card copies + 5 recent passport-size photographs
-5. Caste / Income Certificate (if applying under quota).`,
-      followUp: `Would you like help with document verification or provisional seat booking? You can share the student's name below (or skip to continue):`,
+      overview: `Required Admission Documents:
+• 10th / SSLC Marks Card (original + 3 copies)
+• Transfer Certificate (TC) & Conduct Certificate
+• Migration Certificate (for CBSE / ICSE boards)
+• Student & Parent Aadhaar + 5 Photos`,
+      followUp: `To start document verification, enter student name (or skip):`,
     };
   }
 
   if (q.includes('visit') || q.includes('tour') || q.includes('consult') || q.includes('appointment')) {
     return {
-      overview: `We warmly welcome prospective students and parents to visit our North Campus at No. 79, Mavallipura Kondashettihalli Road, Hesaragatta Hobli, Yelahanka, Bengaluru.
-Visiting hours: Monday to Saturday, 8:30 AM to 5:00 PM. You can tour our laboratories, digital classrooms, sports facilities, and discuss options with our counselors.`,
-      followUp: `To issue a visitor gate pass or schedule a 1-on-1 counseling appointment, please enter the student's name below (or skip to continue):`,
+      overview: `Campus Visit & Counseling:
+• Location: North Campus, Yelahanka (No. 79, Mavallipura)
+• Timings: Monday – Saturday, 8:30 AM to 5:00 PM
+• Campus: Science/CS Labs, Library, Sports grounds & Hostel`,
+      followUp: `To book a visit or counseling slot, enter student name (or skip):`,
     };
   }
 
   if (q.includes('admission') || q.includes('apply') || q.includes('2026') || q.includes('process') || q.includes('eligib')) {
     return {
-      overview: `Admissions for the 2026–2027 academic year are officially open for 1st PU (11th) and 2nd PU (12th).
-Eligibility requires passing Karnataka SSLC, CBSE 10th, ICSE 10th, or equivalent recognised board. Admissions are merit-based with direct counselor support at our Yelahanka campus.`,
-      followUp: `To begin your provisional registration or check seat availability, please enter the student's name below (or skip to keep asking questions):`,
+      overview: `Admissions 2026–27 (1st & 2nd PU):
+• Streams: Science (PCMB, PCMC) & Commerce (CEBA)
+• Eligibility: 10th / SSLC Pass (State Board, CBSE, ICSE)
+• Mode: Direct Merit & Counseling`,
+      followUp: `To register your admission inquiry, enter student name (or skip):`,
     };
   }
 
   return {
-    overview: `Gopalan Pre-University College, North Campus (Yelahanka) provides quality Pre-University education in Science (PCMB, PCMC) and Commerce (CEBA) with integrated coaching, smart classrooms, and transport.`,
-    followUp: `To help us guide you effectively, please enter the student's name below (or skip to continue):`,
+    overview: `Available Courses (North Campus):
+• Science: PCMB & PCMC (with NEET/JEE/KCET)
+• Commerce: CEBA (Computer Science, Economics, Business, Accountancy)
+• Timings: Mon–Sat, 8:30 AM–5:00 PM`,
+    followUp: `To register an inquiry, enter student name (or skip):`,
   };
 }
 

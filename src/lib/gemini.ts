@@ -202,7 +202,25 @@ export async function callGemini(
   const isCommerceQuery = /commerce (combination|course|stream)|what commerce|commerce subject/i.test(cleanQ);
   if (isCommerceQuery) {
     return {
-      text: "Gopalan PU College North Campus offers the CEBA stream (Computer Science, Economics, Business Studies, Accountancy).\n\nLanguages offered are English (mandatory) with Kannada or Hindi.",
+      text: "Commerce Stream Available:\n• CEBA: Computer Science, Economics, Business Studies, Accountancy\n• Focus: CA Foundation, CS & B.Com pathways\n• Languages: English + Kannada / Hindi",
+      toolCallsExecuted: [],
+    };
+  }
+
+  // Instant response for Science courses queries
+  const isScienceQuery = /science (combination|course|stream)|what science|pcmb|pcmc|integrated neet|integrated jee|integrated kcet/i.test(cleanQ);
+  if (isScienceQuery && !cleanQ.includes('calculate') && !cleanQ.includes('solve')) {
+    return {
+      text: "Science Streams Available:\n• PCMB: Physics, Chemistry, Maths, Biology\n• PCMC: Physics, Chemistry, Maths, Computer Science\n• Integrated Coaching: NEET, JEE & KCET\n• Languages: English + Kannada / Hindi",
+      toolCallsExecuted: [],
+    };
+  }
+
+  // Instant response for All Courses queries
+  const isAllCoursesQuery = /what courses|which courses|available courses|list of courses|courses offered|all courses|streams offered|combinations offered/i.test(cleanQ);
+  if (isAllCoursesQuery) {
+    return {
+      text: "Courses Offered at North Campus:\n• Science: PCMB & PCMC (with integrated NEET/JEE/KCET)\n• Commerce: CEBA (CS, Economics, Business, Accountancy)\n• Languages: English + Kannada / Hindi",
       toolCallsExecuted: [],
     };
   }
@@ -221,15 +239,6 @@ export async function callGemini(
   if (isContactDirect && !cleanQ.includes('calculate') && !cleanQ.includes('solve')) {
     return {
       text: "North Campus (Yelahanka) Admissions Desk: +91 81053 88193 / +91 81230 40418.\nEmail: gpuc.north@gopalanpucollege.com.\nAddress: No. 79 Mavallipura, Hesaragatta Hobli, Yelahanka.",
-      toolCallsExecuted: [],
-    };
-  }
-
-  // Instant response for Science courses queries
-  const isScienceQuery = /science (combination|course|stream)|what science|pcmb|pcmc|integrated neet|integrated jee|integrated kcet/i.test(cleanQ);
-  if (isScienceQuery && !cleanQ.includes('calculate') && !cleanQ.includes('solve')) {
-    return {
-      text: "Gopalan PU College North Campus offers Science combinations: PCMB (Physics, Chemistry, Maths, Biology) and PCMC (Physics, Chemistry, Maths, Computer Science) with integrated NEET, JEE & KCET coaching.\n\nLanguages offered are English (mandatory) with Kannada or Hindi.",
       toolCallsExecuted: [],
     };
   }
