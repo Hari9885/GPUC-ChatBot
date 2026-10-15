@@ -252,6 +252,9 @@
 
   function closeChat() {
     isOpen = false;
+    try {
+      sessionStorage.setItem('gpuc_ai_popped', 'true');
+    } catch (e) {}
     containerEl.classList.remove('open');
     launcherBtn.style.transform = '';
     try {
@@ -298,13 +301,23 @@
     toggle: toggleChat,
   };
 
-  // Auto pop-up AI assistant on page load
+  // Auto pop-up AI assistant when user stays on page actively for more than 4 seconds (once per session)
   function triggerAutoPopup() {
+    try {
+      if (sessionStorage.getItem('gpuc_ai_popped') === 'true') {
+        return; // Never repeat if already shown or dismissed in this session
+      }
+    } catch (e) {}
+
     setTimeout(() => {
       if (!isOpen) {
+        try {
+          if (sessionStorage.getItem('gpuc_ai_popped') === 'true') return;
+          sessionStorage.setItem('gpuc_ai_popped', 'true');
+        } catch (e) {}
         openChat();
       }
-    }, 1200);
+    }, 4000);
   }
 
   if (document.readyState === 'complete') {

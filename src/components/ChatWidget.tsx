@@ -280,14 +280,27 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
       };
       window.addEventListener('message', handleMsg);
 
-      // Auto pop up AI assistant on page load (1.2s delay)
-      const autoPopupTimer = setTimeout(() => {
-        setIsChatOpen(true);
-      }, 1200);
+      // Auto pop up AI assistant when user stays on page actively for more than 4 seconds (once per session)
+      let autoPopupTimer: NodeJS.Timeout | null = null;
+      try {
+        const alreadyPopped = sessionStorage.getItem('gpuc_ai_popped');
+        if (!alreadyPopped) {
+          autoPopupTimer = setTimeout(() => {
+            try {
+              sessionStorage.setItem('gpuc_ai_popped', 'true');
+            } catch (e) {}
+            setIsChatOpen(true);
+          }, 4000);
+        }
+      } catch (e) {
+        autoPopupTimer = setTimeout(() => {
+          setIsChatOpen(true);
+        }, 4000);
+      }
 
       return () => {
         window.removeEventListener('message', handleMsg);
-        clearTimeout(autoPopupTimer);
+        if (autoPopupTimer) clearTimeout(autoPopupTimer);
       };
     }
   }, [initialEmbedded]);
