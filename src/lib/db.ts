@@ -79,7 +79,7 @@ const DB_FILE = path.join(process.cwd(), 'data', 'db.json');
 
 function initializeSlots(): TimeSlot[] {
   const slots: TimeSlot[] = [];
-  const times = ['10:00 AM', '11:30 AM', '02:00 PM', '03:30 PM'];
+  const times = ['09:00 AM', '10:00 AM', '11:30 AM', '02:00 PM', '03:30 PM'];
   const today = new Date();
 
   // Generate slots for the next 7 business days
@@ -95,13 +95,47 @@ function initializeSlots(): TimeSlot[] {
         id: `slot_${dateStr}_${idx}`,
         date: dateStr,
         time,
-        department: idx % 2 === 0 ? 'Admissions' : 'Academic Coordinator',
+        department: idx === 0 || idx % 2 === 0 ? 'Admissions' : 'Academic Coordinator',
         mode: 'all',
         isBooked: false,
       });
     });
   }
   return slots;
+}
+
+export function ensureSlots(db: DatabaseSchema): boolean {
+  if (!db.slots) {
+    db.slots = initializeSlots();
+    return true;
+  }
+  let modified = false;
+  const times = ['09:00 AM', '10:00 AM', '11:30 AM', '02:00 PM', '03:30 PM'];
+  const today = new Date();
+
+  for (let d = 1; d <= 7; d++) {
+    const nextDate = new Date(today);
+    nextDate.setDate(today.getDate() + d);
+    if (nextDate.getDay() === 0) continue;
+
+    const dateStr = nextDate.toISOString().split('T')[0];
+
+    times.forEach((time, idx) => {
+      const exists = db.slots.some((s) => s.date === dateStr && s.time === time);
+      if (!exists) {
+        db.slots.push({
+          id: `slot_${dateStr}_${idx}`,
+          date: dateStr,
+          time,
+          department: idx === 0 || idx % 2 === 0 ? 'Admissions' : 'Academic Coordinator',
+          mode: 'all',
+          isBooked: false,
+        });
+        modified = true;
+      }
+    });
+  }
+  return modified;
 }
 
 function getInitialData(): DatabaseSchema {
@@ -180,7 +214,12 @@ export function readDB(): DatabaseSchema {
       return initial;
     }
     const raw = fs.readFileSync(DB_FILE, 'utf8');
-    return JSON.parse(raw);
+    const data: DatabaseSchema = JSON.parse(raw);
+    const updated = ensureSlots(data);
+    if (updated) {
+      writeDB(data);
+    }
+    return data;
   } catch (err) {
     console.error('Error reading db.json:', err);
     return getInitialData();
@@ -197,4 +236,150 @@ export function writeDB(data: DatabaseSchema): void {
   } catch (err) {
     console.error('Error writing to db.json:', err);
   }
+}
+
+export function getTomorrowDateString(): string {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  if (tomorrow.getDay() === 0) {
+    // If tomorrow is Sunday, skip to Monday
+    tomorrow.setDate(tomorrow.getDate() + 1);
+  }
+  return tomorrow.toISOString().split('T')[0];
+}
+
+export function normalizeTime(time: string): string {
+  const t = time.trim().toUpperCase().replace(/\s+/g, ' ');
+  if (/^0?9(:00)?(\s*AM)?$/i.test(t)) return '09:00 AM';
+  if (/^10(:00)?(\s*AM)?$/i.test(t)) return '10:00 AM';
+  if (/^11:?30(\s*AM)?$/i.test(t)) return '11:30 AM';
+  if (/^(0?2|14)(:00)?(\s*PM)?$/i.test(t)) return '02:00 PM';
+  if (/^(0?3|15):?30(\s*PM)?$/i.test(t)) return '03:30 PM';
+  return time;
+}
+
+export function checkSlotAvailability(
+  db: DatabaseSchema,
+  date: string,
+  time: string,
+  department = 'Admissions'
+): { available: boolean; slot?: TimeSlot; reason?: string } {
+  const normTime = normalizeTime(time);
+  const slot = db.slots.find(
+    (s) =>
+      s.date === date &&
+      (s.time === normTime || normalizeTime(s.time) === normTime) &&
+      (department === 'All' || s.department.toLowerCase() === department.toLowerCase() || s.department.toLowerCase().includes('admissions'))
+  );
+
+  if (!slot) {
+    return { available: false, reason: 'No slot found for this time' };
+  }
+  if (slot.isBooked) {
+    return { available: false, slot, reason: 'Slot already booked' };
+  }
+  return { available: true, slot };
+}
+
+export function getNextAvailableSlot(
+  db: DatabaseSchema,
+  afterDate?: string,
+  afterTime?: string,
+  department = 'Admissions'
+): TimeSlot | null {
+  const minDate = afterDate || getTomorrowDateString();
+  const sorted = [...db.slots].sort((a, b) => {
+    if (a.date !== b.date) return a.date.localeCompare(b.date);
+    return a.time.localeCompare(b.time);
+  });
+
+  for (const slot of sorted) {
+    if (slot.isBooked) continue;
+    if (department && department !== 'All') {
+      if (!slot.department.toLowerCase().includes(department.toLowerCase())) continue;
+    }
+    if (slot.date < minDate) continue;
+    if (slot.date === minDate && afterTime) {
+      if (normalizeTime(slot.time) <= normalizeTime(afterTime)) continue;
+    }
+    return slot;
+  }
+  return null;
+}
+
+export function bookAppointment(
+  db: DatabaseSchema,
+  params: {
+    name: string;
+    mobile: string;
+    mode: 'campus_visit' | 'online_meeting';
+    date?: string;
+    timeSlot?: string;
+    purpose?: string;
+    inquiryId?: string;
+  }
+): { success: boolean; appointment: Appointment; slot?: TimeSlot } {
+  const refNum = (500 + (db.appointments?.length || 0) + 1).toString();
+  const finalDate = params.date || getTomorrowDateString();
+  const finalTime = params.timeSlot ? normalizeTime(params.timeSlot) : (params.mode === 'online_meeting' ? '09:00 AM' : '8:30 AM - 5:00 PM');
+
+  let meetingLinkOrVenue = '';
+  let id = '';
+
+  if (params.mode === 'campus_visit') {
+    id = `GPUC-VISIT-2026-${refNum}`;
+    meetingLinkOrVenue = 'Gopalan Pre-University College Campus, 181/1, Hoodi Village, Whitefield, Bengaluru - 560048';
+  } else {
+    id = `GPUC-2026-APT-${refNum}`;
+    meetingLinkOrVenue = `Google Meet (meet.google.com/gpuc-adm-${refNum.toLowerCase()})`;
+  }
+
+  // Find slot to book if applicable
+  let bookedSlot: TimeSlot | undefined;
+  if (params.mode === 'online_meeting') {
+    const slotIdx = db.slots.findIndex(
+      (s) => s.date === finalDate && (s.time === finalTime || normalizeTime(s.time) === finalTime)
+    );
+    if (slotIdx >= 0) {
+      db.slots[slotIdx].isBooked = true;
+      db.slots[slotIdx].bookedBy = params.name;
+      bookedSlot = db.slots[slotIdx];
+    }
+  }
+
+  const newAppointment: Appointment = {
+    id,
+    inquiryId: params.inquiryId,
+    name: params.name,
+    mobile: params.mobile,
+    mode: params.mode,
+    date: finalDate,
+    timeSlot: finalTime,
+    purpose: params.purpose || (params.mode === 'campus_visit' ? 'Campus Visit & Document Verification' : 'Online Admission Consultation'),
+    assignedStaff: 'Admissions Desk Counselor',
+    assignedDepartment: 'Admissions',
+    status: 'CONFIRMED',
+    meetingLinkOrVenue,
+    createdAt: new Date().toISOString(),
+  };
+
+  if (!db.appointments) db.appointments = [];
+  db.appointments.unshift(newAppointment);
+
+  // Also log confirmation message
+  if (!db.messages) db.messages = [];
+  db.messages.unshift({
+    id: `MSG-${Date.now().toString().slice(-4)}`,
+    type: 'whatsapp',
+    recipient: params.mobile,
+    templateId: params.mode === 'campus_visit' ? 'visit_ticket_confirmation' : 'appointment_confirmation',
+    content: params.mode === 'campus_visit'
+      ? `Dear ${params.name}, your Campus Visit ticket ${id} is confirmed. Visiting hours: Monday to Friday 8:30 AM to 5:00 PM.`
+      : `Dear ${params.name}, your online meeting ${id} with Admissions is confirmed for ${finalDate} at ${finalTime}. Link: ${meetingLinkOrVenue}.`,
+    status: 'DELIVERED',
+    timestamp: new Date().toISOString(),
+  });
+
+  writeDB(db);
+  return { success: true, appointment: newAppointment, slot: bookedSlot };
 }

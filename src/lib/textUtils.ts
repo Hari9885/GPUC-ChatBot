@@ -37,3 +37,13 @@ export function enforceMaxThreeLines(text: string): string {
 
   return formatPhoneNumbers(rawLines.slice(0, 3).join('\n\n'));
 }
+
+export function getTomorrowDateString(): string {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  if (tomorrow.getDay() === 0) {
+    // If tomorrow is Sunday, skip to Monday
+    tomorrow.setDate(tomorrow.getDate() + 1);
+  }
+  return tomorrow.toISOString().split('T')[0];
+}

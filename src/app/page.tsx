@@ -20,17 +20,45 @@ import {
   Check,
   AlertCircle,
   ArrowRight,
+  Clock,
+  MapPin,
+  Video,
+  ExternalLink,
 } from 'lucide-react';
 import GpucWebsite from '@/components/GpucWebsite';
-import { stripStarsAndAsterisks, enforceMaxThreeLines, formatPhoneNumbers } from '@/lib/textUtils';
+import { stripStarsAndAsterisks, enforceMaxThreeLines, formatPhoneNumbers, getTomorrowDateString } from '@/lib/textUtils';
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
   topic?: string;
-  step?: 'ask_student_name' | 'ask_contact' | 'ask_admission' | 'completed';
+  step?:
+    | 'ask_student_name'
+    | 'ask_contact'
+    | 'ask_admission'
+    | 'offer_visit_or_online'
+    | 'ask_tomorrow_9am'
+    | 'choose_custom_slot'
+    | 'offer_next_slot'
+    | 'completed';
   leadInquiryId?: string;
   pendingQuery?: string;
+  ticketData?: {
+    id: string;
+    mode: 'campus_visit' | 'online_meeting';
+    date: string;
+    timeSlot: string;
+    venue: string;
+    studentName: string;
+    mobile: string;
+    instructions?: string;
+  };
+  slotOffer?: {
+    date: string;
+    time: string;
+    formatted: string;
+  };
+  availableSlotsList?: Array<{ date: string; time: string; department: string }>;
   toolCalls?: Array<{ tool: string; args: any; result: any }>;
 }
 
@@ -51,43 +79,26 @@ function isGreetingQuery(query: string): boolean {
   );
 }
 
-function isBookingOrRegistrationIntent(query: string): boolean {
+function isPresetOrResemblingQuery(query: string): boolean {
+  if (isGreetingQuery(query)) return false;
   const q = query.toLowerCase().trim();
-  // Basic questions should NEVER trigger booking/lead funnel
-  if (
-    q.includes('where') ||
-    q.includes('location') ||
-    q.includes('address') ||
-    q.includes('course') ||
-    q.includes('combination') ||
-    q.includes('stream') ||
-    q.includes('subject') ||
-    q.includes('fee') ||
-    q.includes('cost') ||
-    q.includes('document') ||
-    q.includes('eligib') ||
-    q.includes('timing') ||
-    q.includes('hour') ||
-    q.includes('hostel') ||
-    q.includes('facility') ||
-    q.includes('faculty') ||
-    q.includes('teacher') ||
-    q.includes('bus') ||
-    q.includes('transport')
-  ) {
-    return false;
-  }
 
+  // 1. Direct matches with preset FAQs
+  const matchesPreset = FAQ_PRESETS.some(
+    (p) =>
+      p.query.toLowerCase() === q ||
+      q.includes(p.query.toLowerCase()) ||
+      p.label.toLowerCase().includes(q)
+  );
+  if (matchesPreset) return true;
+
+  // 2. Resembling queries for courses, admissions, visits, documents, fees
   return (
-    /\b(book|schedule|reserve)\b/i.test(q) ||
-    /\b(campus visit|campus tour)\b/i.test(q) ||
-    /\b(apply for admission|register for admission|request a callback|call me back|arrange a callback)\b/i.test(q) ||
-    /\b(want to visit|like to visit|come to campus|visit the campus)\b/i.test(q) ||
-    q === 'book' ||
-    q === 'book visit' ||
-    q === 'book appointment' ||
-    q === 'appointment' ||
-    q === 'apply'
+    /\b(admission|admissions|apply|application|eligib|seat|seats|enrol|enrollment|2026)\b/i.test(q) ||
+    /\b(science|commerce|pcmb|pcmc|ceba|seba|meba|stream|streams|combination|combinations|course|courses)\b/i.test(q) ||
+    /\b(visit|tour|appointment|consultation|campus visit|offline|online meeting|meeting|schedule)\b/i.test(q) ||
+    /\b(document|documents|marks card|marksheet|tc|transfer certificate|certificate|certificates|checklist)\b/i.test(q) ||
+    /\b(fee|fees|tuition|cost|scholarship|scholarships)\b/i.test(q)
   );
 }
 
@@ -181,6 +192,16 @@ export default function Home() {
   const [stepError, setStepError] = useState('');
   const [isSubmittingLead, setIsSubmittingLead] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+
+  // Appointment & Meeting Booking Flow State
+  const [bookingFlowState, setBookingFlowState] = useState<
+    'idle' | 'offered_choice' | 'offered_tomorrow_9am' | 'choosing_custom' | 'offered_next_slot' | 'completed'
+  >('idle');
+  const [tomorrowDateStr, setTomorrowDateStr] = useState('');
+  const [offeredNextSlot, setOfferedNextSlot] = useState<{ date: string; time: string } | null>(null);
+  const [availableSlotsList, setAvailableSlotsList] = useState<Array<{ date: string; time: string; department: string }>>([]);
+  const [customSlotDate, setCustomSlotDate] = useState('');
+  const [customSlotTime, setCustomSlotTime] = useState('10:00 AM');
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -330,12 +351,17 @@ export default function Home() {
 
       const content = enforceMaxThreeLines(chatData?.content || 'I have noted your inquiry.');
 
+      setBookingFlowState('offered_choice');
+
+      const fullContent = `${content}\n\nWould you like to book a campus visit (offline) or request an online meeting?`;
+
       setMessages((prev) => [
         ...prev,
         {
           role: 'assistant',
-          content,
+          content: fullContent,
           leadInquiryId: newInquiryId,
+          step: 'offer_visit_or_online',
           toolCalls: chatData?.toolCalls,
         },
       ]);
@@ -353,6 +379,364 @@ export default function Home() {
       setIsSubmittingLead(false);
       setLoading(false);
     }
+  };
+
+  // Offline Booking: Generate Ticket & Record in Database
+  const handleBookOfflineVisit = async () => {
+    const currentLead = userLead || {
+      inquiryId: 'GPUC-2026-INQ-1001',
+      studentName: leadStudentName || 'Prospective Student',
+      parentName: leadParentName,
+      mobile: leadMobile || '9845012345',
+      admissionClass: '12th Class (2nd PU)',
+      inquiryType: 'Campus Visit',
+    };
+
+    const userMsg: Message = { role: 'user', content: 'Book a Campus Visit (Offline)' };
+    setMessages((prev) => [...prev, userMsg]);
+    setIsTyping(true);
+    setLoading(true);
+
+    try {
+      const minWait = new Promise((res) => setTimeout(res, 1500));
+      const res = await fetch('/api/appointments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: currentLead.studentName + (currentLead.parentName ? ` (Parent: ${currentLead.parentName})` : ''),
+          mobile: currentLead.mobile,
+          mode: 'campus_visit',
+          inquiryId: currentLead.inquiryId,
+          purpose: `Campus Visit & Admission Consultation (${currentLead.admissionClass})`,
+        }),
+      });
+      const data = await res.json();
+      await minWait;
+
+      const apt = data.appointment || {
+        id: `GPUC-VISIT-2026-${Date.now().toString().slice(-4)}`,
+        mode: 'campus_visit',
+        date: 'Monday to Friday',
+        timeSlot: '8:30 AM - 5:00 PM',
+        meetingLinkOrVenue: 'Gopalan Pre-University College Campus, 181/1, Hoodi Village, Whitefield, Bengaluru - 560048',
+      };
+
+      setBookingFlowState('completed');
+
+      const replyContent = `Your campus visit ticket has been generated and recorded with Reference ${apt.id}.\n\nVisiting hours are Monday to Friday from 8:30 AM to 5:00 PM at our Whitefield campus.`;
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: enforceMaxThreeLines(replyContent),
+          step: 'completed',
+          ticketData: {
+            id: apt.id,
+            mode: 'campus_visit',
+            date: apt.date || 'Monday to Friday',
+            timeSlot: apt.timeSlot || '8:30 AM - 5:00 PM',
+            venue: apt.meetingLinkOrVenue,
+            studentName: currentLead.studentName,
+            mobile: currentLead.mobile,
+            instructions: 'Please present this ticket reference at the Admissions Desk (Block A) upon arrival.',
+          },
+        },
+      ]);
+    } catch (err) {
+      console.error('Campus visit booking error:', err);
+      setBookingFlowState('completed');
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: `Your campus visit has been noted! Please visit our campus from Monday to Friday between 8:30 AM and 5:00 PM.\n\nYou may contact the admissions desk directly at +91 96069 41908.`,
+          step: 'completed',
+        },
+      ]);
+    } finally {
+      setIsTyping(false);
+      setLoading(false);
+    }
+  };
+
+  // Online Meeting: Check Tomorrow 9:00 AM Availability
+  const handleInitiateOnlineMeeting = async () => {
+    const userMsg: Message = { role: 'user', content: 'Request an Online Meeting' };
+    setMessages((prev) => [...prev, userMsg]);
+    setIsTyping(true);
+    setLoading(true);
+
+    try {
+      const minWait = new Promise((res) => setTimeout(res, 1500));
+      const res = await fetch('/api/appointments');
+      const data = await res.json();
+      await minWait;
+
+      const tDate = data.tomorrowDate || getTomorrowDateString();
+      setTomorrowDateStr(tDate);
+      setAvailableSlotsList(data.availableSlots || []);
+
+      if (data.isTomorrow9AmAvailable) {
+        setBookingFlowState('offered_tomorrow_9am');
+        const replyContent = `Our Admissions department has an open slot tomorrow (${tDate}) at 9:00 AM.\n\nWould tomorrow at 9:00 AM be a good time for your online meeting?`;
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            content: enforceMaxThreeLines(replyContent),
+            step: 'ask_tomorrow_9am',
+          },
+        ]);
+      } else {
+        // Tomorrow at 9:00 AM is not available
+        setBookingFlowState('choosing_custom');
+        const next = data.nextAvailableSlot;
+        if (next) setOfferedNextSlot({ date: next.date, time: next.time });
+
+        const replyContent = `Tomorrow at 9:00 AM is currently booked.\n\nPlease enter your preferred date and time, or choose from our available timetable slots:`;
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            content: enforceMaxThreeLines(replyContent),
+            step: 'choose_custom_slot',
+            availableSlotsList: data.availableSlots || [],
+          },
+        ]);
+      }
+    } catch (err) {
+      console.error('Online meeting check error:', err);
+      handleCannotAgreeDeskFallback();
+    } finally {
+      setIsTyping(false);
+      setLoading(false);
+    }
+  };
+
+  // Confirm Online Meeting for Tomorrow at 9:00 AM
+  const handleConfirmTomorrow9Am = async () => {
+    const currentLead = userLead || {
+      inquiryId: 'GPUC-2026-INQ-1001',
+      studentName: leadStudentName || 'Prospective Student',
+      parentName: leadParentName,
+      mobile: leadMobile || '9845012345',
+      admissionClass: '12th Class (2nd PU)',
+      inquiryType: 'Online Meeting',
+    };
+
+    const userMsg: Message = { role: 'user', content: 'Yes, tomorrow at 9:00 AM works.' };
+    setMessages((prev) => [...prev, userMsg]);
+    setIsTyping(true);
+    setLoading(true);
+
+    try {
+      const minWait = new Promise((res) => setTimeout(res, 1500));
+      const targetDate = tomorrowDateStr || getTomorrowDateString();
+      const res = await fetch('/api/appointments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: currentLead.studentName + (currentLead.parentName ? ` (Parent: ${currentLead.parentName})` : ''),
+          mobile: currentLead.mobile,
+          mode: 'online_meeting',
+          date: targetDate,
+          timeSlot: '09:00 AM',
+          inquiryId: currentLead.inquiryId,
+          purpose: `Online Admission Consultation (${currentLead.admissionClass})`,
+        }),
+      });
+      const data = await res.json();
+      await minWait;
+
+      const apt = data.appointment || {
+        id: `GPUC-2026-APT-${Date.now().toString().slice(-4)}`,
+        mode: 'online_meeting',
+        date: targetDate,
+        timeSlot: '09:00 AM',
+        meetingLinkOrVenue: 'Google Meet (meet.google.com/gpuc-adm-meet)',
+      };
+
+      setBookingFlowState('completed');
+
+      const replyContent = `Your online consultation is confirmed for tomorrow at 9:00 AM with Reference ${apt.id}.\n\nThe meeting link has been recorded in our timetable and sent to your mobile.`;
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: enforceMaxThreeLines(replyContent),
+          step: 'completed',
+          ticketData: {
+            id: apt.id,
+            mode: 'online_meeting',
+            date: apt.date,
+            timeSlot: apt.timeSlot,
+            venue: apt.meetingLinkOrVenue,
+            studentName: currentLead.studentName,
+            mobile: currentLead.mobile,
+            instructions: 'The Google Meet link will also be dispatched via WhatsApp/SMS 30 minutes before the call.',
+          },
+        },
+      ]);
+    } catch (err) {
+      console.error('Confirm 9am booking error:', err);
+      handleCannotAgreeDeskFallback();
+    } finally {
+      setIsTyping(false);
+      setLoading(false);
+    }
+  };
+
+  // Show Custom Date/Time Picker
+  const handleShowCustomSlotPicker = async () => {
+    const userMsg: Message = { role: 'user', content: 'Choose another date and time' };
+    setMessages((prev) => [...prev, userMsg]);
+    setIsTyping(true);
+
+    try {
+      const res = await fetch('/api/appointments');
+      const data = await res.json();
+      const slots = data.availableSlots || [];
+      setAvailableSlotsList(slots);
+      setBookingFlowState('choosing_custom');
+
+      setTimeout(() => {
+        setIsTyping(false);
+        const replyContent = `Please select an available timetable slot below or enter your preferred date and time:`;
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            content: enforceMaxThreeLines(replyContent),
+            step: 'choose_custom_slot',
+            availableSlotsList: slots,
+          },
+        ]);
+      }, 1000);
+    } catch (err) {
+      console.error(err);
+      setIsTyping(false);
+    }
+  };
+
+  // Check custom slot with timetable and book or offer next
+  const handleCheckAndBookCustomSlot = async (selDate: string, selTime: string) => {
+    const currentLead = userLead || {
+      inquiryId: 'GPUC-2026-INQ-1001',
+      studentName: leadStudentName || 'Prospective Student',
+      parentName: leadParentName,
+      mobile: leadMobile || '9845012345',
+      admissionClass: '12th Class (2nd PU)',
+      inquiryType: 'Online Meeting',
+    };
+
+    const userMsg: Message = { role: 'user', content: `${selDate} at ${selTime}` };
+    setMessages((prev) => [...prev, userMsg]);
+    setIsTyping(true);
+    setLoading(true);
+
+    try {
+      const minWait = new Promise((res) => setTimeout(res, 1500));
+      // 1. Check availability with timetable
+      const checkRes = await fetch(`/api/appointments?date=${encodeURIComponent(selDate)}&time=${encodeURIComponent(selTime)}`);
+      const checkData = await checkRes.json();
+
+      if (checkData.available) {
+        // Book the slot!
+        const bookRes = await fetch('/api/appointments', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: currentLead.studentName + (currentLead.parentName ? ` (Parent: ${currentLead.parentName})` : ''),
+            mobile: currentLead.mobile,
+            mode: 'online_meeting',
+            date: selDate,
+            timeSlot: selTime,
+            inquiryId: currentLead.inquiryId,
+            purpose: `Online Admission Consultation (${currentLead.admissionClass})`,
+          }),
+        });
+        const bookData = await bookRes.json();
+        await minWait;
+
+        const apt = bookData.appointment;
+        setBookingFlowState('completed');
+
+        const replyContent = `Your online consultation is confirmed for ${apt.date} at ${apt.timeSlot} (Ref: ${apt.id}).\n\nThe meeting link has been registered with the Admissions team.`;
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            content: enforceMaxThreeLines(replyContent),
+            step: 'completed',
+            ticketData: {
+              id: apt.id,
+              mode: 'online_meeting',
+              date: apt.date,
+              timeSlot: apt.timeSlot,
+              venue: apt.meetingLinkOrVenue,
+              studentName: currentLead.studentName,
+              mobile: currentLead.mobile,
+              instructions: 'The Google Meet link will be dispatched via WhatsApp/SMS 30 minutes prior.',
+            },
+          },
+        ]);
+      } else {
+        // Unavailable! Offer the next slot available
+        await minWait;
+        const next = checkData.nextAvailableSlot;
+        if (next) {
+          setOfferedNextSlot({ date: next.date, time: next.time });
+          setBookingFlowState('offered_next_slot');
+
+          const replyContent = `That slot is not available. The next available slot with Admissions is on ${next.date} at ${next.time}.\n\nWould that slot work for you?`;
+
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: 'assistant',
+              content: enforceMaxThreeLines(replyContent),
+              step: 'offer_next_slot',
+              slotOffer: {
+                date: next.date,
+                time: next.time,
+                formatted: `${next.date} at ${next.time}`,
+              },
+            },
+          ]);
+        } else {
+          handleCannotAgreeDeskFallback();
+        }
+      }
+    } catch (err) {
+      console.error('Custom slot checking error:', err);
+      handleCannotAgreeDeskFallback();
+    } finally {
+      setIsTyping(false);
+      setLoading(false);
+    }
+  };
+
+  // Fallback to Desk Helpline when agreement cannot be reached
+  const handleCannotAgreeDeskFallback = () => {
+    setBookingFlowState('completed');
+    setIsTyping(false);
+    setLoading(false);
+
+    const genericReply = `You can reach our Admissions help desk directly at +91 96069 41908 from 8:30 AM to 5:00 PM (Monday to Friday).\n\nOur counseling team will be happy to assist you in coordinating your visit or meeting.`;
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: 'assistant',
+        content: enforceMaxThreeLines(genericReply),
+        step: 'completed',
+      },
+    ]);
   };
 
   const handleSend = async (textToSend?: string) => {
@@ -382,6 +766,75 @@ export default function Home() {
       }
     }
 
+    // Handle user inputs during booking flow steps:
+    if (bookingFlowState === 'offered_choice') {
+      const lower = text.toLowerCase();
+      if (lower.includes('offline') || lower.includes('campus') || lower.includes('visit') || lower.includes('in person')) {
+        setInput('');
+        handleBookOfflineVisit();
+        return;
+      }
+      if (lower.includes('online') || lower.includes('meeting') || lower.includes('virtual') || lower.includes('call') || lower.includes('meet')) {
+        setInput('');
+        handleInitiateOnlineMeeting();
+        return;
+      }
+      if (lower.includes('no') || lower.includes('skip') || lower.includes('later')) {
+        setInput('');
+        setBookingFlowState('completed');
+        setMessages((prev) => [
+          ...prev,
+          { role: 'user', content: text },
+          { role: 'assistant', content: 'No problem! Feel free to ask any question about GPUC courses, admissions, or facilities.' },
+        ]);
+        return;
+      }
+    }
+
+    if (bookingFlowState === 'offered_tomorrow_9am') {
+      const lower = text.toLowerCase();
+      if (lower.includes('yes') || lower.includes('sure') || lower.includes('ok') || lower.includes('fine') || lower.includes('good') || lower.includes('tomorrow') || lower.includes('9')) {
+        setInput('');
+        handleConfirmTomorrow9Am();
+        return;
+      }
+      if (lower.includes('no') || lower.includes('other') || lower.includes('different') || lower.includes('another') || lower.includes('change')) {
+        setInput('');
+        handleShowCustomSlotPicker();
+        return;
+      }
+      if (lower.includes('cannot') || lower.includes("can't") || lower.includes('cancel') || lower.includes('desk') || lower.includes('call')) {
+        setInput('');
+        setMessages((prev) => [...prev, { role: 'user', content: text }]);
+        handleCannotAgreeDeskFallback();
+        return;
+      }
+    }
+
+    if (bookingFlowState === 'choosing_custom') {
+      setInput('');
+      const targetDate = customSlotDate || tomorrowDateStr || getTomorrowDateString();
+      handleCheckAndBookCustomSlot(targetDate, text);
+      return;
+    }
+
+    if (bookingFlowState === 'offered_next_slot') {
+      const lower = text.toLowerCase();
+      if (lower.includes('yes') || lower.includes('sure') || lower.includes('ok') || lower.includes('works') || lower.includes('fine')) {
+        setInput('');
+        if (offeredNextSlot) {
+          handleCheckAndBookCustomSlot(offeredNextSlot.date, offeredNextSlot.time);
+        }
+        return;
+      }
+      if (lower.includes('no') || lower.includes('cannot') || lower.includes("can't") || lower.includes('none') || lower.includes('cancel')) {
+        setInput('');
+        setMessages((prev) => [...prev, { role: 'user', content: text }]);
+        handleCannotAgreeDeskFallback();
+        return;
+      }
+    }
+
     // Standard question flow
     const userMsg: Message = { role: 'user', content: text };
     setInput('');
@@ -407,23 +860,23 @@ export default function Home() {
       return;
     }
 
-    // EXPLICIT BOOKING / REGISTRATION INTENT:
-    // Only ask for name/contact if the user specifically requests to book a visit, appointment, or register
-    if (!userLead && isBookingOrRegistrationIntent(text)) {
-      const topic = 'Campus Visit & Admissions Consultation';
+    // PRESET QUESTIONS OR RESEMBLING QUESTIONS:
+    // "as soon as i select any preset qw or resemble those qw ask for name, details"
+    if (!userLead && isPresetOrResemblingQuery(text)) {
+      const topic = getTopicFromQuery(text);
       setPendingQuery(text);
       setPendingTopic(topic);
       setMessages((prev) => [...prev, userMsg]);
       setIsTyping(true);
 
-      // Bouncing dots for 1.5 seconds, then display assistant message + input box
+      // Bouncing dots for 1.5 seconds, then display assistant prompt for Student Name
       setTimeout(() => {
         setIsTyping(false);
         setLeadStep('ask_student_name');
 
         const assistantPromptMsg: Message = {
           role: 'assistant',
-          content: `I would be delighted to help you schedule a campus visit! 🎓\n\nCould you please provide the Name of the Student?`,
+          content: `I would be happy to share details about ${topic}! 🎓\n\nCould you please provide the Name of the Student?`,
           topic,
           step: 'ask_student_name',
           pendingQuery: text,
@@ -435,10 +888,9 @@ export default function Home() {
       return;
     }
 
-    // GENERAL & BASIC QUESTIONS (e.g. "where is it located", "science courses", "fees", "timings"):
-    // Answered directly without demanding student name or phone number!
+    // GENERAL & BASIC QUESTIONS for already registered user
     if (userLead) {
-      // Update server inquiry with new chat information ("and more chat information if given")
+      // Update server inquiry with new chat information
       fetch('/api/inquiries', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -511,6 +963,12 @@ export default function Home() {
     setIsTyping(false);
     setLoading(false);
     setIsSubmittingLead(false);
+    setBookingFlowState('idle');
+    setTomorrowDateStr('');
+    setOfferedNextSlot(null);
+    setAvailableSlotsList([]);
+    setCustomSlotDate('');
+    setCustomSlotTime('10:00 AM');
   };
 
   const getInputPlaceholder = () => {
@@ -519,7 +977,10 @@ export default function Home() {
       if (leadStep === 'ask_contact') return "Enter 10-digit mobile number...";
       if (leadStep === 'ask_admission') return "Type class or choose an option above...";
     }
-    return 'Ask about admissions, combinations, hostel...';
+    if (bookingFlowState === 'offered_choice') return "Type 'offline' for visit or 'online' for meeting...";
+    if (bookingFlowState === 'offered_tomorrow_9am') return "Type 'yes' or 'choose another time'...";
+    if (bookingFlowState === 'choosing_custom') return "Type preferred time (e.g. 11:30 AM)...";
+    if (bookingFlowState === 'offered_next_slot') return "Type 'yes' to accept or 'no'...";
   };
 
   const handleFeedbackSubmit = async () => {
@@ -1235,6 +1696,475 @@ export default function Home() {
                           {isSubmittingLead && (
                             <div style={{ marginTop: '8px', fontSize: '0.74rem', color: '#D97706', textAlign: 'center', fontWeight: 600 }}>
                               Registering inquiry with Gopalan admissions server...
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Step: Offer Offline Campus Visit vs Online Meeting */}
+                      {msg.step === 'offer_visit_or_online' && bookingFlowState === 'offered_choice' && (
+                        <div
+                          style={{
+                            marginTop: '12px',
+                            background: '#FFFFFF',
+                            border: '1.5px solid #F59E0B',
+                            borderRadius: '12px',
+                            padding: '12px',
+                            boxShadow: '0 4px 14px rgba(0, 0, 0, 0.06)',
+                            width: '100%',
+                            boxSizing: 'border-box',
+                          }}
+                        >
+                          <div style={{ fontSize: '0.74rem', fontWeight: 700, color: '#92400E', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <Sparkles size={13} color="#D97706" /> Consultation & Visit Options
+                          </div>
+
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
+                            <button
+                              type="button"
+                              disabled={loading || isTyping}
+                              onClick={() => handleBookOfflineVisit()}
+                              style={{
+                                width: '100%',
+                                padding: '10px 12px',
+                                background: 'linear-gradient(135deg, #FFFBEB, #FEF3C7)',
+                                border: '1.5px solid #F59E0B',
+                                borderRadius: '10px',
+                                textAlign: 'left',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                transition: 'all 0.15s ease',
+                              }}
+                            >
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#F59E0B', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '1rem' }}>
+                                  🏫
+                                </div>
+                                <div>
+                                  <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#92400E' }}>
+                                    Book a Campus Visit (Offline)
+                                  </div>
+                                  <div style={{ fontSize: '0.72rem', color: '#78350F' }}>
+                                    Tour Whitefield campus &bull; Instant visit ticket
+                                  </div>
+                                </div>
+                              </div>
+                              <ArrowRight size={15} color="#D97706" />
+                            </button>
+
+                            <button
+                              type="button"
+                              disabled={loading || isTyping}
+                              onClick={() => handleInitiateOnlineMeeting()}
+                              style={{
+                                width: '100%',
+                                padding: '10px 12px',
+                                background: 'linear-gradient(135deg, #EFF6FF, #DBEAFE)',
+                                border: '1.5px solid #3B82F6',
+                                borderRadius: '10px',
+                                textAlign: 'left',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                transition: 'all 0.15s ease',
+                              }}
+                            >
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#3B82F6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '1rem' }}>
+                                  💻
+                                </div>
+                                <div>
+                                  <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#1E40AF' }}>
+                                    Request an Online Meeting
+                                  </div>
+                                  <div style={{ fontSize: '0.72rem', color: '#1E3A8A' }}>
+                                    Admissions video consultation &bull; Check timetable
+                                  </div>
+                                </div>
+                              </div>
+                              <ArrowRight size={15} color="#2563EB" />
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setBookingFlowState('completed');
+                                setMessages((prev) => [
+                                  ...prev,
+                                  { role: 'assistant', content: 'No problem! Feel free to ask any other questions about courses, combinations, or facilities.' },
+                                ]);
+                              }}
+                              style={{
+                                background: 'transparent',
+                                border: 'none',
+                                color: '#64748B',
+                                fontSize: '0.74rem',
+                                padding: '4px',
+                                cursor: 'pointer',
+                                textAlign: 'center',
+                              }}
+                            >
+                              Skip for now
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Step: Ask if tomorrow at 9:00 AM works */}
+                      {msg.step === 'ask_tomorrow_9am' && bookingFlowState === 'offered_tomorrow_9am' && (
+                        <div
+                          style={{
+                            marginTop: '12px',
+                            background: '#FFFFFF',
+                            border: '1.5px solid #3B82F6',
+                            borderRadius: '12px',
+                            padding: '12px',
+                            boxShadow: '0 4px 14px rgba(0, 0, 0, 0.06)',
+                            width: '100%',
+                            boxSizing: 'border-box',
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                            <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#1E40AF', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                              <Clock size={13} color="#2563EB" /> Admissions Desk Availability Check
+                            </span>
+                            <span style={{ fontSize: '0.7rem', padding: '2px 6px', borderRadius: '4px', background: '#DCFCE7', color: '#166534', fontWeight: 600 }}>
+                              Slot Open
+                            </span>
+                          </div>
+
+                          <div style={{ fontSize: '0.78rem', color: '#1E293B', marginBottom: '10px', background: '#F8FAFC', padding: '8px 10px', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
+                            📅 <strong>Tomorrow ({tomorrowDateStr || 'Upcoming'}) at 09:00 AM</strong> with Admissions Counselor
+                          </div>
+
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                            <button
+                              type="button"
+                              disabled={loading || isTyping}
+                              onClick={() => handleConfirmTomorrow9Am()}
+                              style={{
+                                padding: '9px 12px',
+                                background: 'linear-gradient(135deg, #10B981, #059669)',
+                                color: '#FFFFFF',
+                                border: 'none',
+                                borderRadius: '8px',
+                                fontWeight: 700,
+                                fontSize: '0.8rem',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '6px',
+                              }}
+                            >
+                              <Check size={14} /> Yes, tomorrow at 9:00 AM works
+                            </button>
+
+                            <button
+                              type="button"
+                              disabled={loading || isTyping}
+                              onClick={() => handleShowCustomSlotPicker()}
+                              style={{
+                                padding: '8px 12px',
+                                background: '#F1F5F9',
+                                color: '#334155',
+                                border: '1px solid #CBD5E1',
+                                borderRadius: '8px',
+                                fontWeight: 600,
+                                fontSize: '0.78rem',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '6px',
+                              }}
+                            >
+                              <Calendar size={13} /> Choose another date & time
+                            </button>
+
+                            <button
+                              type="button"
+                              disabled={loading || isTyping}
+                              onClick={() => handleCannotAgreeDeskFallback()}
+                              style={{
+                                padding: '7px 12px',
+                                background: '#FFF1F2',
+                                color: '#BE123C',
+                                border: '1px solid #FECDD3',
+                                borderRadius: '8px',
+                                fontWeight: 600,
+                                fontSize: '0.76rem',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '6px',
+                              }}
+                            >
+                              <Phone size={13} /> Cannot make this time &bull; Contact Desk
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Step: Choose Custom Slot from Timetable */}
+                      {msg.step === 'choose_custom_slot' && bookingFlowState === 'choosing_custom' && (
+                        <div
+                          style={{
+                            marginTop: '12px',
+                            background: '#FFFFFF',
+                            border: '1.5px solid #3B82F6',
+                            borderRadius: '12px',
+                            padding: '12px',
+                            boxShadow: '0 4px 14px rgba(0, 0, 0, 0.06)',
+                            width: '100%',
+                            boxSizing: 'border-box',
+                          }}
+                        >
+                          <div style={{ fontSize: '0.74rem', fontWeight: 700, color: '#1E40AF', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <Calendar size={13} color="#2563EB" /> Select Timetable Slot
+                          </div>
+
+                          {availableSlotsList.length > 0 && (
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px', marginBottom: '10px' }}>
+                              {availableSlotsList.slice(0, 4).map((slot, sIdx) => (
+                                <button
+                                  key={sIdx}
+                                  type="button"
+                                  disabled={loading || isTyping}
+                                  onClick={() => handleCheckAndBookCustomSlot(slot.date, slot.time)}
+                                  style={{
+                                    padding: '7px 8px',
+                                    background: '#EFF6FF',
+                                    border: '1px solid #BFDBFE',
+                                    borderRadius: '6px',
+                                    fontSize: '0.75rem',
+                                    color: '#1E40AF',
+                                    fontWeight: 600,
+                                    cursor: 'pointer',
+                                    textAlign: 'center',
+                                  }}
+                                >
+                                  {slot.date} &bull; {slot.time}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Custom date and time selectors */}
+                          <div style={{ display: 'flex', gap: '6px', marginBottom: '8px' }}>
+                            <input
+                              type="date"
+                              value={customSlotDate || tomorrowDateStr}
+                              onChange={(e) => setCustomSlotDate(e.target.value)}
+                              style={{
+                                flex: 1,
+                                padding: '6px 8px',
+                                borderRadius: '6px',
+                                border: '1px solid #CBD5E1',
+                                fontSize: '0.78rem',
+                                color: '#0F172A',
+                                background: '#F8FAFC',
+                                outline: 'none',
+                              }}
+                            />
+                            <select
+                              value={customSlotTime}
+                              onChange={(e) => setCustomSlotTime(e.target.value)}
+                              style={{
+                                flex: 1,
+                                padding: '6px 8px',
+                                borderRadius: '6px',
+                                border: '1px solid #CBD5E1',
+                                fontSize: '0.78rem',
+                                color: '#0F172A',
+                                background: '#F8FAFC',
+                                outline: 'none',
+                              }}
+                            >
+                              <option value="09:00 AM">09:00 AM</option>
+                              <option value="10:00 AM">10:00 AM</option>
+                              <option value="11:30 AM">11:30 AM</option>
+                              <option value="02:00 PM">02:00 PM</option>
+                              <option value="03:30 PM">03:30 PM</option>
+                            </select>
+                            <button
+                              type="button"
+                              disabled={loading || isTyping}
+                              onClick={() => handleCheckAndBookCustomSlot(customSlotDate || tomorrowDateStr, customSlotTime)}
+                              style={{
+                                padding: '6px 12px',
+                                background: '#3B82F6',
+                                color: '#fff',
+                                borderRadius: '6px',
+                                border: 'none',
+                                fontSize: '0.78rem',
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                              }}
+                            >
+                              Check
+                            </button>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => handleCannotAgreeDeskFallback()}
+                            style={{
+                              width: '100%',
+                              padding: '6px',
+                              background: '#FFF1F2',
+                              color: '#BE123C',
+                              border: '1px solid #FECDD3',
+                              borderRadius: '6px',
+                              fontSize: '0.74rem',
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                              textAlign: 'center',
+                            }}
+                          >
+                            None of these work &bull; Reach Help Desk
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Step: Offer Next Available Slot if requested slot was booked */}
+                      {msg.step === 'offer_next_slot' && bookingFlowState === 'offered_next_slot' && offeredNextSlot && (
+                        <div
+                          style={{
+                            marginTop: '12px',
+                            background: '#FFFFFF',
+                            border: '1.5px solid #F59E0B',
+                            borderRadius: '12px',
+                            padding: '12px',
+                            boxShadow: '0 4px 14px rgba(0, 0, 0, 0.06)',
+                            width: '100%',
+                            boxSizing: 'border-box',
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                            <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#92400E', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                              <Clock size={13} color="#D97706" /> Next Available Slot Offered
+                            </span>
+                            <span style={{ fontSize: '0.7rem', padding: '2px 6px', borderRadius: '4px', background: '#FEF3C7', color: '#92400E', fontWeight: 600 }}>
+                              Open Slot
+                            </span>
+                          </div>
+
+                          <div style={{ fontSize: '0.8rem', color: '#1E293B', marginBottom: '10px', background: '#FFFBEB', padding: '8px 10px', borderRadius: '8px', border: '1px solid #FDE68A' }}>
+                            📅 <strong>{offeredNextSlot.date} at {offeredNextSlot.time}</strong> with Admissions Desk
+                          </div>
+
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                            <button
+                              type="button"
+                              disabled={loading || isTyping}
+                              onClick={() => handleCheckAndBookCustomSlot(offeredNextSlot.date, offeredNextSlot.time)}
+                              style={{
+                                padding: '9px 12px',
+                                background: 'linear-gradient(135deg, #10B981, #059669)',
+                                color: '#FFFFFF',
+                                border: 'none',
+                                borderRadius: '8px',
+                                fontWeight: 700,
+                                fontSize: '0.8rem',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '6px',
+                              }}
+                            >
+                              <Check size={14} /> Yes, book {offeredNextSlot.date} at {offeredNextSlot.time}
+                            </button>
+
+                            <button
+                              type="button"
+                              disabled={loading || isTyping}
+                              onClick={() => handleCannotAgreeDeskFallback()}
+                              style={{
+                                padding: '8px 12px',
+                                background: '#FFF1F2',
+                                color: '#BE123C',
+                                border: '1px solid #FECDD3',
+                                borderRadius: '8px',
+                                fontWeight: 600,
+                                fontSize: '0.76rem',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '6px',
+                              }}
+                            >
+                              <Phone size={13} /> Cannot make this time &bull; Contact Desk
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Confirmed Ticket Card (Campus Visit or Online Meeting) */}
+                      {msg.ticketData && (
+                        <div
+                          style={{
+                            marginTop: '12px',
+                            background: msg.ticketData.mode === 'campus_visit' ? '#FFFDF5' : '#F8FAFC',
+                            border: msg.ticketData.mode === 'campus_visit' ? '1.5px solid #F59E0B' : '1.5px solid #3B82F6',
+                            borderRadius: '12px',
+                            padding: '14px',
+                            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
+                            width: '100%',
+                            boxSizing: 'border-box',
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', borderBottom: '1px solid #E2E8F0', paddingBottom: '6px' }}>
+                            <span style={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: '0.5px', color: msg.ticketData.mode === 'campus_visit' ? '#92400E' : '#1E40AF', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                              {msg.ticketData.mode === 'campus_visit' ? '🏫 CAMPUS VISIT TICKET' : '💻 ONLINE MEETING CONFIRMED'}
+                            </span>
+                            <span style={{ fontSize: '0.68rem', padding: '2px 7px', borderRadius: '4px', background: '#DCFCE7', color: '#166534', fontWeight: 700 }}>
+                              CONFIRMED
+                            </span>
+                          </div>
+
+                          <div style={{ marginBottom: '8px' }}>
+                            <div style={{ fontSize: '0.7rem', color: '#64748B', fontWeight: 500 }}>Ticket / Appointment Reference</div>
+                            <div style={{ fontSize: '1rem', fontWeight: 800, color: '#0F172A', letterSpacing: '0.5px' }}>
+                              {msg.ticketData.id}
+                            </div>
+                          </div>
+
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px', marginBottom: '10px' }}>
+                            <div>
+                              <div style={{ fontSize: '0.68rem', color: '#64748B' }}>Student Name</div>
+                              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#1E293B' }}>{msg.ticketData.studentName}</div>
+                            </div>
+                            <div>
+                              <div style={{ fontSize: '0.68rem', color: '#64748B' }}>Registered Mobile</div>
+                              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#1E293B' }}>{msg.ticketData.mobile}</div>
+                            </div>
+                            <div>
+                              <div style={{ fontSize: '0.68rem', color: '#64748B' }}>Date / Schedule</div>
+                              <div style={{ fontSize: '0.78rem', fontWeight: 600, color: '#0F172A' }}>{msg.ticketData.date}</div>
+                            </div>
+                            <div>
+                              <div style={{ fontSize: '0.68rem', color: '#64748B' }}>Time Slot</div>
+                              <div style={{ fontSize: '0.78rem', fontWeight: 600, color: '#0F172A' }}>{msg.ticketData.timeSlot}</div>
+                            </div>
+                          </div>
+
+                          <div style={{ background: '#FFFFFF', padding: '8px 10px', borderRadius: '8px', border: '1px solid #CBD5E1', marginBottom: '6px' }}>
+                            <div style={{ fontSize: '0.68rem', color: '#64748B', fontWeight: 600 }}>Venue / Meeting Location:</div>
+                            <div style={{ fontSize: '0.76rem', color: '#0F172A', fontWeight: 600, marginTop: '2px' }}>
+                              {msg.ticketData.venue}
+                            </div>
+                          </div>
+
+                          {msg.ticketData.instructions && (
+                            <div style={{ fontSize: '0.72rem', color: '#475569', lineHeight: 1.35 }}>
+                              &bull; {msg.ticketData.instructions}
                             </div>
                           )}
                         </div>
