@@ -77,9 +77,26 @@ interface DatabaseSchema {
 
 const DB_FILE = path.join(process.cwd(), 'data', 'db.json');
 
+export const ADMISSION_TIMES = [
+  '09:00 AM',
+  '09:30 AM',
+  '10:00 AM',
+  '10:30 AM',
+  '11:00 AM',
+  '11:30 AM',
+  '12:00 PM',
+  '12:30 PM',
+  '02:00 PM',
+  '02:30 PM',
+  '03:00 PM',
+  '03:30 PM',
+  '04:00 PM',
+  '04:30 PM',
+  '05:00 PM',
+];
+
 function initializeSlots(): TimeSlot[] {
   const slots: TimeSlot[] = [];
-  const times = ['09:00 AM', '10:00 AM', '11:30 AM', '02:00 PM', '03:30 PM'];
   const today = new Date();
 
   // Generate slots for the next 7 business days
@@ -90,12 +107,12 @@ function initializeSlots(): TimeSlot[] {
 
     const dateStr = nextDate.toISOString().split('T')[0];
 
-    times.forEach((time, idx) => {
+    ADMISSION_TIMES.forEach((time, idx) => {
       slots.push({
         id: `slot_${dateStr}_${idx}`,
         date: dateStr,
         time,
-        department: idx === 0 || idx % 2 === 0 ? 'Admissions' : 'Academic Coordinator',
+        department: 'Admissions',
         mode: 'all',
         isBooked: false,
       });
@@ -110,7 +127,6 @@ export function ensureSlots(db: DatabaseSchema): boolean {
     return true;
   }
   let modified = false;
-  const times = ['09:00 AM', '10:00 AM', '11:30 AM', '02:00 PM', '03:30 PM'];
   const today = new Date();
 
   for (let d = 1; d <= 7; d++) {
@@ -120,14 +136,14 @@ export function ensureSlots(db: DatabaseSchema): boolean {
 
     const dateStr = nextDate.toISOString().split('T')[0];
 
-    times.forEach((time, idx) => {
+    ADMISSION_TIMES.forEach((time, idx) => {
       const exists = db.slots.some((s) => s.date === dateStr && s.time === time);
       if (!exists) {
         db.slots.push({
           id: `slot_${dateStr}_${idx}`,
           date: dateStr,
           time,
-          department: idx === 0 || idx % 2 === 0 ? 'Admissions' : 'Academic Coordinator',
+          department: 'Admissions',
           mode: 'all',
           isBooked: false,
         });
@@ -251,11 +267,34 @@ export function getTomorrowDateString(): string {
 export function normalizeTime(time: string): string {
   const t = time.trim().toUpperCase().replace(/\s+/g, ' ');
   if (/^0?9(:00)?(\s*AM)?$/i.test(t)) return '09:00 AM';
+  if (/^0?9:30(\s*AM)?$/i.test(t)) return '09:30 AM';
   if (/^10(:00)?(\s*AM)?$/i.test(t)) return '10:00 AM';
-  if (/^11:?30(\s*AM)?$/i.test(t)) return '11:30 AM';
+  if (/^10:30(\s*AM)?$/i.test(t)) return '10:30 AM';
+  if (/^11(:00)?(\s*AM)?$/i.test(t)) return '11:00 AM';
+  if (/^11:30(\s*AM)?$/i.test(t)) return '11:30 AM';
+  if (/^12(:00)?(\s*PM)?$/i.test(t)) return '12:00 PM';
+  if (/^12:30(\s*PM)?$/i.test(t)) return '12:30 PM';
   if (/^(0?2|14)(:00)?(\s*PM)?$/i.test(t)) return '02:00 PM';
-  if (/^(0?3|15):?30(\s*PM)?$/i.test(t)) return '03:30 PM';
+  if (/^(0?2|14):30(\s*PM)?$/i.test(t)) return '02:30 PM';
+  if (/^(0?3|15)(:00)?(\s*PM)?$/i.test(t)) return '03:00 PM';
+  if (/^(0?3|15):30(\s*PM)?$/i.test(t)) return '03:30 PM';
+  if (/^(0?4|16)(:00)?(\s*PM)?$/i.test(t)) return '04:00 PM';
+  if (/^(0?4|16):30(\s*PM)?$/i.test(t)) return '04:30 PM';
+  if (/^(0?5|17)(:00)?(\s*PM)?$/i.test(t)) return '05:00 PM';
   return time;
+}
+
+export function getAvailableSlotsForDate(
+  db: DatabaseSchema,
+  date: string,
+  department = 'Admissions'
+): TimeSlot[] {
+  return db.slots.filter(
+    (s) =>
+      s.date === date &&
+      !s.isBooked &&
+      (department === 'All' || s.department.toLowerCase().includes(department.toLowerCase()))
+  );
 }
 
 export function checkSlotAvailability(

@@ -25,11 +25,25 @@ export async function GET(req: NextRequest) {
         ? getNextAvailableSlot(db, queryDate, queryTime, 'Admissions')
         : null;
 
+      const dateSlots = db.slots.filter(
+        (s) => s.date === queryDate && !s.isBooked && s.department.toLowerCase().includes('admissions')
+      );
+
       return NextResponse.json({
         available: check.available,
         slot: check.slot,
         reason: check.reason,
         nextAvailableSlot: nextSlot,
+        availableSlotsForDate: dateSlots,
+      });
+    }
+
+    if (queryDate && !queryTime) {
+      const dateSlots = db.slots.filter(
+        (s) => s.date === queryDate && !s.isBooked && s.department.toLowerCase().includes('admissions')
+      );
+      return NextResponse.json({
+        availableSlotsForDate: dateSlots,
       });
     }
 

@@ -28,6 +28,24 @@ import {
 import GpucWebsite from '@/components/GpucWebsite';
 import { stripStarsAndAsterisks, enforceMaxThreeLines, formatPhoneNumbers, getTomorrowDateString } from '@/lib/textUtils';
 
+const ADMISSION_TIME_OPTIONS = [
+  '09:00 AM',
+  '09:30 AM',
+  '10:00 AM',
+  '10:30 AM',
+  '11:00 AM',
+  '11:30 AM',
+  '12:00 PM',
+  '12:30 PM',
+  '02:00 PM',
+  '02:30 PM',
+  '03:00 PM',
+  '03:30 PM',
+  '04:00 PM',
+  '04:30 PM',
+  '05:00 PM',
+];
+
 interface Message {
   role: 'user' | 'assistant';
   content: string;
@@ -37,9 +55,8 @@ interface Message {
     | 'ask_contact'
     | 'ask_admission'
     | 'offer_visit_or_online'
-    | 'ask_tomorrow_9am'
-    | 'choose_custom_slot'
-    | 'offer_next_slot'
+    | 'ask_custom_slot'
+    | 'show_available_slots'
     | 'completed';
   leadInquiryId?: string;
   pendingQuery?: string;
@@ -195,13 +212,11 @@ export default function Home() {
 
   // Appointment & Meeting Booking Flow State
   const [bookingFlowState, setBookingFlowState] = useState<
-    'idle' | 'offered_choice' | 'offered_tomorrow_9am' | 'choosing_custom' | 'offered_next_slot' | 'completed'
+    'idle' | 'offered_choice' | 'asking_check_slot' | 'showing_available_slots' | 'completed'
   >('idle');
-  const [tomorrowDateStr, setTomorrowDateStr] = useState('');
-  const [offeredNextSlot, setOfferedNextSlot] = useState<{ date: string; time: string } | null>(null);
-  const [availableSlotsList, setAvailableSlotsList] = useState<Array<{ date: string; time: string; department: string }>>([]);
   const [customSlotDate, setCustomSlotDate] = useState('');
   const [customSlotTime, setCustomSlotTime] = useState('10:00 AM');
+  const [availableSlotsList, setAvailableSlotsList] = useState<Array<{ date: string; time: string; department: string }>>([]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -460,64 +475,37 @@ export default function Home() {
     }
   };
 
-  // Online Meeting: Check Tomorrow 9:00 AM Availability
+  // Online Meeting: Request date & time from user (do not display availability the first time)
   const handleInitiateOnlineMeeting = async () => {
     const userMsg: Message = { role: 'user', content: 'Request an Online Meeting' };
     setMessages((prev) => [...prev, userMsg]);
     setIsTyping(true);
     setLoading(true);
 
-    try {
-      const minWait = new Promise((res) => setTimeout(res, 1500));
-      const res = await fetch('/api/appointments');
-      const data = await res.json();
-      await minWait;
+    const targetDate = customSlotDate || getTomorrowDateString();
+    setCustomSlotDate(targetDate);
+    setCustomSlotTime('10:00 AM');
+    setBookingFlowState('asking_check_slot');
 
-      const tDate = data.tomorrowDate || getTomorrowDateString();
-      setTomorrowDateStr(tDate);
-      setAvailableSlotsList(data.availableSlots || []);
+    await new Promise((res) => setTimeout(res, 800));
 
-      if (data.isTomorrow9AmAvailable) {
-        setBookingFlowState('offered_tomorrow_9am');
-        const replyContent = `Our Admissions department has an open slot tomorrow (${tDate}) at 9:00 AM.\n\nWould tomorrow at 9:00 AM be a good time for your online meeting?`;
+    const replyContent = `Please select your preferred date and time to check slot availability with our Admissions Department:`;
 
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: 'assistant',
-            content: enforceMaxThreeLines(replyContent),
-            step: 'ask_tomorrow_9am',
-          },
-        ]);
-      } else {
-        // Tomorrow at 9:00 AM is not available
-        setBookingFlowState('choosing_custom');
-        const next = data.nextAvailableSlot;
-        if (next) setOfferedNextSlot({ date: next.date, time: next.time });
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: 'assistant',
+        content: enforceMaxThreeLines(replyContent),
+        step: 'ask_custom_slot',
+      },
+    ]);
 
-        const replyContent = `Tomorrow at 9:00 AM is currently booked.\n\nPlease enter your preferred date and time, or choose from our available timetable slots:`;
-
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: 'assistant',
-            content: enforceMaxThreeLines(replyContent),
-            step: 'choose_custom_slot',
-            availableSlotsList: data.availableSlots || [],
-          },
-        ]);
-      }
-    } catch (err) {
-      console.error('Online meeting check error:', err);
-      handleCannotAgreeDeskFallback();
-    } finally {
-      setIsTyping(false);
-      setLoading(false);
-    }
+    setIsTyping(false);
+    setLoading(false);
   };
 
-  // Confirm Online Meeting for Tomorrow at 9:00 AM
-  const handleConfirmTomorrow9Am = async () => {
+  // Check user requested slot with timetable and book or show open slots
+  const handleCheckAndBookSlot = async (selDate: string, selTime: string) => {
     const currentLead = userLead || {
       inquiryId: 'GPUC-2026-INQ-1001',
       studentName: leadStudentName || 'Prospective Student',
@@ -527,125 +515,20 @@ export default function Home() {
       inquiryType: 'Online Meeting',
     };
 
-    const userMsg: Message = { role: 'user', content: 'Yes, tomorrow at 9:00 AM works.' };
+    const userMsg: Message = { role: 'user', content: `Check ${selDate} at ${selTime}` };
     setMessages((prev) => [...prev, userMsg]);
     setIsTyping(true);
     setLoading(true);
 
     try {
-      const minWait = new Promise((res) => setTimeout(res, 1500));
-      const targetDate = tomorrowDateStr || getTomorrowDateString();
-      const res = await fetch('/api/appointments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: currentLead.studentName + (currentLead.parentName ? ` (Parent: ${currentLead.parentName})` : ''),
-          mobile: currentLead.mobile,
-          mode: 'online_meeting',
-          date: targetDate,
-          timeSlot: '09:00 AM',
-          inquiryId: currentLead.inquiryId,
-          purpose: `Online Admission Consultation (${currentLead.admissionClass})`,
-        }),
-      });
-      const data = await res.json();
-      await minWait;
-
-      const apt = data.appointment || {
-        id: `GPUC-2026-APT-${Date.now().toString().slice(-4)}`,
-        mode: 'online_meeting',
-        date: targetDate,
-        timeSlot: '09:00 AM',
-        meetingLinkOrVenue: 'Online Consultation (Admissions Team)',
-      };
-
-      setBookingFlowState('completed');
-
-      const replyContent = `Your online consultation is confirmed for tomorrow at 9:00 AM (Ref: ${apt.id}).\n\nOur Admissions team will contact you 1 minute before the allocated time and you will receive a WhatsApp notification confirming your ticket initiation and request.`;
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: 'assistant',
-          content: enforceMaxThreeLines(replyContent),
-          step: 'completed',
-          ticketData: {
-            id: apt.id,
-            mode: 'online_meeting',
-            date: apt.date,
-            timeSlot: apt.timeSlot,
-            venue: apt.meetingLinkOrVenue,
-            studentName: currentLead.studentName,
-            mobile: currentLead.mobile,
-            instructions: 'Our Admissions team will contact you 1 minute before the allocated time and you will receive a WhatsApp notification confirming your ticket initiation and request.',
-          },
-        },
-      ]);
-    } catch (err) {
-      console.error('Confirm 9am booking error:', err);
-      handleCannotAgreeDeskFallback();
-    } finally {
-      setIsTyping(false);
-      setLoading(false);
-    }
-  };
-
-  // Show Custom Date/Time Picker
-  const handleShowCustomSlotPicker = async () => {
-    const userMsg: Message = { role: 'user', content: 'Choose another date and time' };
-    setMessages((prev) => [...prev, userMsg]);
-    setIsTyping(true);
-
-    try {
-      const res = await fetch('/api/appointments');
-      const data = await res.json();
-      const slots = data.availableSlots || [];
-      setAvailableSlotsList(slots);
-      setBookingFlowState('choosing_custom');
-
-      setTimeout(() => {
-        setIsTyping(false);
-        const replyContent = `Please select an available timetable slot below or enter your preferred date and time:`;
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: 'assistant',
-            content: enforceMaxThreeLines(replyContent),
-            step: 'choose_custom_slot',
-            availableSlotsList: slots,
-          },
-        ]);
-      }, 1000);
-    } catch (err) {
-      console.error(err);
-      setIsTyping(false);
-    }
-  };
-
-  // Check custom slot with timetable and book or offer next
-  const handleCheckAndBookCustomSlot = async (selDate: string, selTime: string) => {
-    const currentLead = userLead || {
-      inquiryId: 'GPUC-2026-INQ-1001',
-      studentName: leadStudentName || 'Prospective Student',
-      parentName: leadParentName,
-      mobile: leadMobile || '9845012345',
-      admissionClass: '12th Class (2nd PU)',
-      inquiryType: 'Online Meeting',
-    };
-
-    const userMsg: Message = { role: 'user', content: `${selDate} at ${selTime}` };
-    setMessages((prev) => [...prev, userMsg]);
-    setIsTyping(true);
-    setLoading(true);
-
-    try {
-      const minWait = new Promise((res) => setTimeout(res, 1500));
-      // 1. Check availability with timetable
+      const minWait = new Promise((res) => setTimeout(res, 1200));
+      // 1. Check availability with admissions timetable
       const checkRes = await fetch(`/api/appointments?date=${encodeURIComponent(selDate)}&time=${encodeURIComponent(selTime)}`);
       const checkData = await checkRes.json();
+      await minWait;
 
       if (checkData.available) {
-        // Book the slot!
+        // Slot is available! Book immediately
         const bookRes = await fetch('/api/appointments', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -660,8 +543,6 @@ export default function Home() {
           }),
         });
         const bookData = await bookRes.json();
-        await minWait;
-
         const apt = bookData.appointment;
         setBookingFlowState('completed');
 
@@ -686,34 +567,29 @@ export default function Home() {
           },
         ]);
       } else {
-        // Unavailable! Offer the next slot available
-        await minWait;
-        const next = checkData.nextAvailableSlot;
-        if (next) {
-          setOfferedNextSlot({ date: next.date, time: next.time });
-          setBookingFlowState('offered_next_slot');
+        // Requested slot is unavailable! Now show available timetable slots
+        const openSlots: Array<{ date: string; time: string; department: string }> =
+          checkData.availableSlotsForDate && checkData.availableSlotsForDate.length > 0
+            ? checkData.availableSlotsForDate
+            : (checkData.availableSlots || []);
 
-          const replyContent = `That slot is not available. The next available slot with Admissions is on ${next.date} at ${next.time}.\n\nWould that slot work for you?`;
+        setAvailableSlotsList(openSlots);
+        setBookingFlowState('showing_available_slots');
 
-          setMessages((prev) => [
-            ...prev,
-            {
-              role: 'assistant',
-              content: enforceMaxThreeLines(replyContent),
-              step: 'offer_next_slot',
-              slotOffer: {
-                date: next.date,
-                time: next.time,
-                formatted: `${next.date} at ${next.time}`,
-              },
-            },
-          ]);
-        } else {
-          handleCannotAgreeDeskFallback();
-        }
+        const replyContent = `The slot on ${selDate} at ${selTime} is currently booked.\n\nHere are the available time slots with our Admissions department for ${selDate}. Please select an open slot:`;
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            content: enforceMaxThreeLines(replyContent),
+            step: 'show_available_slots',
+            availableSlotsList: openSlots,
+          },
+        ]);
       }
     } catch (err) {
-      console.error('Custom slot checking error:', err);
+      console.error('Check and book slot error:', err);
       handleCannotAgreeDeskFallback();
     } finally {
       setIsTyping(false);
@@ -721,13 +597,13 @@ export default function Home() {
     }
   };
 
-  // Fallback to Desk Helpline when agreement cannot be reached
+  // Fallback to Desk Helpline when user cannot find or agree to a slot
   const handleCannotAgreeDeskFallback = () => {
     setBookingFlowState('completed');
     setIsTyping(false);
     setLoading(false);
 
-    const genericReply = `You can reach our Admissions help desk directly at +91 96069 41908 from 8:30 AM to 5:00 PM (Monday to Friday).\n\nOur counseling team will be happy to assist you in coordinating your visit or meeting.`;
+    const genericReply = `You can reach our Admissions Help Desk directly at +91 96069 41908 from 8:30 AM to 5:00 PM (Monday to Friday).\n\nOur counseling team will be happy to assist you in coordinating your visit or scheduling a custom meeting slot.`;
 
     setMessages((prev) => [
       ...prev,
@@ -791,48 +667,43 @@ export default function Home() {
       }
     }
 
-    if (bookingFlowState === 'offered_tomorrow_9am') {
+    if (bookingFlowState === 'asking_check_slot') {
       const lower = text.toLowerCase();
-      if (lower.includes('yes') || lower.includes('sure') || lower.includes('ok') || lower.includes('fine') || lower.includes('good') || lower.includes('tomorrow') || lower.includes('9')) {
-        setInput('');
-        handleConfirmTomorrow9Am();
-        return;
-      }
-      if (lower.includes('no') || lower.includes('other') || lower.includes('different') || lower.includes('another') || lower.includes('change')) {
-        setInput('');
-        handleShowCustomSlotPicker();
-        return;
-      }
-      if (lower.includes('cannot') || lower.includes("can't") || lower.includes('cancel') || lower.includes('desk') || lower.includes('call')) {
+      if (lower.includes('call') || lower.includes('desk') || lower.includes('help') || lower.includes('no') || lower.includes("can't") || lower.includes('cannot') || lower.includes('cancel')) {
         setInput('');
         setMessages((prev) => [...prev, { role: 'user', content: text }]);
         handleCannotAgreeDeskFallback();
         return;
       }
-    }
-
-    if (bookingFlowState === 'choosing_custom') {
       setInput('');
-      const targetDate = customSlotDate || tomorrowDateStr || getTomorrowDateString();
-      handleCheckAndBookCustomSlot(targetDate, text);
+      const targetDate = customSlotDate || getTomorrowDateString();
+      handleCheckAndBookSlot(targetDate, text);
       return;
     }
 
-    if (bookingFlowState === 'offered_next_slot') {
+    if (bookingFlowState === 'showing_available_slots') {
       const lower = text.toLowerCase();
-      if (lower.includes('yes') || lower.includes('sure') || lower.includes('ok') || lower.includes('works') || lower.includes('fine')) {
-        setInput('');
-        if (offeredNextSlot) {
-          handleCheckAndBookCustomSlot(offeredNextSlot.date, offeredNextSlot.time);
-        }
-        return;
-      }
-      if (lower.includes('no') || lower.includes('cannot') || lower.includes("can't") || lower.includes('none') || lower.includes('cancel')) {
+      if (
+        lower.includes('no') ||
+        lower.includes('none') ||
+        lower.includes('neither') ||
+        lower.includes('cannot') ||
+        lower.includes("can't") ||
+        lower.includes('cancel') ||
+        lower.includes('desk') ||
+        lower.includes('help') ||
+        lower.includes('call') ||
+        lower.includes('still no')
+      ) {
         setInput('');
         setMessages((prev) => [...prev, { role: 'user', content: text }]);
         handleCannotAgreeDeskFallback();
         return;
       }
+      setInput('');
+      const targetDate = customSlotDate || getTomorrowDateString();
+      handleCheckAndBookSlot(targetDate, text);
+      return;
     }
 
     // Standard question flow
@@ -964,8 +835,6 @@ export default function Home() {
     setLoading(false);
     setIsSubmittingLead(false);
     setBookingFlowState('idle');
-    setTomorrowDateStr('');
-    setOfferedNextSlot(null);
     setAvailableSlotsList([]);
     setCustomSlotDate('');
     setCustomSlotTime('10:00 AM');
@@ -978,9 +847,9 @@ export default function Home() {
       if (leadStep === 'ask_admission') return "Type class or choose an option above...";
     }
     if (bookingFlowState === 'offered_choice') return "Type 'offline' for visit or 'online' for meeting...";
-    if (bookingFlowState === 'offered_tomorrow_9am') return "Type 'yes' or 'choose another time'...";
-    if (bookingFlowState === 'choosing_custom') return "Type preferred time (e.g. 11:30 AM)...";
-    if (bookingFlowState === 'offered_next_slot') return "Type 'yes' to accept or 'no'...";
+    if (bookingFlowState === 'asking_check_slot') return "Select date & time above or type preferred time...";
+    if (bookingFlowState === 'showing_available_slots') return "Select an available slot or type your time...";
+    return "Ask about admissions, courses, fees, visits...";
   };
 
   const handleFeedbackSubmit = async () => {
@@ -1013,15 +882,15 @@ export default function Home() {
       <div
         style={{
           position: 'fixed',
-          bottom: '24px',
-          right: '24px',
+          bottom: '20px',
+          right: '20px',
           zIndex: 1000,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'flex-end',
         }}
       >
-        {/* Floating Chatbot Circular Button (when chat is closed) */}
+        {/* Floating Chatbot Circular Button (when chat is closed - reduced by 20%) */}
         {!isChatOpen && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
             {/* Optional lightweight tooltip shown ONLY when actively hovering */}
@@ -1050,19 +919,19 @@ export default function Home() {
               </div>
             )}
 
-            {/* Gopalan Crest Icon Floating Circle */}
+            {/* Gopalan Crest Icon Floating Circle (Reduced 20%: 66px -> 53px) */}
             <button
               onClick={() => setIsChatOpen(true)}
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
               aria-label="Open Gopalan PU College Assistant"
               style={{
-                width: '66px',
-                height: '66px',
+                width: '53px',
+                height: '53px',
                 borderRadius: '50%',
                 background: '#FFFFFF',
-                border: '3px solid #F59E0B',
-                boxShadow: '0 8px 28px rgba(0, 0, 0, 0.45), 0 0 0 3px rgba(245, 158, 11, 0.25)',
+                border: '2.5px solid #F59E0B',
+                boxShadow: '0 6px 22px rgba(0, 0, 0, 0.4), 0 0 0 2.5px rgba(245, 158, 11, 0.25)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -1077,8 +946,8 @@ export default function Home() {
                 src="/gopalan_crest.svg"
                 alt="Gopalan PU College"
                 style={{
-                  width: '46px',
-                  height: '46px',
+                  width: '37px',
+                  height: '37px',
                   objectFit: 'contain',
                   display: 'block',
                 }}
@@ -1090,12 +959,12 @@ export default function Home() {
                   position: 'absolute',
                   top: '-2px',
                   right: '-2px',
-                  width: '16px',
-                  height: '16px',
+                  width: '13px',
+                  height: '13px',
                   borderRadius: '50%',
                   background: '#22C55E',
-                  border: '2.5px solid #060D19',
-                  boxShadow: '0 0 8px rgba(34, 197, 94, 0.8)',
+                  border: '2px solid #060D19',
+                  boxShadow: '0 0 6px rgba(34, 197, 94, 0.8)',
                 }}
               />
             </button>
@@ -1112,10 +981,10 @@ export default function Home() {
               e.stopPropagation();
             }}
             style={{
-              width: '420px',
-              maxWidth: 'calc(100vw - 32px)',
-              height: '640px',
-              maxHeight: 'calc(100vh - 48px)',
+              width: '380px',
+              maxWidth: 'calc(100vw - 28px)',
+              height: '600px',
+              maxHeight: 'calc(100vh - 40px)',
               display: 'flex',
               flexDirection: 'column',
               background: '#FFFFFF',
@@ -1303,12 +1172,12 @@ export default function Home() {
                           msg.role === 'user'
                             ? '16px 16px 4px 16px'
                             : '16px 16px 16px 4px',
-                        padding: '13px 16px',
+                        padding: '10px 14px',
                         color: msg.role === 'user' ? '#FFFFFF' : '#0F172A',
-                        fontSize: '0.86rem',
-                        lineHeight: 1.6,
+                        fontSize: '0.83rem',
+                        lineHeight: 1.55,
                         border: msg.role === 'user' ? 'none' : '1px solid #E2E8F0',
-                        boxShadow: msg.role === 'user' ? '0 2px 8px rgba(30, 58, 138, 0.25)' : '0 2px 10px rgba(0, 0, 0, 0.05)',
+                        boxShadow: msg.role === 'user' ? '0 2px 8px rgba(30, 58, 138, 0.25)' : '0 2px 8px rgba(0, 0, 0, 0.05)',
                         whiteSpace: 'pre-line',
                         wordBreak: 'break-word',
                         width: msg.step ? '100%' : 'auto',
@@ -1813,108 +1682,11 @@ export default function Home() {
                         </div>
                       )}
 
-                      {/* Step: Ask if tomorrow at 9:00 AM works */}
-                      {msg.step === 'ask_tomorrow_9am' && bookingFlowState === 'offered_tomorrow_9am' && (
+                      {/* Step: Ask User to Check Preferred Date & Time (Do not display availability the first time) */}
+                      {msg.step === 'ask_custom_slot' && bookingFlowState === 'asking_check_slot' && (
                         <div
                           style={{
-                            marginTop: '12px',
-                            background: '#FFFFFF',
-                            border: '1.5px solid #3B82F6',
-                            borderRadius: '12px',
-                            padding: '12px',
-                            boxShadow: '0 4px 14px rgba(0, 0, 0, 0.06)',
-                            width: '100%',
-                            boxSizing: 'border-box',
-                          }}
-                        >
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                            <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#1E40AF', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                              <Clock size={13} color="#2563EB" /> Admissions Desk Availability Check
-                            </span>
-                            <span style={{ fontSize: '0.7rem', padding: '2px 6px', borderRadius: '4px', background: '#DCFCE7', color: '#166534', fontWeight: 600 }}>
-                              Slot Open
-                            </span>
-                          </div>
-
-                          <div style={{ fontSize: '0.78rem', color: '#1E293B', marginBottom: '10px', background: '#F8FAFC', padding: '8px 10px', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
-                            📅 <strong>Tomorrow ({tomorrowDateStr || 'Upcoming'}) at 09:00 AM</strong> with Admissions Counselor
-                          </div>
-
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                            <button
-                              type="button"
-                              disabled={loading || isTyping}
-                              onClick={() => handleConfirmTomorrow9Am()}
-                              style={{
-                                padding: '9px 12px',
-                                background: 'linear-gradient(135deg, #10B981, #059669)',
-                                color: '#FFFFFF',
-                                border: 'none',
-                                borderRadius: '8px',
-                                fontWeight: 700,
-                                fontSize: '0.8rem',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '6px',
-                              }}
-                            >
-                              <Check size={14} /> Yes, tomorrow at 9:00 AM works
-                            </button>
-
-                            <button
-                              type="button"
-                              disabled={loading || isTyping}
-                              onClick={() => handleShowCustomSlotPicker()}
-                              style={{
-                                padding: '8px 12px',
-                                background: '#F1F5F9',
-                                color: '#334155',
-                                border: '1px solid #CBD5E1',
-                                borderRadius: '8px',
-                                fontWeight: 600,
-                                fontSize: '0.78rem',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '6px',
-                              }}
-                            >
-                              <Calendar size={13} /> Choose another date & time
-                            </button>
-
-                            <button
-                              type="button"
-                              disabled={loading || isTyping}
-                              onClick={() => handleCannotAgreeDeskFallback()}
-                              style={{
-                                padding: '7px 12px',
-                                background: '#FFF1F2',
-                                color: '#BE123C',
-                                border: '1px solid #FECDD3',
-                                borderRadius: '8px',
-                                fontWeight: 600,
-                                fontSize: '0.76rem',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '6px',
-                              }}
-                            >
-                              <Phone size={13} /> Cannot make this time &bull; Contact Desk
-                            </button>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Step: Choose Custom Slot from Timetable */}
-                      {msg.step === 'choose_custom_slot' && bookingFlowState === 'choosing_custom' && (
-                        <div
-                          style={{
-                            marginTop: '12px',
+                            marginTop: '10px',
                             background: '#FFFFFF',
                             border: '1.5px solid #3B82F6',
                             borderRadius: '12px',
@@ -1925,117 +1697,137 @@ export default function Home() {
                           }}
                         >
                           <div style={{ fontSize: '0.74rem', fontWeight: 700, color: '#1E40AF', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                            <Calendar size={13} color="#2563EB" /> Select Timetable Slot
+                            <Calendar size={13} color="#2563EB" /> Check Consultation Slot Availability
                           </div>
 
-                          {availableSlotsList.length > 0 && (
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px', marginBottom: '10px' }}>
-                              {availableSlotsList.slice(0, 4).map((slot, sIdx) => (
-                                <button
-                                  key={sIdx}
-                                  type="button"
-                                  disabled={loading || isTyping}
-                                  onClick={() => handleCheckAndBookCustomSlot(slot.date, slot.time)}
-                                  style={{
-                                    padding: '7px 8px',
-                                    background: '#EFF6FF',
-                                    border: '1px solid #BFDBFE',
-                                    borderRadius: '6px',
-                                    fontSize: '0.75rem',
-                                    color: '#1E40AF',
-                                    fontWeight: 600,
-                                    cursor: 'pointer',
-                                    textAlign: 'center',
-                                  }}
-                                >
-                                  {slot.date} &bull; {slot.time}
-                                </button>
-                              ))}
-                            </div>
-                          )}
+                          <div style={{ fontSize: '0.74rem', color: '#475569', marginBottom: '10px' }}>
+                            Select your preferred date and 30-minute consultation window to check availability with our Admissions team:
+                          </div>
 
-                          {/* Custom date and time selectors */}
-                          <div style={{ display: 'flex', gap: '6px', marginBottom: '8px' }}>
-                            <input
-                              type="date"
-                              value={customSlotDate || tomorrowDateStr}
-                              onChange={(e) => setCustomSlotDate(e.target.value)}
-                              style={{
-                                flex: 1,
-                                padding: '6px 8px',
-                                borderRadius: '6px',
-                                border: '1px solid #CBD5E1',
-                                fontSize: '0.78rem',
-                                color: '#0F172A',
-                                background: '#F8FAFC',
-                                outline: 'none',
-                              }}
-                            />
-                            <select
-                              value={customSlotTime}
-                              onChange={(e) => setCustomSlotTime(e.target.value)}
-                              style={{
-                                flex: 1,
-                                padding: '6px 8px',
-                                borderRadius: '6px',
-                                border: '1px solid #CBD5E1',
-                                fontSize: '0.78rem',
-                                color: '#0F172A',
-                                background: '#F8FAFC',
-                                outline: 'none',
-                              }}
-                            >
-                              <option value="09:00 AM">09:00 AM</option>
-                              <option value="10:00 AM">10:00 AM</option>
-                              <option value="11:30 AM">11:30 AM</option>
-                              <option value="02:00 PM">02:00 PM</option>
-                              <option value="03:30 PM">03:30 PM</option>
-                            </select>
+                          {/* Date and Time Selectors */}
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '10px' }}>
+                            <div>
+                              <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 600, color: '#475569', marginBottom: '3px' }}>
+                                Preferred Date:
+                              </label>
+                              <input
+                                type="date"
+                                min={getTomorrowDateString()}
+                                value={customSlotDate || getTomorrowDateString()}
+                                onChange={(e) => setCustomSlotDate(e.target.value)}
+                                style={{
+                                  width: '100%',
+                                  boxSizing: 'border-box',
+                                  padding: '7px 10px',
+                                  borderRadius: '7px',
+                                  border: '1px solid #CBD5E1',
+                                  fontSize: '0.8rem',
+                                  color: '#0F172A',
+                                  background: '#F8FAFC',
+                                  outline: 'none',
+                                }}
+                              />
+                            </div>
+
+                            <div>
+                              <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 600, color: '#475569', marginBottom: '3px' }}>
+                                Preferred 30-Min Time Slot:
+                              </label>
+                              <select
+                                value={customSlotTime}
+                                onChange={(e) => setCustomSlotTime(e.target.value)}
+                                style={{
+                                  width: '100%',
+                                  boxSizing: 'border-box',
+                                  padding: '7px 10px',
+                                  borderRadius: '7px',
+                                  border: '1px solid #CBD5E1',
+                                  fontSize: '0.8rem',
+                                  color: '#0F172A',
+                                  background: '#F8FAFC',
+                                  outline: 'none',
+                                  cursor: 'pointer',
+                                }}
+                              >
+                                <optgroup label="Morning (9:00 AM – 12:30 PM)">
+                                  <option value="09:00 AM">09:00 AM</option>
+                                  <option value="09:30 AM">09:30 AM</option>
+                                  <option value="10:00 AM">10:00 AM</option>
+                                  <option value="10:30 AM">10:30 AM</option>
+                                  <option value="11:00 AM">11:00 AM</option>
+                                  <option value="11:30 AM">11:30 AM</option>
+                                  <option value="12:00 PM">12:00 PM</option>
+                                  <option value="12:30 PM">12:30 PM</option>
+                                </optgroup>
+                                <optgroup label="Afternoon (2:00 PM – 5:00 PM)">
+                                  <option value="02:00 PM">02:00 PM</option>
+                                  <option value="02:30 PM">02:30 PM</option>
+                                  <option value="03:00 PM">03:00 PM</option>
+                                  <option value="03:30 PM">03:30 PM</option>
+                                  <option value="04:00 PM">04:00 PM</option>
+                                  <option value="04:30 PM">04:30 PM</option>
+                                  <option value="05:00 PM">05:00 PM</option>
+                                </optgroup>
+                              </select>
+                            </div>
+                          </div>
+
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                             <button
                               type="button"
                               disabled={loading || isTyping}
-                              onClick={() => handleCheckAndBookCustomSlot(customSlotDate || tomorrowDateStr, customSlotTime)}
+                              onClick={() => handleCheckAndBookSlot(customSlotDate || getTomorrowDateString(), customSlotTime)}
                               style={{
-                                padding: '6px 12px',
-                                background: '#3B82F6',
-                                color: '#fff',
-                                borderRadius: '6px',
+                                width: '100%',
+                                padding: '9px 12px',
+                                background: 'linear-gradient(135deg, #2563EB, #1D4ED8)',
+                                color: '#FFFFFF',
                                 border: 'none',
-                                fontSize: '0.78rem',
-                                fontWeight: 600,
+                                borderRadius: '8px',
+                                fontWeight: 700,
+                                fontSize: '0.8rem',
                                 cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '6px',
+                                boxShadow: '0 2px 6px rgba(37, 99, 235, 0.3)',
                               }}
                             >
-                              Check
+                              <Check size={14} /> Check Availability & Book Slot
+                            </button>
+
+                            <button
+                              type="button"
+                              disabled={loading || isTyping}
+                              onClick={() => handleCannotAgreeDeskFallback()}
+                              style={{
+                                width: '100%',
+                                padding: '7px 10px',
+                                background: '#FFF1F2',
+                                color: '#BE123C',
+                                border: '1px solid #FECDD3',
+                                borderRadius: '7px',
+                                fontWeight: 600,
+                                fontSize: '0.74rem',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '5px',
+                              }}
+                            >
+                              <Phone size={13} /> Prefer to speak directly &bull; Admissions Help Desk
                             </button>
                           </div>
-
-                          <button
-                            type="button"
-                            onClick={() => handleCannotAgreeDeskFallback()}
-                            style={{
-                              width: '100%',
-                              padding: '6px',
-                              background: '#FFF1F2',
-                              color: '#BE123C',
-                              border: '1px solid #FECDD3',
-                              borderRadius: '6px',
-                              fontSize: '0.74rem',
-                              fontWeight: 600,
-                              cursor: 'pointer',
-                              textAlign: 'center',
-                            }}
-                          >
-                            None of these work &bull; Reach Help Desk
-                          </button>
                         </div>
                       )}
 
-                      {/* Step: Offer Next Available Slot if requested slot was booked */}
-                      {msg.step === 'offer_next_slot' && bookingFlowState === 'offered_next_slot' && offeredNextSlot && (
+                      {/* Step: Show Available Time Slots when requested slot was booked */}
+                      {msg.step === 'show_available_slots' && bookingFlowState === 'showing_available_slots' && (
                         <div
                           style={{
-                            marginTop: '12px',
+                            marginTop: '10px',
                             background: '#FFFFFF',
                             border: '1.5px solid #F59E0B',
                             borderRadius: '12px',
@@ -2047,62 +1839,72 @@ export default function Home() {
                         >
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                             <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#92400E', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                              <Clock size={13} color="#D97706" /> Next Available Slot Offered
+                              <Clock size={13} color="#D97706" /> Available Timetable Slots
                             </span>
-                            <span style={{ fontSize: '0.7rem', padding: '2px 6px', borderRadius: '4px', background: '#FEF3C7', color: '#92400E', fontWeight: 600 }}>
-                              Open Slot
+                            <span style={{ fontSize: '0.68rem', padding: '2px 6px', borderRadius: '4px', background: '#FEF3C7', color: '#92400E', fontWeight: 700 }}>
+                              Open Slots
                             </span>
                           </div>
 
-                          <div style={{ fontSize: '0.8rem', color: '#1E293B', marginBottom: '10px', background: '#FFFBEB', padding: '8px 10px', borderRadius: '8px', border: '1px solid #FDE68A' }}>
-                            📅 <strong>{offeredNextSlot.date} at {offeredNextSlot.time}</strong> with Admissions Desk
+                          <div style={{ fontSize: '0.74rem', color: '#475569', marginBottom: '10px' }}>
+                            The slot you requested is taken. Please select any open slot below to confirm your booking:
                           </div>
 
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                            <button
-                              type="button"
-                              disabled={loading || isTyping}
-                              onClick={() => handleCheckAndBookCustomSlot(offeredNextSlot.date, offeredNextSlot.time)}
-                              style={{
-                                padding: '9px 12px',
-                                background: 'linear-gradient(135deg, #10B981, #059669)',
-                                color: '#FFFFFF',
-                                border: 'none',
-                                borderRadius: '8px',
-                                fontWeight: 700,
-                                fontSize: '0.8rem',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '6px',
-                              }}
-                            >
-                              <Check size={14} /> Yes, book {offeredNextSlot.date} at {offeredNextSlot.time}
-                            </button>
+                          {/* Available Slots Grid */}
+                          {availableSlotsList.length > 0 ? (
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', marginBottom: '10px' }}>
+                              {availableSlotsList.map((slot, sIdx) => (
+                                <button
+                                  key={sIdx}
+                                  type="button"
+                                  disabled={loading || isTyping}
+                                  onClick={() => handleCheckAndBookSlot(slot.date, slot.time)}
+                                  style={{
+                                    padding: '8px 4px',
+                                    background: '#EFF6FF',
+                                    border: '1.5px solid #3B82F6',
+                                    borderRadius: '7px',
+                                    color: '#1E40AF',
+                                    fontSize: '0.76rem',
+                                    fontWeight: 700,
+                                    cursor: 'pointer',
+                                    textAlign: 'center',
+                                    transition: 'all 0.15s ease',
+                                  }}
+                                >
+                                  {slot.time}
+                                </button>
+                              ))}
+                            </div>
+                          ) : (
+                            <div style={{ fontSize: '0.76rem', color: '#64748B', fontStyle: 'italic', marginBottom: '10px' }}>
+                              All slots for this day are currently filled.
+                            </div>
+                          )}
 
-                            <button
-                              type="button"
-                              disabled={loading || isTyping}
-                              onClick={() => handleCannotAgreeDeskFallback()}
-                              style={{
-                                padding: '8px 12px',
-                                background: '#FFF1F2',
-                                color: '#BE123C',
-                                border: '1px solid #FECDD3',
-                                borderRadius: '8px',
-                                fontWeight: 600,
-                                fontSize: '0.76rem',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '6px',
-                              }}
-                            >
-                              <Phone size={13} /> Cannot make this time &bull; Contact Desk
-                            </button>
-                          </div>
+                          {/* Fallback to Help Desk if user still cannot agree */}
+                          <button
+                            type="button"
+                            disabled={loading || isTyping}
+                            onClick={() => handleCannotAgreeDeskFallback()}
+                            style={{
+                              width: '100%',
+                              padding: '8px 12px',
+                              background: '#FFF1F2',
+                              color: '#BE123C',
+                              border: '1.5px solid #FECDD3',
+                              borderRadius: '8px',
+                              fontWeight: 700,
+                              fontSize: '0.76rem',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '6px',
+                            }}
+                          >
+                            <Phone size={13} /> None of these work for me &bull; Help Desk Details
+                          </button>
                         </div>
                       )}
 
@@ -2188,6 +1990,60 @@ export default function Home() {
                               <span>{msg.ticketData.instructions}</span>
                             </div>
                           )}
+                        </div>
+                      )}
+
+                      {/* Admissions Help Desk Contact Card */}
+                      {msg.step === 'completed' && msg.content.includes('+91 96069 41908') && !msg.ticketData && (
+                        <div
+                          style={{
+                            marginTop: '10px',
+                            background: '#FFFDF5',
+                            border: '1.5px solid #F59E0B',
+                            borderRadius: '12px',
+                            padding: '12px',
+                            boxShadow: '0 4px 14px rgba(0, 0, 0, 0.06)',
+                            width: '100%',
+                            boxSizing: 'border-box',
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                            <span style={{ fontSize: '0.74rem', fontWeight: 800, color: '#92400E', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                              <Phone size={13} color="#D97706" /> ADMISSIONS HELP DESK
+                            </span>
+                            <span style={{ fontSize: '0.68rem', padding: '2px 6px', borderRadius: '4px', background: '#FEF3C7', color: '#92400E', fontWeight: 700 }}>
+                              DIRECT LINE
+                            </span>
+                          </div>
+
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', background: '#FFFFFF', padding: '8px 10px', borderRadius: '8px', border: '1px solid #FDE68A' }}>
+                            <div>
+                              <div style={{ fontSize: '0.68rem', color: '#78350F', fontWeight: 600 }}>Helpline Phone</div>
+                              <div style={{ fontSize: '0.96rem', fontWeight: 800, color: '#92400E' }}>+91 96069 41908</div>
+                            </div>
+                            <a
+                              href="tel:+919606941908"
+                              style={{
+                                padding: '6px 12px',
+                                background: 'linear-gradient(135deg, #F59E0B, #D97706)',
+                                color: '#FFFFFF',
+                                borderRadius: '6px',
+                                fontSize: '0.75rem',
+                                fontWeight: 700,
+                                textDecoration: 'none',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                              }}
+                            >
+                              <Phone size={12} /> Call Desk
+                            </a>
+                          </div>
+
+                          <div style={{ fontSize: '0.72rem', color: '#78350F', lineHeight: 1.45 }}>
+                            🕒 <strong>Working Hours:</strong> Monday &ndash; Friday, 8:30 AM &ndash; 5:00 PM<br />
+                            📍 <strong>Admissions Office:</strong> Gopalan PU College, Whitefield, Bengaluru
+                          </div>
                         </div>
                       )}
 
