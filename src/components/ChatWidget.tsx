@@ -130,7 +130,7 @@ function getTopicOverview(text: string): { overview: string; followUp: string } 
 • PCMC: Physics, Chemistry, Mathematics, Computer Science
 • Integrated Coaching: NEET, JEE & KCET
 • Languages: English + Kannada / Hindi`,
-      followUp: `To apply or receive syllabus details, enter student name (or skip):`,
+      followUp: `To apply or receive syllabus details, enter student name:`,
     };
   }
 
@@ -140,7 +140,7 @@ function getTopicOverview(text: string): { overview: string; followUp: string } 
 • CEBA: Computer Science, Economics, Business Studies, Accountancy
 • Focus: CA Foundation, CS & B.Com career pathways
 • Languages: English + Kannada / Hindi`,
-      followUp: `To apply or receive course details, enter student name (or skip):`,
+      followUp: `To apply or receive course details, enter student name:`,
     };
   }
 
@@ -414,8 +414,8 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isChatOpen, isMaximized, isEmbedded]);
 
-  // Skip option: Allows user to refuse giving contact info and freely ask questions
-  const handleSkipLead = () => {
+  // Close option: Dismiss the lead inquiry card cleanly without adding useless chat messages
+  const handleCloseLead = () => {
     setHasSkippedLead(true);
     setLeadStep('idle');
     setStepError('');
@@ -423,13 +423,8 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
     setStepParentName('');
     setStepMobile('');
     setStepLocation('');
-
-    const skipAckMsg: Message = {
-      role: 'assistant',
-      content: `No problem at all! Feel free to ask any questions about our Science (PCMB/PCMC), Commerce (CEBA), campus facilities, or admissions. How can I help you today?`,
-    };
-    setMessages((prev) => [...prev, skipAckMsg]);
   };
+  const handleSkipLead = handleCloseLead;
 
   // Step 1: Submit Student Name (with 1.5s bouncing dots)
   const handleStudentNameSubmit = (nameVal?: string) => {
@@ -835,77 +830,18 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
       setIsChatOpen(true);
     }
 
-    // If user is currently in the middle of lead steps, allow answering via bottom chat bar or skipping:
-    if (!userLead) {
+    // If a lead step card was open, any interaction in the chat input dismisses the card
+    if (!userLead && leadStep !== 'idle') {
       const lower = text.toLowerCase().trim();
-      if (
-        (leadStep === 'ask_student_name' || leadStep === 'ask_contact' || leadStep === 'ask_admission') &&
-        (lower === 'skip' ||
-          lower === 'no' ||
-          lower === 'cancel' ||
-          lower === 'later' ||
-          lower === 'x' ||
-          lower.includes('skip') ||
-          lower.includes('not now') ||
-          lower.includes('just browsing'))
-      ) {
+      if (lower === 'close' || lower === 'cancel' || lower === 'skip' || lower === 'x') {
         setInput('');
-        handleSkipLead();
+        handleCloseLead();
         return;
       }
-
-      if (leadStep === 'ask_student_name') {
-        const isQuery =
-          text.includes('?') ||
-          /\b(who|what|where|when|why|how|which|can|is|are|do|does|tell|fee|fees|cost|tuition|hostel|bus|principal)\b/i.test(text);
-
-        if (isQuery) {
-          // User asked a question instead of entering their name; dismiss lead prompt and answer their question
-          setLeadStep('idle');
-          setHasSkippedLead(true);
-          // fall through to process user question
-        } else {
-          setInput('');
-          handleStudentNameSubmit(text);
-          return;
-        }
-      }
-      if (leadStep === 'ask_contact') {
-        setInput('');
-        const digits = text.replace(/\D/g, '');
-        // If user typed a 10+ digit mobile number directly
-        if (digits.length >= 10 && !stepMobile) {
-          setStepMobile(text);
-          setStepError('');
-          locationInputRef.current?.focus();
-          return;
-        }
-        // If parent name is not set yet and text doesn't look like phone digits
-        if (!stepParentName && digits.length < 10) {
-          setStepParentName(text);
-          mobileInputRef.current?.focus();
-          return;
-        }
-        // If mobile is not set yet
-        if (!stepMobile) {
-          if (digits.length < 10) {
-            setStepError('Please enter a valid 10-digit mobile number.');
-            mobileInputRef.current?.focus();
-            return;
-          }
-          setStepMobile(text);
-          locationInputRef.current?.focus();
-          return;
-        }
-        // If mobile is set, treat text as location and submit
-        handleContactSubmit(stepParentName, stepMobile, text);
-        return;
-      }
-      if (leadStep === 'ask_admission') {
-        setInput('');
-        handleAdmissionSubmit(text, 'Admissions 2026-27');
-        return;
-      }
+      // Any other text is a user query/question: dismiss the lead card and answer the user's question directly
+      setLeadStep('idle');
+      setHasSkippedLead(true);
+      setStepError('');
     }
 
     // Handle user inputs during booking flow steps:
@@ -1112,15 +1048,6 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
   };
 
   const getInputPlaceholder = () => {
-    if (!userLead) {
-      if (leadStep === 'ask_student_name') return "Enter student's full name...";
-      if (leadStep === 'ask_contact') {
-        if (!stepParentName) return "Enter parent name (or fill form above)...";
-        if (!stepMobile) return "Enter 10-digit mobile number...";
-        return "Enter area & pincode (e.g. Whitefield 560066)...";
-      }
-      if (leadStep === 'ask_admission') return "Type class or choose an option above...";
-    }
     if (bookingFlowState === 'offered_choice') return "Type 'offline' for visit or 'online' for meeting...";
     if (bookingFlowState === 'asking_check_slot') return "Select date & time above or type preferred time...";
     if (bookingFlowState === 'showing_available_slots') return "Select an available slot or type your time...";
@@ -1745,7 +1672,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                       {msg.step === 'ask_student_name' && leadStep === 'ask_student_name' && !userLead && (
                         <div
                           style={{
-                            marginTop: '12px',
+                            marginTop: '10px',
                             background: '#FFFFFF',
                             border: '1.5px solid #F59E0B',
                             borderRadius: '12px',
@@ -1756,32 +1683,29 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                           }}
                         >
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                            <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#92400E', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                              <Sparkles size={13} color="#D97706" /> Step 1: Student Details
+                            <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#92400E', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                              <Sparkles size={13} color="#D97706" /> Student Details (Step 1/3)
                             </span>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                              <span style={{ fontSize: '0.7rem', color: '#64748B' }}>1 of 3</span>
-                              <button
-                                type="button"
-                                onClick={handleSkipLead}
-                                title="Skip for now and continue chat"
-                                style={{
-                                  background: 'rgba(239, 68, 68, 0.08)',
-                                  color: '#DC2626',
-                                  border: '1px solid rgba(239, 68, 68, 0.25)',
-                                  borderRadius: '12px',
-                                  padding: '2px 8px',
-                                  fontSize: '0.68rem',
-                                  fontWeight: 600,
-                                  cursor: 'pointer',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '3px',
-                                }}
-                              >
-                                <X size={11} /> Skip
-                              </button>
-                            </div>
+                            <button
+                              type="button"
+                              onClick={handleCloseLead}
+                              aria-label="Close"
+                              title="Close"
+                              style={{
+                                background: 'transparent',
+                                border: 'none',
+                                color: '#64748B',
+                                cursor: 'pointer',
+                                padding: '4px',
+                                borderRadius: '6px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                lineHeight: 1,
+                              }}
+                            >
+                              <X size={15} />
+                            </button>
                           </div>
 
                           {stepError && (
@@ -1839,24 +1763,6 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                               Next <ArrowRight size={14} />
                             </button>
                           </div>
-
-                          <div style={{ textAlign: 'center', marginTop: '8px' }}>
-                            <button
-                              type="button"
-                              onClick={handleSkipLead}
-                              style={{
-                                background: 'none',
-                                border: 'none',
-                                color: '#64748B',
-                                fontSize: '0.72rem',
-                                cursor: 'pointer',
-                                textDecoration: 'underline',
-                                padding: '3px',
-                              }}
-                            >
-                              Prefer not to share? Skip and continue asking questions ✕
-                            </button>
-                          </div>
                         </div>
                       )}
 
@@ -1864,7 +1770,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                       {msg.step === 'ask_contact' && leadStep === 'ask_contact' && !userLead && (
                         <div
                           style={{
-                            marginTop: '12px',
+                            marginTop: '10px',
                             background: '#FFFFFF',
                             border: '1.5px solid #F59E0B',
                             borderRadius: '12px',
@@ -1875,32 +1781,29 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                           }}
                         >
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                            <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#92400E', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                              <Sparkles size={13} color="#D97706" /> Step 2: Contact Information & Location
+                            <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#92400E', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                              <Sparkles size={13} color="#D97706" /> Contact & Location (Step 2/3)
                             </span>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                              <span style={{ fontSize: '0.7rem', color: '#64748B' }}>2 of 3</span>
-                              <button
-                                type="button"
-                                onClick={handleSkipLead}
-                                title="Skip for now and continue chat"
-                                style={{
-                                  background: 'rgba(239, 68, 68, 0.08)',
-                                  color: '#DC2626',
-                                  border: '1px solid rgba(239, 68, 68, 0.25)',
-                                  borderRadius: '12px',
-                                  padding: '2px 8px',
-                                  fontSize: '0.68rem',
-                                  fontWeight: 600,
-                                  cursor: 'pointer',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '3px',
-                                }}
-                              >
-                                <X size={11} /> Skip
-                              </button>
-                            </div>
+                            <button
+                              type="button"
+                              onClick={handleCloseLead}
+                              aria-label="Close"
+                              title="Close"
+                              style={{
+                                background: 'transparent',
+                                border: 'none',
+                                color: '#64748B',
+                                cursor: 'pointer',
+                                padding: '4px',
+                                borderRadius: '6px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                lineHeight: 1,
+                              }}
+                            >
+                              <X size={15} />
+                            </button>
                           </div>
 
                           {stepError && (
@@ -1910,10 +1813,10 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                             </div>
                           )}
 
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%', boxSizing: 'border-box' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '7px', width: '100%', boxSizing: 'border-box' }}>
                             {/* 1. Parent / Guardian Name (with autoFocus) */}
                             <div>
-                              <div style={{ fontSize: '0.74rem', fontWeight: 600, color: '#334155', marginBottom: '3px' }}>
+                              <div style={{ fontSize: '0.72rem', fontWeight: 600, color: '#334155', marginBottom: '2px' }}>
                                 Parent / Guardian Name <span style={{ color: '#94A3B8', fontWeight: 400 }}>(Optional)</span>
                               </div>
                               <div style={{ position: 'relative' }}>
@@ -1933,23 +1836,23 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                   style={{
                                     width: '100%',
                                     boxSizing: 'border-box',
-                                    padding: '8px 12px 8px 34px',
+                                    padding: '7px 10px 7px 32px',
                                     background: '#F8FAFC',
                                     border: '1px solid #CBD5E1',
                                     borderRadius: '8px',
                                     color: '#0F172A',
-                                    fontSize: '0.84rem',
+                                    fontSize: '0.82rem',
                                     outline: 'none',
                                   }}
                                 />
-                                <Users size={15} color="#64748B" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }} />
+                                <Users size={14} color="#64748B" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }} />
                               </div>
                             </div>
 
                             {/* 2. Mobile / WhatsApp Phone Number */}
                             <div>
-                              <div style={{ fontSize: '0.74rem', fontWeight: 600, color: '#334155', marginBottom: '3px' }}>
-                                Mobile / WhatsApp Phone Number <span style={{ color: '#D97706', fontSize: '0.7rem', fontWeight: 600 }}>(Required)</span>
+                              <div style={{ fontSize: '0.72rem', fontWeight: 600, color: '#334155', marginBottom: '2px' }}>
+                                Mobile Number <span style={{ color: '#D97706', fontSize: '0.68rem', fontWeight: 600 }}>(Required)</span>
                               </div>
                               <div style={{ position: 'relative' }}>
                                 <input
@@ -1967,26 +1870,26 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                       locationInputRef.current?.focus();
                                     }
                                   }}
-                                  placeholder="10-digit mobile number (e.g. 98450 12345)"
+                                  placeholder="10-digit mobile number"
                                   style={{
                                     width: '100%',
                                     boxSizing: 'border-box',
-                                    padding: '8px 12px 8px 34px',
+                                    padding: '7px 10px 7px 32px',
                                     background: '#F8FAFC',
                                     border: '1px solid #CBD5E1',
                                     borderRadius: '8px',
                                     color: '#0F172A',
-                                    fontSize: '0.84rem',
+                                    fontSize: '0.82rem',
                                     outline: 'none',
                                   }}
                                 />
-                                <Phone size={15} color="#64748B" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }} />
+                                <Phone size={14} color="#64748B" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }} />
                               </div>
                             </div>
 
                             {/* 3. Location: Area & Pincode */}
                             <div>
-                              <div style={{ fontSize: '0.74rem', fontWeight: 600, color: '#334155', marginBottom: '3px' }}>
+                              <div style={{ fontSize: '0.72rem', fontWeight: 600, color: '#334155', marginBottom: '2px' }}>
                                 Location / Area & Pincode <span style={{ color: '#94A3B8', fontWeight: 400 }}>(e.g. Whitefield 560066)</span>
                               </div>
                               <div style={{ position: 'relative' }}>
@@ -2005,16 +1908,16 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                   style={{
                                     width: '100%',
                                     boxSizing: 'border-box',
-                                    padding: '8px 12px 8px 34px',
+                                    padding: '7px 10px 7px 32px',
                                     background: '#F8FAFC',
                                     border: '1px solid #CBD5E1',
                                     borderRadius: '8px',
                                     color: '#0F172A',
-                                    fontSize: '0.84rem',
+                                    fontSize: '0.82rem',
                                     outline: 'none',
                                   }}
                                 />
-                                <MapPin size={15} color="#64748B" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }} />
+                                <MapPin size={14} color="#64748B" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }} />
                               </div>
                             </div>
 
@@ -2026,7 +1929,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                 marginTop: '4px',
                                 width: '100%',
                                 boxSizing: 'border-box',
-                                padding: '9px 14px',
+                                padding: '8px 14px',
                                 fontSize: '0.82rem',
                                 background: 'linear-gradient(135deg, #F59E0B, #D97706)',
                                 color: '#FFFFFF',
@@ -2041,24 +1944,6 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                             >
                               Next: Select Class / Inquiry <ArrowRight size={14} />
                             </button>
-
-                            <div style={{ textAlign: 'center', marginTop: '6px' }}>
-                              <button
-                                type="button"
-                                onClick={handleSkipLead}
-                                style={{
-                                  background: 'none',
-                                  border: 'none',
-                                  color: '#64748B',
-                                  fontSize: '0.72rem',
-                                  cursor: 'pointer',
-                                  textDecoration: 'underline',
-                                  padding: '3px',
-                                }}
-                              >
-                                Prefer not to share? Skip and continue asking questions ✕
-                              </button>
-                            </div>
                           </div>
                         </div>
                       )}
@@ -2067,7 +1952,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                       {msg.step === 'ask_admission' && leadStep === 'ask_admission' && !userLead && (
                         <div
                           style={{
-                            marginTop: '12px',
+                            marginTop: '10px',
                             background: '#FFFFFF',
                             border: '1.5px solid #F59E0B',
                             borderRadius: '12px',
@@ -2078,43 +1963,40 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                           }}
                         >
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                            <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#92400E', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                              <Sparkles size={13} color="#D97706" /> Step 3: Choose Admission Option
+                            <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#92400E', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                              <Sparkles size={13} color="#D97706" /> Choose Option (Step 3/3)
                             </span>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                              <span style={{ fontSize: '0.7rem', color: '#64748B' }}>3 of 3</span>
-                              <button
-                                type="button"
-                                onClick={handleSkipLead}
-                                title="Skip for now and continue chat"
-                                style={{
-                                  background: 'rgba(239, 68, 68, 0.08)',
-                                  color: '#DC2626',
-                                  border: '1px solid rgba(239, 68, 68, 0.25)',
-                                  borderRadius: '12px',
-                                  padding: '2px 8px',
-                                  fontSize: '0.68rem',
-                                  fontWeight: 600,
-                                  cursor: 'pointer',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '3px',
-                                }}
-                              >
-                                <X size={11} /> Skip
-                              </button>
-                            </div>
+                            <button
+                              type="button"
+                              onClick={handleCloseLead}
+                              aria-label="Close"
+                              title="Close"
+                              style={{
+                                background: 'transparent',
+                                border: 'none',
+                                color: '#64748B',
+                                cursor: 'pointer',
+                                padding: '4px',
+                                borderRadius: '6px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                lineHeight: 1,
+                              }}
+                            >
+                              <X size={15} />
+                            </button>
                           </div>
 
-                          <div style={{ fontSize: '0.76rem', color: '#475569', marginBottom: '10px' }}>
-                            Tap an option below to register and instantly receive full details:
+                          <div style={{ fontSize: '0.74rem', color: '#475569', marginBottom: '8px' }}>
+                            Tap an option below to register:
                           </div>
 
                           <div
                             style={{
                               display: 'grid',
                               gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-                              gap: '8px',
+                              gap: '6px',
                               width: '100%',
                               boxSizing: 'border-box',
                             }}
@@ -2124,13 +2006,13 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                               disabled={isSubmittingLead}
                               onClick={() => handleAdmissionSubmit('12th Class (2nd PU)', 'Admissions 2026-27')}
                               style={{
-                                padding: '10px 8px',
+                                padding: '8px 6px',
                                 textAlign: 'center',
                                 background: '#FEF3C7',
                                 border: '1px solid #F59E0B',
                                 color: '#92400E',
                                 fontWeight: 700,
-                                fontSize: '0.78rem',
+                                fontSize: '0.76rem',
                                 borderRadius: '8px',
                                 cursor: isSubmittingLead ? 'not-allowed' : 'pointer',
                                 whiteSpace: 'normal',
@@ -2139,10 +2021,9 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                gap: '5px',
+                                gap: '4px',
                                 width: '100%',
                                 boxSizing: 'border-box',
-                                transition: 'all 0.15s ease',
                               }}
                             >
                               🎓 12th Class (2nd PU)
@@ -2152,13 +2033,13 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                               disabled={isSubmittingLead}
                               onClick={() => handleAdmissionSubmit('11th Class (1st PU)', 'Admissions 2026-27')}
                               style={{
-                                padding: '10px 8px',
+                                padding: '8px 6px',
                                 textAlign: 'center',
                                 background: '#EFF6FF',
                                 border: '1px solid #3B82F6',
                                 color: '#1E40AF',
                                 fontWeight: 700,
-                                fontSize: '0.78rem',
+                                fontSize: '0.76rem',
                                 borderRadius: '8px',
                                 cursor: isSubmittingLead ? 'not-allowed' : 'pointer',
                                 whiteSpace: 'normal',
@@ -2167,10 +2048,9 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                gap: '5px',
+                                gap: '4px',
                                 width: '100%',
                                 boxSizing: 'border-box',
-                                transition: 'all 0.15s ease',
                               }}
                             >
                               🎒 11th Class (1st PU)
@@ -2180,13 +2060,13 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                               disabled={isSubmittingLead}
                               onClick={() => handleAdmissionSubmit('11th/12th PU', 'Campus Visit')}
                               style={{
-                                padding: '10px 8px',
+                                padding: '8px 6px',
                                 textAlign: 'center',
                                 background: '#F0FDF4',
                                 border: '1px solid #22C55E',
                                 color: '#166534',
                                 fontWeight: 700,
-                                fontSize: '0.78rem',
+                                fontSize: '0.76rem',
                                 borderRadius: '8px',
                                 cursor: isSubmittingLead ? 'not-allowed' : 'pointer',
                                 whiteSpace: 'normal',
@@ -2195,10 +2075,9 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                gap: '5px',
+                                gap: '4px',
                                 width: '100%',
                                 boxSizing: 'border-box',
-                                transition: 'all 0.15s ease',
                               }}
                             >
                               🏫 Campus Visit
@@ -2208,13 +2087,13 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                               disabled={isSubmittingLead}
                               onClick={() => handleAdmissionSubmit('General PU', 'Admissions 2026-27')}
                               style={{
-                                padding: '10px 8px',
+                                padding: '8px 6px',
                                 textAlign: 'center',
                                 background: '#F1F5F9',
                                 border: '1px solid #94A3B8',
                                 color: '#334155',
                                 fontWeight: 700,
-                                fontSize: '0.78rem',
+                                fontSize: '0.76rem',
                                 borderRadius: '8px',
                                 cursor: isSubmittingLead ? 'not-allowed' : 'pointer',
                                 whiteSpace: 'normal',
@@ -2223,10 +2102,9 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                gap: '5px',
+                                gap: '4px',
                                 width: '100%',
                                 boxSizing: 'border-box',
-                                transition: 'all 0.15s ease',
                               }}
                             >
                               📋 General Inquiry
@@ -2238,24 +2116,6 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                               Registering inquiry with Gopalan admissions server...
                             </div>
                           )}
-
-                          <div style={{ textAlign: 'center', marginTop: '8px' }}>
-                            <button
-                              type="button"
-                              onClick={handleSkipLead}
-                              style={{
-                                background: 'none',
-                                border: 'none',
-                                color: '#64748B',
-                                fontSize: '0.72rem',
-                                cursor: 'pointer',
-                                textDecoration: 'underline',
-                                padding: '3px',
-                              }}
-                            >
-                              Skip and continue asking questions ✕
-                            </button>
-                          </div>
                         </div>
                       )}
 
@@ -2820,8 +2680,8 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Quick Horizontal Presets Bar (hidden on initial greeting to maximize vertical space) */}
-            {messages.length > 1 && (
+            {/* Quick Horizontal Presets Bar (hidden on initial greeting or when card is open to maximize vertical space) */}
+            {messages.length > 1 && leadStep === 'idle' && (
               <div
                 style={{
                   flexShrink: 0,
