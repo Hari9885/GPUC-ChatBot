@@ -118,7 +118,9 @@ For the document checklist and enrollment procedures, please contact our North C
 - Director of Gopalan Foundations: Mrs. Sunita Prabhakar.
 
 5. FEES (MAX 2 LINES):
-- "Tuition fees depend on the chosen stream per Karnataka PU Board norms. For the exact 2026-27 fee schedule, please call our North Campus help desk at +91 81053 88193."
+- When asked about fees, tuition, installment options, or scholarships, do not quote amounts or estimates. Immediately direct the user to the North Campus Help Desk:
+"For official fee structures, installment options, and scholarship details, please contact our North Campus Help Desk directly:
+Helpline: +91 81053 88193 / +91 81230 40418 (Mon–Sat, 8:30 AM–5:00 PM) | Email: gpuc.north@gopalanpucollege.com"
 
 6. HOSTEL & FACILITIES (MAX 3 LINES):
 - "North Campus features modern science labs, computer lab, library, sports grounds (cricket, football), cafeteria, secure girls' hostel, and college bus transport across North Bengaluru."
@@ -186,6 +188,16 @@ export async function callGemini(
     };
   }
 
+  // Instant response for Fee queries - direct to helpline desk for further info
+  const isFeeQuery = /\b(fee|fees|cost|costs|tuition|installment|scholarship|scholarships|concession)\b/i.test(cleanQ) ||
+    ((cleanQ.includes('fee') || cleanQ.includes('cost') || cleanQ.includes('tuition') || cleanQ.includes('installment') || cleanQ.includes('scholarship') || cleanQ.includes('concession') || cleanQ.includes('payment') || cleanQ.includes('how much')) && !cleanQ.includes('calculate') && !cleanQ.includes('solve'));
+  if (isFeeQuery) {
+    return {
+      text: "For official fee structures, installment options, and scholarship details, please contact our North Campus Help Desk directly:\n\nHelpline: +91 81053 88193 / +91 81230 40418 (Mon–Sat, 8:30 AM–5:00 PM)\nEmail: gpuc.north@gopalanpucollege.com",
+      toolCallsExecuted: [],
+    };
+  }
+
   // Instant response for Commerce courses queries
   const isCommerceQuery = /commerce (combination|course|stream)|what commerce|commerce subject/i.test(cleanQ);
   if (isCommerceQuery) {
@@ -249,14 +261,7 @@ export async function callGemini(
     };
   }
 
-  // Instant response for Fee queries
-  const isFeeQuery = /fee|fees|cost|scholarship|tuition/i.test(cleanQ);
-  if (isFeeQuery) {
-    return {
-      text: "Tuition fees depend on the chosen stream per Karnataka PU Board norms, with merit scholarships for students scoring above 85% in 10th/SSLC.\n\nFor the exact 2026-27 fee schedule, please call our North Campus help desk at +91 81053 88193.",
-      toolCallsExecuted: [],
-    };
-  }
+
 
   // Hybrid RAG: Retrieve grounded context from knowledge base & FAQs
   const isCourseQuery = /course|cource|stream|combin|subject|puc|pcmb|pcmc|ceba|seba|meba|offer/i.test(cleanQ);

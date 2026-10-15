@@ -52,8 +52,10 @@
 - Help Desk: +91 81053 88193 / +91 81230 40418.
 
 ## Fees and Payments
-Tuition fees depend on the chosen stream per Karnataka PU Board norms.
-For the exact 2026-27 fee schedule, please call our North Campus Admissions help desk at +91 81053 88193.
+For official fee structures, installment options, and scholarship details, please contact our North Campus Admissions & Accounts Help Desk directly:
+- Helpline: +91 81053 88193 / +91 81230 40418
+- Email: gpuc.north@gopalanpucollege.com
+- Office Hours: Monday to Saturday, 8:30 AM to 5:00 PM.
 
 ## Leadership and Faculty
 - Principal: Mr. M. Mahesh (MSc, MPhil, BEd, 21+ years academic experience).

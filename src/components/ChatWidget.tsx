@@ -129,7 +129,7 @@ function getTopicOverview(text: string): { overview: string; followUp: string } 
 • PCMB: Physics, Chemistry, Mathematics, Biology
 • PCMC: Physics, Chemistry, Mathematics, Computer Science
 Both programs include integrated coaching for NEET, JEE (Main & Advanced), and KCET with experienced senior faculty and state-of-the-art laboratory facilities. Compulsory English is paired with Kannada or Hindi.`,
-      followUp: `Would you like full admission details, fee breakdown, or seat reservation? You can enter the student's name below (or skip to keep asking questions):`,
+      followUp: `Would you like full admission details, syllabus overview, or seat reservation? You can enter the student's name below (or skip to keep asking questions):`,
     };
   }
 
@@ -138,15 +138,17 @@ Both programs include integrated coaching for NEET, JEE (Main & Advanced), and K
       overview: `At Gopalan PU College North Campus, we offer the comprehensive Commerce combination:
 • CEBA: Computer Science, Economics, Business Studies, Accountancy
 Designed to build strong foundations in commerce principles, financial accounting, and modern computer applications for future CA, CS, B.Com, and corporate career pathways. Languages offered are English with Kannada or Hindi.`,
-      followUp: `Would you like curriculum guidance, fee schedule, or seat availability? You can enter the student's name below (or skip to keep asking questions):`,
+      followUp: `Would you like curriculum guidance, subject breakdown, or seat availability? You can enter the student's name below (or skip to keep asking questions):`,
     };
   }
 
   if (q.includes('fee') || q.includes('cost') || q.includes('scholarship') || q.includes('tuition')) {
     return {
-      overview: `Tuition fee structures at Gopalan PU College follow Karnataka PU Board guidelines, tailored to the chosen stream (Science PCMB/PCMC with integrated competitive coaching or Commerce CEBA).
-Merit-based scholarships and fee concessions are available for students achieving 85%+ in their 10th / SSLC Board examinations.`,
-      followUp: `To receive the exact fee breakdown and scholarship eligibility for your stream, you can share the student's name below (or skip to continue):`,
+      overview: `For official fee structures, installment options, and scholarship details, please contact our North Campus Help Desk directly:
+• Admissions & Accounts Helpline: +91 81053 88193 / +91 81230 40418
+• Email: gpuc.north@gopalanpucollege.com
+• Visiting & Office Hours: Monday to Saturday, 8:30 AM to 5:00 PM`,
+      followUp: `Please let us know which stream or facility you would like to explore, or if you would like to schedule a campus visit:`,
     };
   }
 
@@ -246,12 +248,6 @@ const FAQ_PRESETS = [
     title: 'Documents',
     label: '📄 Required Documents',
     query: 'Which documents are required for admission at North Campus?',
-  },
-  {
-    icon: '💰',
-    title: 'Fees',
-    label: '💰 Fee Structure',
-    query: 'What is the tuition fee structure for Gopalan PU College North Campus?',
   },
 ];
 
@@ -422,7 +418,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
 
     const skipAckMsg: Message = {
       role: 'assistant',
-      content: `No problem at all! Feel free to ask any questions about our Science (PCMB/PCMC), Commerce (CEBA), campus facilities, fees, or admissions. How can I help you today?`,
+      content: `No problem at all! Feel free to ask any questions about our Science (PCMB/PCMC), Commerce (CEBA), campus facilities, or admissions. How can I help you today?`,
     };
     setMessages((prev) => [...prev, skipAckMsg]);
   };
@@ -851,9 +847,20 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
       }
 
       if (leadStep === 'ask_student_name') {
-        setInput('');
-        handleStudentNameSubmit(text);
-        return;
+        const isQuery =
+          text.includes('?') ||
+          /\b(who|what|where|when|why|how|which|can|is|are|do|does|tell|fee|fees|cost|tuition|hostel|bus|principal)\b/i.test(text);
+
+        if (isQuery) {
+          // User asked a question instead of entering their name; dismiss lead prompt and answer their question
+          setLeadStep('idle');
+          setHasSkippedLead(true);
+          // fall through to process user question
+        } else {
+          setInput('');
+          handleStudentNameSubmit(text);
+          return;
+        }
       }
       if (leadStep === 'ask_contact') {
         setInput('');
@@ -1109,7 +1116,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
     if (bookingFlowState === 'offered_choice') return "Type 'offline' for visit or 'online' for meeting...";
     if (bookingFlowState === 'asking_check_slot') return "Select date & time above or type preferred time...";
     if (bookingFlowState === 'showing_available_slots') return "Select an available slot or type your time...";
-    return "Ask about admissions, courses, fees, visits...";
+    return "Ask about admissions, courses, facilities, visits...";
   };
 
   const handleFeedbackSubmit = async () => {
@@ -1673,6 +1680,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                   gap: '9px',
                                   transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
                                   boxShadow: '0 1px 3px rgba(245, 158, 11, 0.08)',
+                                  gridColumn: pIdx === 4 && FAQ_PRESETS.length === 5 ? 'span 2' : 'auto',
                                 }}
                                 onMouseEnter={(e) => {
                                   e.currentTarget.style.borderColor = '#F59E0B';
