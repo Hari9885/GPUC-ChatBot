@@ -1,6 +1,25 @@
 {
   "inquiries": [
     {
+      "id": "GPUC-2026-INQ-1017",
+      "name": "Test Student North (Parent: Mr. Rajesh)",
+      "mobile": "+91 98888 12345",
+      "userType": "parent",
+      "courseInterest": "Science (PCMB)",
+      "intendedYear": "2026-2027",
+      "category": "ADMISSIONS_2026-27",
+      "preferredContact": "phone",
+      "summary": "Topic: NEET Integrated Coaching | Class: Science (PCMB) | Inquiry: Admissions 2026-27 | Student: Test Student North | Parent: Mr. Rajesh | Note: Interested in hostel facility",
+      "assignedTeam": "Admissions",
+      "assignedStaff": "Mr. Aravind J",
+      "status": "CONTACTED",
+      "consentGiven": true,
+      "consentPurpose": "Inquiry guidance and admission assistance",
+      "consentTimestamp": "2026-10-15T06:46:14.418Z",
+      "createdAt": "2026-10-15T06:46:14.418Z",
+      "updatedAt": "2026-10-15T06:46:22.900Z"
+    },
+    {
       "id": "GPUC-2026-INQ-1016",
       "name": "12345678 (Parent: 54321)",
       "mobile": "432143214321",
@@ -305,6 +324,20 @@
     }
   ],
   "appointments": [
+    {
+      "id": "GPUC-VISIT-2026-513",
+      "name": "Test Student North",
+      "mobile": "+91 98888 12345",
+      "mode": "campus_visit",
+      "date": "2026-10-16",
+      "timeSlot": "8:30 AM - 5:00 PM",
+      "purpose": "North Campus Tour & Document Verification",
+      "assignedStaff": "Admissions Desk Counselor",
+      "assignedDepartment": "Admissions",
+      "status": "CONFIRMED",
+      "meetingLinkOrVenue": "Gopalan Pre-University College, North Campus, No. 79 Mavallipura, Hesaragatta Hobli, Yelahanka, Bengaluru - 560089",
+      "createdAt": "2026-10-15T06:46:28.900Z"
+    },
     {
       "id": "GPUC-2026-APT-512",
       "inquiryId": "GPUC-2026-INQ-1015",
@@ -1246,6 +1279,13 @@
   ],
   "feedback": [
     {
+      "id": "FB-5093",
+      "inquiryId": "GPUC-2026-INQ-1017",
+      "rating": 5,
+      "comment": "Very smooth and accurate assistant for North Campus Yelahanka",
+      "createdAt": "2026-10-15T06:46:35.093Z"
+    },
+    {
       "id": "FB-01",
       "inquiryId": "GPUC-2026-INQ-1001",
       "rating": 5,
@@ -1254,6 +1294,15 @@
     }
   ],
   "messages": [
+    {
+      "id": "MSG-8900",
+      "type": "whatsapp",
+      "recipient": "+91 98888 12345",
+      "templateId": "visit_ticket_confirmation",
+      "content": "Dear Test Student North, your Campus Visit ticket GPUC-VISIT-2026-513 is confirmed. Visiting hours: Monday to Friday 8:30 AM to 5:00 PM.",
+      "status": "DELIVERED",
+      "timestamp": "2026-10-15T06:46:28.900Z"
+    },
     {
       "id": "MSG-3234",
       "type": "whatsapp",
