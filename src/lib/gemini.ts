@@ -17,8 +17,83 @@ export interface ChatMessage {
   parts: any[];
 }
 
+export const OUT_OF_SCOPE_RESPONSE =
+  "I can help with Gopalan PU College information, courses, admissions, facilities and appointments. What would you like to know about the college?";
+
+export function isOutOfScopeQuery(query: string): boolean {
+  if (!query || typeof query !== 'string') return false;
+  const q = query.toLowerCase().trim();
+  const clean = q.replace(/[?!.,;:'"()]+/g, ' ').replace(/\s+/g, ' ').trim();
+
+  // If query is very short greeting, it's handled by greeting handler
+  if (/^(hi|hello|hey|heyy|heya|hola|namaste|vanakkam|good\s*(morning|afternoon|evening|day)|greetings|howdy)$/i.test(clean)) {
+    return false;
+  }
+
+  // Strong college context keywords
+  const hasStrongCollegeContext =
+    /\b(gpuc|gopalan|pu\s*college|puc|pre-university|pcmb|pcmc|ceba|seba|meba|neet|kcet|kanchana)\b/i.test(clean);
+
+  // 1. National/World leaders, politics, elections, presidents, prime ministers
+  const politicalOrLeaderPattern =
+    /\b(president|prime\s*minister|chief\s*minister|governor|droupadi\s*murmu|narendra\s*modi|siddaramaiah|rahul\s*gandhi|bjp|congress|parliament|lok\s*sabha|rajya\s*sabha|election|elections|vote\s*for|minister\s*of)\b/i;
+  if (politicalOrLeaderPattern.test(clean)) {
+    // Only allow if asking specifically about college leadership/principal with college context
+    if (/\b(principal|director|faculty|teacher)\b/i.test(clean) && hasStrongCollegeContext) {
+      return false;
+    }
+    return true;
+  }
+
+  // 2. Geography / World facts / Trivia / General Knowledge
+  const gkTriviaPattern =
+    /\b(capital\s+of|currency\s+of|population\s+of|speed\s+of\s+light|solar\s+system|who\s+invented|who\s+discovered|who\s+wrote\b|tallest\s+building|longest\s+river|highest\s+mountain|formula\s+of|einstein|newton|photosynthesis|dna|meaning\s+of\s+life|how\s+to\s+cook|recipe\s+for)\b/i;
+  if (gkTriviaPattern.test(clean)) {
+    return true;
+  }
+
+  // 3. Coding, Math, Homework, Medical diagnosis
+  const codingMathPattern =
+    /\b(write\s+(a\s+)?(python|javascript|java|c\+\+|code|script|sql)|fibonacci|solve\s+(this\s+)?(math|equation|calculus|derivative|integral|\d+)|calculate\s+\d+|\b\d+\s*[\+\-\*\/]\s*\d+\b|diagnose\s+my|fever\s+and\s+cough|medical\s+advice|write\s+(an?\s+)?essay\s+on|homework\s+help)\b/i;
+  if (codingMathPattern.test(clean)) {
+    return true;
+  }
+
+  // 4. Creative / Casual AI / Entertainment / Sports / Jokes / Weather
+  const casualAiPattern =
+    /\b(tell\s+(me\s+)?(a\s+)?joke|make\s+me\s+laugh|write\s+(a\s+)?poem|sing\s+(a\s+)?song|tell\s+(me\s+)?a\s+story|cricket\s+score|ipl\s+score|world\s+cup|who\s+won\s+the|virat\s+kohli|messi|ronaldo|box\s+office|weather\s+(in|today|tomorrow)|temperature\s+in)\b/i;
+  if (casualAiPattern.test(clean)) {
+    return true;
+  }
+
+  // 5. Prompt injection / Jailbreak / System Prompt leaks
+  const jailbreakPattern =
+    /\b(ignore\s+(previous|all)\s+instructions|you\s+are\s+now\b|unrestricted\s+ai|jailbreak|system\s+prompt|print\s+(your\s+)?prompt|repeat\s+the\s+words\s+above)\b/i;
+  if (jailbreakPattern.test(clean)) {
+    return true;
+  }
+
+  // 6. Direct scope questions
+  const scopeMetaPattern =
+    /\b(unrelated\s+question|questions?\s+unrelated|answer\s+anything|general\s+knowledge|out\s+of\s+scope|who\s+created\s+you|are\s+you\s+chatgpt|who\s+made\s+you)\b/i;
+  if (scopeMetaPattern.test(clean)) {
+    return true;
+  }
+
+  return false;
+}
+
 export const MASTER_SYSTEM_INSTRUCTION = `
 SYSTEM PROMPT — GOPALAN PRE-UNIVERSITY COLLEGE AI ASSISTANT
+
+0. STRICT SCOPE BOUNDARY (MANDATORY & ABSOLUTE):
+- You are EXCLUSIVELY the Admissions & College Information Assistant for GOPALAN PRE-UNIVERSITY COLLEGE (GPUC), Whitefield, Bengaluru.
+- You are STRICTLY FORBIDDEN from answering any question unrelated to Gopalan Pre-University College.
+- NEVER answer questions about general knowledge, national or world politics, presidents, prime ministers, external history, geography, science/homework problems, coding, jokes, weather, movies, sports, or other institutions.
+- IF THE USER ASKS ANY OUT-OF-SCOPE OR UNRELATED QUESTION (such as "president of india", "who is the prime minister", "capital of france", "what is the meaning of life", "tell a joke", "write code", etc.), DO NOT ANSWER THE QUESTION.
+- For ANY out-of-scope question, you must respond ONLY with this exact approved policy answer:
+"I can help with Gopalan PU College information, courses, admissions, facilities and appointments. What would you like to know about the college?"
+- Never answer the trivia question and then add a disclaimer. The refusal must be immediate, direct, and adhere to this exact wording.
 
 1. STRICT MAXIMUM 3 LINES RULE (MANDATORY):
 - FOR ANY QUESTION, YOUR ENTIRE ANSWER MUST BE MAXIMUM 3 LINES. NEVER EXCEED 3 LINES.
@@ -76,6 +151,14 @@ export async function callGemini(
   const cleanQ = userQuery.toLowerCase().trim();
   const cleanQWithoutPunct = cleanQ.replace(/[!.,?]+$/, '').trim();
 
+  // Instant response for out-of-scope / general knowledge queries
+  if (isOutOfScopeQuery(userQuery)) {
+    return {
+      text: OUT_OF_SCOPE_RESPONSE,
+      toolCallsExecuted: [],
+    };
+  }
+
   // Instant response for standard greetings
   const isGreeting =
     /^(hi|hello|hey|heyy|heya|hola|namaste|vanakkam|good\s*(morning|afternoon|evening|day)|greetings|howdy)$/i.test(cleanQWithoutPunct) ||
@@ -128,6 +211,11 @@ export async function callGemini(
     if (isContactQuery && f.id === 'contact') return true;
     return cleanQ.includes(f.intent.toLowerCase()) || f.question.toLowerCase().includes(cleanQ);
   });
+
+  const unrelatedFAQ = allFAQs.find((f) => f.id === 'unrelated_question');
+  if (unrelatedFAQ && !faqMatches.some((f) => f.id === 'unrelated_question')) {
+    faqMatches.push(unrelatedFAQ);
+  }
 
   let groundedContext = `\n\n=== VERIFIED GOPALAN PU COLLEGE RECORDS ===\n`;
   if (kbMatches.length > 0) {
@@ -220,8 +308,30 @@ export async function callGemini(
     if (functionCalls.length === 0) {
       // Model produced text response
       const textParts = parts.filter((p: any) => p.text).map((p: any) => p.text);
+      const rawText = textParts.join('\n') || '';
+
+      // Post-generation guard: If model answered out-of-scope topic or leaked political/general knowledge
+      const mentionsPoliticalOrGK =
+        /droupadi\s*murmu|narendra\s*modi|president\s+of\s+india|prime\s+minister\s+of\s+india|siddaramaiah/i.test(rawText);
+      if (mentionsPoliticalOrGK) {
+        return {
+          text: OUT_OF_SCOPE_RESPONSE,
+          toolCallsExecuted,
+        };
+      }
+
+      if (
+        isOutOfScopeQuery(rawText) ||
+        (cleanQ.includes('president') && !cleanQ.includes('principal') && !cleanQ.includes('gopalan'))
+      ) {
+        return {
+          text: OUT_OF_SCOPE_RESPONSE,
+          toolCallsExecuted,
+        };
+      }
+
       return {
-        text: enforceMaxThreeLines(textParts.join('\n') || ''),
+        text: enforceMaxThreeLines(rawText),
         toolCallsExecuted,
       };
     }
