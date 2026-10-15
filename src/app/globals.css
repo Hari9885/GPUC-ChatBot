@@ -470,14 +470,3 @@ h1, h2, h3, h4, h5, h6 {
   animation: fadeIn 0.2s ease-out;
   box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
 }
-
-/* Scale mode adjustments */
-.scale-compact {
-  --assistant-font-scale: 0.9;
-}
-.scale-compact .chat-messages-container {
-  padding: 12px !important;
-}
-.scale-expanded {
-  --assistant-font-scale: 1.12;
-}

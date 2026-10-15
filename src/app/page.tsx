@@ -199,7 +199,6 @@ export default function Home() {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
-  const [assistantScale, setAssistantScale] = useState<'normal' | 'compact' | 'expanded'>('normal');
   const [messages, setMessages] = useState<Message[]>([INITIAL_GREETING]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -1014,9 +1013,7 @@ export default function Home() {
         {isChatOpen && (
           <div
             id="gpuc-chat-window"
-            className={`chat-widget-window ${isMaximized ? 'is-maximized' : ''} ${
-              assistantScale === 'compact' ? 'scale-compact' : assistantScale === 'expanded' ? 'scale-expanded' : ''
-            }`}
+            className={`chat-widget-window ${isMaximized ? 'is-maximized' : ''}`}
             onWheel={(e) => {
               // Contain wheel events within the chat window so background page never scrolls
               e.stopPropagation();
@@ -1024,18 +1021,10 @@ export default function Home() {
             style={{
               width: isMaximized
                 ? 'min(1040px, calc(100vw - 36px))'
-                : assistantScale === 'compact'
-                ? 'calc(var(--assistant-width) * 0.9)'
-                : assistantScale === 'expanded'
-                ? 'calc(var(--assistant-width) * 1.15)'
                 : 'var(--assistant-width)',
               maxWidth: 'calc(100vw - 20px)',
               height: isMaximized
                 ? 'calc(100vh - 40px)'
-                : assistantScale === 'compact'
-                ? 'calc(var(--assistant-height) * 0.9)'
-                : assistantScale === 'expanded'
-                ? 'calc(var(--assistant-height) * 1.15)'
                 : 'var(--assistant-height)',
               maxHeight: 'calc(100dvh - 32px)',
               display: 'flex',
@@ -1133,30 +1122,6 @@ export default function Home() {
                   onMouseLeave={(e) => (e.currentTarget.style.color = '#94A3B8')}
                 >
                   <RotateCcw size={16} />
-                </button>
-
-                {/* Manual Scale Selector Button (Cycle Normal -> Large -> Compact) */}
-                <button
-                  onClick={() => {
-                    setAssistantScale((prev) => (prev === 'normal' ? 'expanded' : prev === 'expanded' ? 'compact' : 'normal'));
-                  }}
-                  title={`Assistant Size: ${assistantScale === 'expanded' ? 'Large (115%)' : assistantScale === 'compact' ? 'Compact (90%)' : 'Standard (100%)'}. Click to adjust scale`}
-                  style={{
-                    background: assistantScale !== 'normal' ? 'rgba(245, 158, 11, 0.2)' : 'transparent',
-                    border: assistantScale !== 'normal' ? '1px solid rgba(245, 158, 11, 0.5)' : '1px solid rgba(255, 255, 255, 0.1)',
-                    color: assistantScale !== 'normal' ? '#FDE68A' : '#94A3B8',
-                    cursor: 'pointer',
-                    padding: '4px 7px',
-                    borderRadius: '6px',
-                    fontSize: '0.68rem',
-                    fontWeight: 700,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '2px',
-                    letterSpacing: '0.02em',
-                  }}
-                >
-                  <span>{assistantScale === 'expanded' ? 'XL' : assistantScale === 'compact' ? 'SM' : 'MD'}</span>
                 </button>
 
                 {/* Maximize / Restore Button with Small Indication */}
