@@ -367,7 +367,7 @@ export function bookAppointment(
 
   if (params.mode === 'campus_visit') {
     id = `GPUC-VISIT-2026-${refNum}`;
-    meetingLinkOrVenue = 'Gopalan Pre-University College Campus, 181/1, Hoodi Village, Whitefield, Bengaluru - 560048';
+    meetingLinkOrVenue = 'Gopalan Pre-University College, North Campus, No. 79 Mavallipura, Hesaragatta Hobli, Yelahanka, Bengaluru - 560089';
   } else {
     id = `GPUC-2026-APT-${refNum}`;
     meetingLinkOrVenue = 'Online Consultation (Admissions Team)';

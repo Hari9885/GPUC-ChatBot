@@ -84,11 +84,11 @@ export function isOutOfScopeQuery(query: string): boolean {
 }
 
 export const MASTER_SYSTEM_INSTRUCTION = `
-SYSTEM PROMPT — GOPALAN PRE-UNIVERSITY COLLEGE AI ASSISTANT
+SYSTEM PROMPT — GOPALAN PRE-UNIVERSITY COLLEGE (NORTH CAMPUS, YELAHANKA) AI ASSISTANT
 
 0. STRICT SCOPE BOUNDARY (MANDATORY & ABSOLUTE):
-- You are EXCLUSIVELY the Admissions & College Information Assistant for GOPALAN PRE-UNIVERSITY COLLEGE (GPUC) — North Campus (Yelahanka) and Whitefield Campus, Bengaluru.
-- You are STRICTLY FORBIDDEN from answering any question unrelated to Gopalan Pre-University College.
+- You are EXCLUSIVELY the Admissions & College Information Assistant for GOPALAN PRE-UNIVERSITY COLLEGE (GPUC) — NORTH CAMPUS, Yelahanka, Bengaluru.
+- You are STRICTLY FORBIDDEN from answering any question unrelated to Gopalan Pre-University College North Campus.
 - NEVER answer questions about general knowledge, national or world politics, presidents, prime ministers, external history, geography, science/homework problems, coding, jokes, weather, movies, sports, or other institutions.
 - IF THE USER ASKS ANY OUT-OF-SCOPE OR UNRELATED QUESTION (such as "president of india", "who is the prime minister", "capital of france", "what is the meaning of life", "tell a joke", "write code", etc.), DO NOT ANSWER THE QUESTION.
 - For ANY out-of-scope question, you must respond ONLY with this exact approved policy answer:
@@ -105,36 +105,36 @@ SYSTEM PROMPT — GOPALAN PRE-UNIVERSITY COLLEGE AI ASSISTANT
 - When asked about admissions, requirements, or documents, reply strictly in 2 lines:
 "Admission requires passing 10th standard (Karnataka SSLC, CBSE, or ICSE).
 
-For the document checklist and enrollment procedures, please contact our help desk at +91 81053 88193 (North Campus) or +91 96069 41908 (Whitefield)."
+For the document checklist and enrollment procedures, please contact our North Campus help desk at +91 81053 88193 / +91 81230 40418."
 
 3. COURSES & COMBINATIONS (OFFICIAL & VERIFIED — MAX 3 LINES):
-- Science: PCMB and PCMC with integrated NEET, JEE, and KCET coaching.
-- Commerce: North Campus offers CEBA (Computer Science, Economics, Business Studies, Accountancy). Whitefield offers CEBA, SEBA, MEBA, and CA Foundation coaching.
-- Languages: English (Mandatory I Language) and Kannada or Hindi (plus Sanskrit/French at Whitefield).
-- When asked about courses, answer directly in 2-3 lines with these exact combinations.
+- Science: PCMB (Physics, Chemistry, Mathematics, Biology) and PCMC (Physics, Chemistry, Mathematics, Computer Science) with integrated NEET, JEE, and KCET coaching.
+- Commerce: CEBA (Computer Science, Economics, Business Studies, Accountancy).
+- Languages: English (Mandatory I Language) and Kannada or Hindi (Part II).
+- When asked about courses, answer directly in 2-3 lines with these exact North Campus combinations.
 
 4. LEADERSHIP (MAX 2 LINES):
-- Principal of North Campus (Yelahanka): Mr. M. Mahesh.
-- Director of Gopalan Foundations: Mrs. Sunita Prabhakar. Principal of Whitefield Campus: Dr. Kanchana A. S.
+- Principal of Gopalan PU College North Campus (Yelahanka): Mr. M. Mahesh.
+- Director of Gopalan Foundations: Mrs. Sunita Prabhakar.
 
 5. FEES (MAX 2 LINES):
-- "Tuition fees depend on the chosen stream per Karnataka PU Board norms. For the exact 2026-27 fee schedule, please call our help desk at +91 81053 88193 (North Campus) or +91 96069 41908 (Whitefield)."
+- "Tuition fees depend on the chosen stream per Karnataka PU Board norms. For the exact 2026-27 fee schedule, please call our North Campus help desk at +91 81053 88193."
 
 6. HOSTEL & FACILITIES (MAX 3 LINES):
-- "Our campuses feature modern science labs, library, smart classrooms, sports grounds (cricket, football), cafeteria, secure girls' hostel, and bus transport covering Bengaluru."
+- "North Campus features modern science labs, computer lab, library, sports grounds (cricket, football), cafeteria, secure girls' hostel, and college bus transport across North Bengaluru."
 
 7. CAMPUS VISITS & APPOINTMENTS (MAX 2 LINES):
-- "Campus visits are available Monday to Saturday between 9:00 AM and 4:00 PM. Would you like to schedule a visit to North Campus (Yelahanka) or Whitefield Campus?"
+- "Campus visits to North Campus (Yelahanka) are available Monday to Saturday between 8:30 AM and 5:00 PM. Would you like to schedule a visit or admission consultation?"
 
 8. NO ASTERISKS / STARS:
 - Never use asterisks (*) or double asterisks (**) anywhere.
 
 9. GREETINGS (MAX 2 LINES):
-- If the user says "hi", "hello", "hey", or a general greeting, respond with a warm hello and welcome them to Gopalan Pre-University College. Never assume an inquiry topic or ask for student details on a simple greeting.
+- If the user says "hi", "hello", "hey", or a general greeting, respond with a warm hello and welcome them to Gopalan Pre-University College, North Campus (Yelahanka). Never assume an inquiry topic or ask for student details on a simple greeting.
 
 10. LOCATION & CONTACT (MAX 3 LINES):
-- North Campus (Yelahanka): No.79 Mavallipura Kondashettihalli Road, Hesaragatta Hobli, Bengaluru 560089. Admissions: +91 81053 88193 / +91 81230 40418 (gpuc.north@gopalanpucollege.com).
-- Whitefield Campus: Behind SAP Labs, Seetharam Palya, Basavanagar, Hoodi, Bengaluru 560048. Admissions: +91 96069 41908.
+- Gopalan Pre-University College, North Campus: No. 79, Mavallipura Kondashettihalli Road, Hesaragatta Hobli, Yelahanka, Bengaluru 560089.
+- Admissions Desk: +91 81053 88193 / +91 81230 40418 / +91 96320 70209 (gpuc.north@gopalanpucollege.com).
 `;
 
 export async function callGemini(
@@ -169,8 +169,8 @@ export async function callGemini(
   if (isGreeting) {
     const studentName = userContext?.studentName || userContext?.name;
     const greetingText = studentName
-      ? `Hello ${studentName}! Welcome back to Gopalan Pre-University College.\n\nHow can I help you today? Feel free to ask about our courses, admissions for 2026-27, or campus facilities.`
-      : `Hello! Welcome to Gopalan Pre-University College.\n\nHow can I help you today? Please feel free to ask any question regarding admissions, courses, or campus visits.`;
+      ? `Hello ${studentName}! Welcome back to Gopalan Pre-University College, North Campus.\n\nHow can I help you today? Feel free to ask about our courses, 2026-27 admissions, or campus visits.`
+      : `Hello! Welcome to Gopalan Pre-University College, North Campus (Yelahanka).\n\nHow can I help you today? Please feel free to ask about admissions, courses, or campus visits.`;
     return {
       text: greetingText,
       toolCallsExecuted: [],
@@ -180,14 +180,8 @@ export async function callGemini(
   // Instant response for Principal / Leadership queries
   const isPrincipalQuery = /\b(who is the principal|principal name|who is principal|principal of|college principal|director)\b/i.test(cleanQ);
   if (isPrincipalQuery) {
-    if (/north|yelahanka/i.test(cleanQ)) {
-      return {
-        text: "The Principal of Gopalan Pre-University College, North Campus (Yelahanka) is Mr. M. Mahesh.\n\nFor admissions and queries, please contact the North Campus help desk at +91 81053 88193.",
-        toolCallsExecuted: [],
-      };
-    }
     return {
-      text: "The Principal of Gopalan PU College North Campus (Yelahanka) is Mr. M. Mahesh.\n\nThe Principal of the Whitefield Campus is Dr. Kanchana A. S.",
+      text: "The Principal of Gopalan Pre-University College, North Campus (Yelahanka) is Mr. M. Mahesh.\n\nFor admissions and inquiries, please contact our help desk at +91 81053 88193.",
       toolCallsExecuted: [],
     };
   }
@@ -195,14 +189,8 @@ export async function callGemini(
   // Instant response for Commerce courses queries
   const isCommerceQuery = /commerce (combination|course|stream)|what commerce|commerce subject/i.test(cleanQ);
   if (isCommerceQuery) {
-    if (/north|yelahanka/i.test(cleanQ)) {
-      return {
-        text: "Gopalan PU College North Campus offers the CEBA stream (Computer Science, Economics, Business Studies, Accountancy).\n\nLanguages offered are English (mandatory) with Kannada or Hindi.",
-        toolCallsExecuted: [],
-      };
-    }
     return {
-      text: "North Campus specializes in CEBA (Computer Science, Economics, Business Studies, Accountancy).\n\nWhitefield Campus offers CEBA, SEBA, and MEBA streams with CA Foundation coaching.",
+      text: "Gopalan PU College North Campus offers the CEBA stream (Computer Science, Economics, Business Studies, Accountancy).\n\nLanguages offered are English (mandatory) with Kannada or Hindi.",
       toolCallsExecuted: [],
     };
   }
@@ -210,14 +198,8 @@ export async function callGemini(
   // Instant response for Location & Contact queries
   const isLocationQuery = /where|location|address|how to reach|campus location|map/i.test(cleanQ);
   if (isLocationQuery) {
-    if (/north|yelahanka|hesaragatta|mavallipura/i.test(cleanQ)) {
-      return {
-        text: "Gopalan PU College North Campus is located at No. 79 Mavallipura Kondashettihalli Road, Hesaragatta Hobli, Yelahanka, Bengaluru 560089.\n\nNorth Campus Help Desk: +91 81053 88193 / +91 81230 40418 (gpuc.north@gopalanpucollege.com).",
-        toolCallsExecuted: [],
-      };
-    }
     return {
-      text: "Gopalan PU College has two premier campuses in Bengaluru:\n- North Campus (Yelahanka): No. 79 Mavallipura, Hesaragatta Hobli (Help Desk: +91 81053 88193)\n- Whitefield Campus: Behind SAP Labs, Hoodi, Whitefield (Help Desk: +91 96069 41908).",
+      text: "Gopalan PU College North Campus is located at No. 79 Mavallipura Kondashettihalli Road, Hesaragatta Hobli, Yelahanka, Bengaluru 560089.\n\nAdmissions Desk: +91 81053 88193 / +91 81230 40418 (gpuc.north@gopalanpucollege.com).",
       toolCallsExecuted: [],
     };
   }
@@ -225,14 +207,8 @@ export async function callGemini(
   // Instant response for Contact queries
   const isContactDirect = /^(how to )?(contact|phone|call|number|spoc|reach|email)/i.test(cleanQ) || /contact (us|the college|admissions|desk)/i.test(cleanQ);
   if (isContactDirect && !cleanQ.includes('calculate') && !cleanQ.includes('solve')) {
-    if (/north|yelahanka/i.test(cleanQ)) {
-      return {
-        text: "North Campus (Yelahanka) Admissions Desk: +91 81053 88193 / +91 81230 40418.\nEmail: gpuc.north@gopalanpucollege.com.\nAddress: No.79 Mavallipura, Hesaragatta Hobli, Yelahanka.",
-        toolCallsExecuted: [],
-      };
-    }
     return {
-      text: "North Campus (Yelahanka): +91 81053 88193 / +91 81230 40418 (gpuc.north@gopalanpucollege.com).\nWhitefield Campus: +91 96069 41908 (admissions@gopalanpucollege.com).",
+      text: "North Campus (Yelahanka) Admissions Desk: +91 81053 88193 / +91 81230 40418.\nEmail: gpuc.north@gopalanpucollege.com.\nAddress: No. 79 Mavallipura, Hesaragatta Hobli, Yelahanka.",
       toolCallsExecuted: [],
     };
   }
@@ -241,7 +217,7 @@ export async function callGemini(
   const isFeeQuery = /fee|fees|cost|scholarship|tuition/i.test(cleanQ);
   if (isFeeQuery) {
     return {
-      text: "Tuition fees depend on the chosen stream per Karnataka PU Board norms.\n\nFor the exact 2026-27 fee schedule, please call our help desk at +91 81053 88193 (North Campus) or +91 96069 41908 (Whitefield).",
+      text: "Tuition fees depend on the chosen stream per Karnataka PU Board norms.\n\nFor the exact 2026-27 fee schedule, please call our North Campus help desk at +91 81053 88193.",
       toolCallsExecuted: [],
     };
   }
@@ -349,7 +325,7 @@ export async function callGemini(
     if (!data?.candidates?.[0]?.content) {
       console.error('All Gemini candidate models failed:', lastError);
       return {
-        text: "For questions about Gopalan PU College, please call our Admissions help desk at +91 96069 41908 or visit our campus.",
+        text: "For questions about Gopalan PU College North Campus, please call our Admissions help desk at +91 81053 88193 or visit our campus in Yelahanka.",
         toolCallsExecuted,
       };
     }

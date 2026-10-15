@@ -1,7 +1,7 @@
 'use client';
 
-import Home from '../page';
+import ChatWidget from '@/components/ChatWidget';
 
 export default function EmbedChatPage() {
-  return <Home initialEmbedded={true} />;
+  return <ChatWidget initialEmbedded={true} />;
 }

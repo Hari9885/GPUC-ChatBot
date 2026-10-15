@@ -3,7 +3,7 @@
     "id": "institution_overview",
     "intent": "college_overview",
     "question": "Tell me about Gopalan PU College.",
-    "answer": "Gopalan Pre-University College (GPUC) has two premier Bengaluru campuses: North Campus (Yelahanka) and Whitefield Campus. We offer Science (PCMB/PCMC) and Commerce streams with experiential learning, smart classrooms, modern laboratories, and holistic development.",
+    "answer": "Gopalan Pre-University College (GPUC) North Campus in Yelahanka offers premier Science (PCMB/PCMC) and Commerce (CEBA) education with smart classrooms, advanced laboratories, sports grounds, and holistic personality development.",
     "source_url": "https://gopalanpucnorth.com/about/",
     "release_status": "approved"
   },
@@ -19,7 +19,7 @@
     "id": "north_campus_principal",
     "intent": "college_principal",
     "question": "Who is the principal of the college?",
-    "answer": "The Principal of Gopalan PU College North Campus (Yelahanka) is Mr. M. Mahesh. The Principal of the Whitefield Campus is Dr. Kanchana A. S.",
+    "answer": "The Principal of Gopalan Pre-University College, North Campus (Yelahanka) is Mr. M. Mahesh. For queries, please contact our help desk at +91 81053 88193.",
     "source_url": "https://gopalanpucnorth.com/",
     "release_status": "approved"
   },
@@ -35,7 +35,7 @@
     "id": "science_combinations",
     "intent": "courses_science",
     "question": "What Science combinations are offered?",
-    "answer": "Science offers PCMB (Physics, Chemistry, Maths, Biology) and PCMC (Physics, Chemistry, Maths, Computer Science) with integrated NEET, JEE, and KCET coaching.\nLanguages include English and Kannada or Hindi (also Sanskrit/French at Whitefield).",
+    "answer": "Science offers PCMB (Physics, Chemistry, Maths, Biology) and PCMC (Physics, Chemistry, Maths, Computer Science) with integrated NEET, JEE, and KCET coaching.\nLanguages include English and Kannada or Hindi.",
     "source_url": "https://gopalanpucnorth.com/courses/",
     "release_status": "approved"
   },
@@ -43,7 +43,7 @@
     "id": "commerce_combinations",
     "intent": "courses_commerce",
     "question": "What Commerce combinations are offered?",
-    "answer": "North Campus specializes in CEBA (Computer Science, Economics, Business Studies, Accountancy).\nWhitefield Campus offers CEBA, SEBA, MEBA, and CA Foundation coaching.\nLanguages include mandatory English and Kannada or Hindi.",
+    "answer": "Gopalan PU College North Campus offers the CEBA stream (Computer Science, Economics, Business Studies, Accountancy).\nLanguages include mandatory English with Kannada or Hindi.",
     "source_url": "https://gopalanpucnorth.com/courses/",
     "release_status": "approved"
   },
@@ -51,7 +51,7 @@
     "id": "languages",
     "intent": "course_languages",
     "question": "What languages can students study?",
-    "answer": "First Language: English (Mandatory).\nSecond Language options: Kannada or Hindi at North Campus (plus Sanskrit or French at Whitefield Campus).",
+    "answer": "First Language: English (Mandatory).\nSecond Language options: Kannada or Hindi.",
     "source_url": "https://gopalanpucnorth.com/courses/",
     "release_status": "approved"
   },
@@ -67,7 +67,7 @@
     "id": "admission_documents",
     "intent": "admission_documents",
     "question": "What documents are needed for admission?",
-    "answer": "Admission requires passing 10th standard (SSLC/CBSE/ICSE).\nFor the document checklist and enrollment procedures, please contact our help desk at +91 81053 88193 (North Campus) or +91 96069 41908 (Whitefield).",
+    "answer": "Admission requires passing 10th standard (Karnataka SSLC, CBSE, or ICSE).\nFor the document checklist and enrollment procedures, please contact our North Campus help desk at +91 81053 88193 / +91 81230 40418.",
     "source_url": "https://gopalanpucnorth.com/admissions/",
     "release_status": "approved"
   },
@@ -83,7 +83,7 @@
     "id": "facilities",
     "intent": "campus_facilities",
     "question": "What facilities are available?",
-    "answer": "Our campuses feature modern science and computer laboratories, extensive libraries, smart classrooms, sports arenas (cricket, football, basketball), cafeterias, secure girls' hostels, and GPS-enabled bus transport.",
+    "answer": "North Campus features modern science and computer laboratories, extensive library, smart classrooms, sports arenas (cricket, football), cafeteria, secure girls' hostel, and college bus transport across North Bengaluru.",
     "source_url": "https://gopalanpucnorth.com/facilities/",
     "release_status": "approved"
   },
@@ -91,7 +91,7 @@
     "id": "contact",
     "intent": "contact_details",
     "question": "How do I contact the college?",
-    "answer": "North Campus (Yelahanka): +91 81053 88193 / +91 81230 40418 / gpuc.north@gopalanpucollege.com (No.79 Mavallipura, Hesaragatta Hobli).\nWhitefield Campus: +91 96069 41908 (Behind SAP Labs, Hoodi).",
+    "answer": "North Campus (Yelahanka) Admissions Desk: +91 81053 88193 / +91 81230 40418 / gpuc.north@gopalanpucollege.com. Address: No. 79 Mavallipura Kondashettihalli Road, Hesaragatta Hobli, Yelahanka, Bengaluru 560089.",
     "source_url": "https://gopalanpucnorth.com/contact-us/",
     "release_status": "approved"
   },
@@ -99,7 +99,7 @@
     "id": "fees",
     "intent": "fees",
     "question": "What are the fees?",
-    "answer": "Tuition fees depend on the chosen stream per Karnataka PU Board norms.\nFor the exact 2026-27 fee schedule, please call our help desk at +91 81053 88193 (North Campus) or +91 96069 41908 (Whitefield Campus).",
+    "answer": "Tuition fees depend on the chosen stream per Karnataka PU Board norms.\nFor the exact 2026-27 fee schedule, please call our North Campus help desk at +91 81053 88193.",
     "source_url": "https://gopalanpucnorth.com/contact-us/",
     "release_status": "approved"
   },
@@ -107,7 +107,7 @@
     "id": "book_appointment",
     "intent": "appointment_booking",
     "question": "Can I book a consultation or campus visit?",
-    "answer": "Campus visits and admissions consultations are welcome Monday to Saturday between 9:00 AM and 4:00 PM. Would you like to schedule a visit to North Campus (Yelahanka) or Whitefield Campus?",
+    "answer": "Campus visits to North Campus (Yelahanka) are welcome Monday to Saturday between 8:30 AM and 5:00 PM. Would you like to schedule an appointment with our admissions counselor?",
     "source_url": "https://gopalanpucnorth.com/contact-us/",
     "release_status": "approved"
   },

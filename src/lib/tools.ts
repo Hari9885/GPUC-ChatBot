@@ -328,7 +328,7 @@ export async function executeTool(name: string, args: Record<string, any>): Prom
       const aptId = `GPUC-2026-APT-${Math.floor(100 + Math.random() * 900)}`;
       const venue =
         args.mode === 'campus_visit'
-          ? 'Gopalan PU College Campus, 181/1, Hoodi, Whitefield, Bengaluru - 560048'
+          ? 'Gopalan Pre-University College, North Campus, No. 79 Mavallipura, Hesaragatta Hobli, Yelahanka, Bengaluru - 560089'
           : args.mode === 'online_meeting'
           ? 'Google Meet (Link will be dispatched 30 mins prior)'
           : 'Telephonic Callback from College Office';
