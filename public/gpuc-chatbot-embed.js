@@ -212,7 +212,7 @@
   tooltipEl.id = 'gpuc-widget-tooltip';
   tooltipEl.innerHTML = `
     <span style="width:8px;height:8px;border-radius:50%;background:#22C55E;display:inline-block;"></span>
-    <span>GPUC AI Admissions Assistant &bull; Click to chat</span>
+    <span>GPUC North Campus &bull; Admissions 2026–27</span>
   `;
   document.body.appendChild(tooltipEl);
 
@@ -223,7 +223,7 @@
   const iframeEl = document.createElement('iframe');
   iframeEl.id = 'gpuc-widget-iframe';
   iframeEl.src = baseUrl + '/embed';
-  iframeEl.title = 'Gopalan Pre-University College AI Admissions Assistant';
+  iframeEl.title = 'Gopalan Pre-University College North Campus AI Admissions Assistant';
   iframeEl.allow = 'clipboard-write; autoplay; microphone';
   containerEl.appendChild(iframeEl);
   document.body.appendChild(containerEl);
