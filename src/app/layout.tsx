@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import GlobalChatLoader from '@/components/GlobalChatLoader';
 
 export const metadata: Metadata = {
   title: 'Gopalan Pre-University College | Official AI Assistant & Portal',
@@ -24,7 +25,10 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <GlobalChatLoader />
+      </body>
     </html>
   );
 }

@@ -19,6 +19,16 @@ import {
   ChevronRight,
   MapPin,
   ExternalLink,
+  GraduationCap,
+  Receipt,
+  Building,
+  BookOpen,
+  MessageCircle,
+  X,
+  Send,
+  Eye,
+  Layers,
+  FileText,
 } from 'lucide-react';
 
 interface Inquiry {
@@ -70,7 +80,11 @@ export default function AdminPortal() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
+  const [departmentFilter, setDepartmentFilter] = useState<'All' | 'Admissions' | 'Accounts' | 'Administration' | 'Academics'>('All');
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
+  const [newNoteText, setNewNoteText] = useState('');
+  const [isSavingNote, setIsSavingNote] = useState(false);
 
   const fetchData = async () => {
     setLoading(true);
@@ -114,11 +128,68 @@ export default function AdminPortal() {
         setInquiries((prev) =>
           prev.map((item) => (item.id === id ? { ...item, status: newStatus } : item))
         );
+        if (selectedInquiry && selectedInquiry.id === id) {
+          setSelectedInquiry((prev) => (prev ? { ...prev, status: newStatus } : null));
+        }
       }
     } catch (err) {
       console.error('Failed to update inquiry status:', err);
     } finally {
       setUpdatingId(null);
+    }
+  };
+
+  const handleUpdateInquiryDepartment = async (id: string, newDepartment: string) => {
+    setUpdatingId(id);
+    try {
+      let defaultStaff = 'Mr. Aravind J (Admissions Officer)';
+      if (newDepartment === 'Accounts') defaultStaff = 'Mrs. Kavitha N (Accountant)';
+      else if (newDepartment === 'Administration') defaultStaff = 'Mr. Suresh Kumar (Administration Officer)';
+      else if (newDepartment === 'Academics') defaultStaff = 'Mrs. Deepa R (Academic Coordinator)';
+
+      const res = await fetch('/api/inquiries', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, assignedTeam: newDepartment, assignedStaff: defaultStaff }),
+      });
+      if (res.ok) {
+        setInquiries((prev) =>
+          prev.map((item) => (item.id === id ? { ...item, assignedTeam: newDepartment, assignedStaff: defaultStaff } : item))
+        );
+        if (selectedInquiry && selectedInquiry.id === id) {
+          setSelectedInquiry((prev) => (prev ? { ...prev, assignedTeam: newDepartment, assignedStaff: defaultStaff } : null));
+        }
+      }
+    } catch (err) {
+      console.error('Failed to update inquiry department:', err);
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  const handleAddNote = async (id: string) => {
+    if (!newNoteText.trim()) return;
+    setIsSavingNote(true);
+    try {
+      const res = await fetch('/api/inquiries', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, notes: newNoteText.trim() }),
+      });
+      if (res.ok) {
+        const appendedSummary = ` | Note: ${newNoteText.trim()}`;
+        setInquiries((prev) =>
+          prev.map((item) => (item.id === id ? { ...item, summary: item.summary + appendedSummary } : item))
+        );
+        if (selectedInquiry && selectedInquiry.id === id) {
+          setSelectedInquiry((prev) => (prev ? { ...prev, summary: prev.summary + appendedSummary } : null));
+        }
+        setNewNoteText('');
+      }
+    } catch (err) {
+      console.error('Failed to append note:', err);
+    } finally {
+      setIsSavingNote(false);
     }
   };
 
@@ -143,12 +214,15 @@ export default function AdminPortal() {
   };
 
   const exportInquiriesCSV = () => {
-    if (inquiries.length === 0) return;
-    const headers = ['Inquiry ID', 'Name', 'Mobile', 'Course / Stream', 'Status', 'Summary', 'Created At'];
-    const rows = inquiries.map((i) => [
+    const listToExport = filteredInquiries;
+    if (listToExport.length === 0) return;
+    const headers = ['Inquiry ID', 'Name', 'Mobile', 'Department', 'Assigned Staff', 'Course / Stream', 'Status', 'Summary', 'Created At'];
+    const rows = listToExport.map((i) => [
       i.id,
       `"${i.name.replace(/"/g, '""')}"`,
       `"${i.mobile}"`,
+      `"${i.assignedTeam || 'Admissions'}"`,
+      `"${i.assignedStaff || ''}"`,
       `"${i.courseInterest || ''}"`,
       i.status,
       `"${i.summary.replace(/"/g, '""')}"`,
@@ -158,7 +232,8 @@ export default function AdminPortal() {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `GPUC_North_Inquiries_${new Date().toISOString().split('T')[0]}.csv`);
+    const deptTag = departmentFilter !== 'All' ? `_${departmentFilter}` : '';
+    link.setAttribute('download', `GPUC_North${deptTag}_Inquiries_${new Date().toISOString().split('T')[0]}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -169,12 +244,34 @@ export default function AdminPortal() {
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.mobile.includes(searchQuery) ||
       item.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (item.assignedTeam && item.assignedTeam.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (item.assignedStaff && item.assignedStaff.toLowerCase().includes(searchQuery.toLowerCase())) ||
       item.summary.toLowerCase().includes(searchQuery.toLowerCase());
+
     const matchesStatus = statusFilter === 'All' || item.status === statusFilter;
-    return matchesSearch && matchesStatus;
+
+    let matchesDepartment = true;
+    if (departmentFilter !== 'All') {
+      const team = (item.assignedTeam || '').toLowerCase();
+      if (departmentFilter === 'Accounts') {
+        matchesDepartment = team.includes('account') || team.includes('fee');
+      } else if (departmentFilter === 'Admissions') {
+        matchesDepartment = team.includes('admission');
+      } else if (departmentFilter === 'Administration') {
+        matchesDepartment = team.includes('admin') && !team.includes('admission');
+      } else if (departmentFilter === 'Academics') {
+        matchesDepartment = team.includes('academic');
+      }
+    }
+
+    return matchesSearch && matchesStatus && matchesDepartment;
   });
 
   const newLeadsCount = inquiries.filter((i) => i.status === 'NEW').length;
+  const admissionsCount = inquiries.filter((i) => (i.assignedTeam || '').toLowerCase().includes('admission')).length;
+  const accountsCount = inquiries.filter((i) => (i.assignedTeam || '').toLowerCase().includes('account') || (i.assignedTeam || '').toLowerCase().includes('fee')).length;
+  const adminOpsCount = inquiries.filter((i) => (i.assignedTeam || '').toLowerCase().includes('admin') && !(i.assignedTeam || '').toLowerCase().includes('admission')).length;
+  const academicsCount = inquiries.filter((i) => (i.assignedTeam || '').toLowerCase().includes('academic')).length;
   const confirmedVisitsCount = appointments.filter((a) => a.mode === 'campus_visit').length;
   const onlineConsultationsCount = appointments.filter((a) => a.mode === 'online_meeting').length;
 
@@ -284,9 +381,9 @@ export default function AdminPortal() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-            gap: '16px',
-            marginBottom: '28px',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
+            gap: '14px',
+            marginBottom: '24px',
           }}
         >
           {/* Card 1: Total Inquiries */}
@@ -295,7 +392,7 @@ export default function AdminPortal() {
               background: '#FFFFFF',
               border: '1px solid #E2E8F0',
               borderRadius: '14px',
-              padding: '20px',
+              padding: '18px',
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
               display: 'flex',
               alignItems: 'center',
@@ -303,105 +400,144 @@ export default function AdminPortal() {
             }}
           >
             <div>
-              <div style={{ fontSize: '0.78rem', fontWeight: 600, color: '#64748B', textTransform: 'uppercase' }}>
-                Total Student Leads
+              <div style={{ fontSize: '0.74rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                Total Leads
               </div>
-              <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#1E3A8A', marginTop: '4px' }}>
+              <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#1E3A8A', marginTop: '2px' }}>
                 {inquiries.length}
               </div>
-              <div style={{ fontSize: '0.75rem', color: newLeadsCount > 0 ? '#DC2626' : '#16A34A', fontWeight: 700, marginTop: '4px' }}>
-                {newLeadsCount} new pending action
+              <div style={{ fontSize: '0.72rem', color: newLeadsCount > 0 ? '#DC2626' : '#16A34A', fontWeight: 700, marginTop: '2px' }}>
+                {newLeadsCount} new uncontacted
               </div>
             </div>
-            <div style={{ width: '46px', height: '46px', borderRadius: '12px', background: '#EFF6FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#2563EB' }}>
-              <Users size={24} />
+            <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#EFF6FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#2563EB' }}>
+              <Users size={22} />
             </div>
           </div>
 
-          {/* Card 2: Campus Visits Booked */}
+          {/* Card 2: Admissions Desk */}
           <div
+            onClick={() => { setActiveTab('inquiries'); setDepartmentFilter('Admissions'); }}
             style={{
               background: '#FFFFFF',
-              border: '1px solid #E2E8F0',
+              border: departmentFilter === 'Admissions' ? '2px solid #2563EB' : '1px solid #E2E8F0',
               borderRadius: '14px',
-              padding: '20px',
+              padding: '18px',
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
             }}
           >
             <div>
-              <div style={{ fontSize: '0.78rem', fontWeight: 600, color: '#64748B', textTransform: 'uppercase' }}>
-                North Campus Visits
+              <div style={{ fontSize: '0.74rem', fontWeight: 700, color: '#2563EB', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                Admissions Desk
               </div>
-              <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#D97706', marginTop: '4px' }}>
+              <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#1E40AF', marginTop: '2px' }}>
+                {admissionsCount}
+              </div>
+              <div style={{ fontSize: '0.72rem', color: '#64748B', marginTop: '2px' }}>
+                Course &amp; seat inquiries
+              </div>
+            </div>
+            <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#DBEAFE', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#1E40AF' }}>
+              <GraduationCap size={22} />
+            </div>
+          </div>
+
+          {/* Card 3: Accounts / Accountant Desk */}
+          <div
+            onClick={() => { setActiveTab('inquiries'); setDepartmentFilter('Accounts'); }}
+            style={{
+              background: '#FFFFFF',
+              border: departmentFilter === 'Accounts' ? '2px solid #059669' : '1px solid #E2E8F0',
+              borderRadius: '14px',
+              padding: '18px',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <div>
+              <div style={{ fontSize: '0.74rem', fontWeight: 700, color: '#059669', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                Accounts &amp; Fees Desk
+              </div>
+              <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#065F46', marginTop: '2px' }}>
+                {accountsCount}
+              </div>
+              <div style={{ fontSize: '0.72rem', color: '#047857', fontWeight: 600, marginTop: '2px' }}>
+                Accountant fee inquiries
+              </div>
+            </div>
+            <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#D1FAE5', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#059669' }}>
+              <Receipt size={22} />
+            </div>
+          </div>
+
+          {/* Card 4: Campus Visits & Admin */}
+          <div
+            onClick={() => { setActiveTab('appointments'); }}
+            style={{
+              background: '#FFFFFF',
+              border: '1px solid #E2E8F0',
+              borderRadius: '14px',
+              padding: '18px',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              cursor: 'pointer',
+            }}
+          >
+            <div>
+              <div style={{ fontSize: '0.74rem', fontWeight: 700, color: '#D97706', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                Campus Visits &amp; Admin
+              </div>
+              <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#B45309', marginTop: '2px' }}>
                 {confirmedVisitsCount}
               </div>
-              <div style={{ fontSize: '0.75rem', color: '#64748B', marginTop: '4px' }}>
-                Yelahanka offline campus tour
+              <div style={{ fontSize: '0.72rem', color: '#64748B', marginTop: '2px' }}>
+                Yelahanka offline tours
               </div>
             </div>
-            <div style={{ width: '46px', height: '46px', borderRadius: '12px', background: '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#D97706' }}>
-              <Building2 size={24} />
+            <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#D97706' }}>
+              <Building2 size={22} />
             </div>
           </div>
 
-          {/* Card 3: Online Consultations */}
+          {/* Card 5: Chatbot Quality & Satisfaction */}
           <div
+            onClick={() => { setActiveTab('feedback'); }}
             style={{
               background: '#FFFFFF',
               border: '1px solid #E2E8F0',
               borderRadius: '14px',
-              padding: '20px',
+              padding: '18px',
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
+              cursor: 'pointer',
             }}
           >
             <div>
-              <div style={{ fontSize: '0.78rem', fontWeight: 600, color: '#64748B', textTransform: 'uppercase' }}>
-                Online Consultations
-              </div>
-              <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#059669', marginTop: '4px' }}>
-                {onlineConsultationsCount}
-              </div>
-              <div style={{ fontSize: '0.75rem', color: '#64748B', marginTop: '4px' }}>
-                Counselor virtual sessions
-              </div>
-            </div>
-            <div style={{ width: '46px', height: '46px', borderRadius: '12px', background: '#D1FAE5', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#059669' }}>
-              <Calendar size={24} />
-            </div>
-          </div>
-
-          {/* Card 4: Chatbot Quality & Satisfaction */}
-          <div
-            style={{
-              background: '#FFFFFF',
-              border: '1px solid #E2E8F0',
-              borderRadius: '14px',
-              padding: '20px',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <div>
-              <div style={{ fontSize: '0.78rem', fontWeight: 600, color: '#64748B', textTransform: 'uppercase' }}>
+              <div style={{ fontSize: '0.74rem', fontWeight: 700, color: '#7C3AED', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                 Satisfaction Rating
               </div>
-              <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#7C3AED', marginTop: '4px' }}>
+              <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#6D28D9', marginTop: '2px' }}>
                 {avgRating} <span style={{ fontSize: '1.1rem', color: '#F59E0B' }}>★</span>
               </div>
-              <div style={{ fontSize: '0.75rem', color: '#64748B', marginTop: '4px' }}>
-                From {feedback.length} parent reviews
+              <div style={{ fontSize: '0.72rem', color: '#64748B', marginTop: '2px' }}>
+                {feedback.length} parent reviews
               </div>
             </div>
-            <div style={{ width: '46px', height: '46px', borderRadius: '12px', background: '#EDE9FE', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#7C3AED' }}>
-              <Star size={24} />
+            <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#EDE9FE', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#7C3AED' }}>
+              <Star size={22} />
             </div>
           </div>
         </div>
@@ -414,6 +550,7 @@ export default function AdminPortal() {
             gap: '8px',
             borderBottom: '2px solid #E2E8F0',
             marginBottom: '20px',
+            overflowX: 'auto',
           }}
         >
           <button
@@ -430,6 +567,7 @@ export default function AdminPortal() {
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
+              whiteSpace: 'nowrap',
             }}
           >
             <Users size={16} /> Student Inquiries &amp; Leads ({inquiries.length})
@@ -448,6 +586,7 @@ export default function AdminPortal() {
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
+              whiteSpace: 'nowrap',
             }}
           >
             <Calendar size={16} /> Campus Visits &amp; Slots ({appointments.length})
@@ -466,6 +605,7 @@ export default function AdminPortal() {
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
+              whiteSpace: 'nowrap',
             }}
           >
             <Star size={16} /> Feedback &amp; Ratings ({feedback.length})
@@ -484,6 +624,7 @@ export default function AdminPortal() {
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
+              whiteSpace: 'nowrap',
             }}
           >
             <ShieldCheck size={16} /> Architecture &amp; Data Pipeline
@@ -493,6 +634,122 @@ export default function AdminPortal() {
         {/* Tab 1: Inquiries / CRM Leads */}
         {activeTab === 'inquiries' && (
           <div>
+            {/* Department Quick Filter Pills */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                flexWrap: 'wrap',
+                marginBottom: '14px',
+                padding: '10px 14px',
+                background: '#FFFFFF',
+                borderRadius: '10px',
+                border: '1px solid #E2E8F0',
+              }}
+            >
+              <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#475569', display: 'flex', alignItems: 'center', gap: '5px', marginRight: '6px' }}>
+                <Layers size={14} /> Filter Department:
+              </span>
+
+              <button
+                onClick={() => setDepartmentFilter('All')}
+                style={{
+                  padding: '5px 12px',
+                  borderRadius: '20px',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  border: departmentFilter === 'All' ? '1.5px solid #1E3A8A' : '1px solid #CBD5E1',
+                  background: departmentFilter === 'All' ? '#1E3A8A' : '#F8FAFC',
+                  color: departmentFilter === 'All' ? '#FFFFFF' : '#475569',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                All Departments ({inquiries.length})
+              </button>
+
+              <button
+                onClick={() => setDepartmentFilter('Admissions')}
+                style={{
+                  padding: '5px 12px',
+                  borderRadius: '20px',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  border: departmentFilter === 'Admissions' ? '1.5px solid #2563EB' : '1px solid #CBD5E1',
+                  background: departmentFilter === 'Admissions' ? '#2563EB' : '#F8FAFC',
+                  color: departmentFilter === 'Admissions' ? '#FFFFFF' : '#1E40AF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <GraduationCap size={13} /> Admissions Desk ({admissionsCount})
+              </button>
+
+              <button
+                onClick={() => setDepartmentFilter('Accounts')}
+                style={{
+                  padding: '5px 12px',
+                  borderRadius: '20px',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  border: departmentFilter === 'Accounts' ? '1.5px solid #059669' : '1px solid #CBD5E1',
+                  background: departmentFilter === 'Accounts' ? '#059669' : '#F8FAFC',
+                  color: departmentFilter === 'Accounts' ? '#FFFFFF' : '#065F46',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <Receipt size={13} /> Accounts (Accountant) ({accountsCount})
+              </button>
+
+              <button
+                onClick={() => setDepartmentFilter('Administration')}
+                style={{
+                  padding: '5px 12px',
+                  borderRadius: '20px',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  border: departmentFilter === 'Administration' ? '1.5px solid #7C3AED' : '1px solid #CBD5E1',
+                  background: departmentFilter === 'Administration' ? '#7C3AED' : '#F8FAFC',
+                  color: departmentFilter === 'Administration' ? '#FFFFFF' : '#6D28D9',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <Building size={13} /> Administration &amp; Visits ({adminOpsCount})
+              </button>
+
+              <button
+                onClick={() => setDepartmentFilter('Academics')}
+                style={{
+                  padding: '5px 12px',
+                  borderRadius: '20px',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  border: departmentFilter === 'Academics' ? '1.5px solid #D97706' : '1px solid #CBD5E1',
+                  background: departmentFilter === 'Academics' ? '#D97706' : '#F8FAFC',
+                  color: departmentFilter === 'Academics' ? '#FFFFFF' : '#B45309',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <BookOpen size={13} /> Academics &amp; Coaching ({academicsCount})
+              </button>
+            </div>
+
             {/* Search and Filters Bar */}
             <div
               style={{
@@ -511,7 +768,7 @@ export default function AdminPortal() {
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search by student, mobile, inquiry ID..."
+                    placeholder="Search student, mobile, inquiry ID, notes..."
                     style={{
                       width: '100%',
                       padding: '8px 12px 8px 36px',
@@ -564,7 +821,7 @@ export default function AdminPortal() {
                   boxShadow: '0 2px 6px rgba(30, 58, 138, 0.25)',
                 }}
               >
-                <Download size={14} /> Export Leads (CSV)
+                <Download size={14} /> Export {departmentFilter !== 'All' ? `${departmentFilter} ` : ''}Leads (CSV)
               </button>
             </div>
 
@@ -581,25 +838,37 @@ export default function AdminPortal() {
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.84rem' }}>
                   <thead>
-                    <tr style={{ background: '#F1F5F9', borderBottom: '1px solid #CBD5E1', color: '#475569', fontSize: '0.76rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                      <th style={{ padding: '12px 16px' }}>Lead Ref &amp; Time</th>
-                      <th style={{ padding: '12px 16px' }}>Student &amp; Parent</th>
-                      <th style={{ padding: '12px 16px' }}>Mobile Contact</th>
-                      <th style={{ padding: '12px 16px' }}>Target Class / Stream</th>
-                      <th style={{ padding: '12px 16px' }}>Chatbot Notes / Summary</th>
-                      <th style={{ padding: '12px 16px' }}>Status &amp; Action</th>
+                    <tr style={{ background: '#F1F5F9', borderBottom: '1px solid #CBD5E1', color: '#475569', fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                      <th style={{ padding: '12px 14px' }}>Lead Ref &amp; Time</th>
+                      <th style={{ padding: '12px 14px' }}>Student &amp; Parent</th>
+                      <th style={{ padding: '12px 14px' }}>Department &amp; Incharge</th>
+                      <th style={{ padding: '12px 14px' }}>Contact &amp; WhatsApp</th>
+                      <th style={{ padding: '12px 14px' }}>Target Stream</th>
+                      <th style={{ padding: '12px 14px' }}>Chatbot Inputs / Summary</th>
+                      <th style={{ padding: '12px 14px' }}>Status &amp; Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredInquiries.length === 0 ? (
                       <tr>
-                        <td colSpan={6} style={{ padding: '36px', textAlign: 'center', color: '#64748B' }}>
-                          No inquiries found matching your filters.
+                        <td colSpan={7} style={{ padding: '36px', textAlign: 'center', color: '#64748B' }}>
+                          No inquiries found matching your filter criteria.
                         </td>
                       </tr>
                     ) : (
                       filteredInquiries.map((inq) => {
                         const isNew = inq.status === 'NEW';
+                        const dept = (inq.assignedTeam || 'Admissions');
+                        const isAccounts = dept.toLowerCase().includes('account') || dept.toLowerCase().includes('fee');
+                        const isAdmissions = dept.toLowerCase().includes('admission');
+                        const isAdministration = dept.toLowerCase().includes('admin') && !isAdmissions;
+                        const isAcademics = dept.toLowerCase().includes('academic');
+
+                        const cleanPhone = inq.mobile.replace(/\D/g, '').slice(-10);
+                        const waMsg = encodeURIComponent(
+                          `Hello, this is Gopalan Pre-University College (North Campus) ${dept} Desk regarding your inquiry for ${inq.name}. How can we assist you with admissions & fees today?`
+                        );
+
                         return (
                           <tr
                             key={inq.id}
@@ -609,9 +878,10 @@ export default function AdminPortal() {
                               transition: 'background 0.15s ease',
                             }}
                           >
-                            <td style={{ padding: '12px 16px', verticalAlign: 'top' }}>
-                              <span style={{ fontWeight: 700, color: '#1E3A8A', display: 'block' }}>{inq.id}</span>
-                              <span style={{ fontSize: '0.72rem', color: '#64748B' }}>
+                            {/* 1. Ref & Date */}
+                            <td style={{ padding: '12px 14px', verticalAlign: 'top' }}>
+                              <span style={{ fontWeight: 700, color: '#1E3A8A', display: 'block', fontSize: '0.82rem' }}>{inq.id}</span>
+                              <span style={{ fontSize: '0.70rem', color: '#64748B' }}>
                                 {new Date(inq.createdAt).toLocaleDateString('en-IN', {
                                   month: 'short',
                                   day: 'numeric',
@@ -620,45 +890,150 @@ export default function AdminPortal() {
                                 })}
                               </span>
                             </td>
-                            <td style={{ padding: '12px 16px', verticalAlign: 'top' }}>
-                              <div style={{ fontWeight: 700, color: '#0F172A' }}>{inq.name}</div>
-                              <span style={{ fontSize: '0.72rem', color: '#64748B' }}>
-                                Assigned: {inq.assignedTeam}
+
+                            {/* 2. Student & Parent */}
+                            <td style={{ padding: '12px 14px', verticalAlign: 'top' }}>
+                              <div style={{ fontWeight: 700, color: '#0F172A', fontSize: '0.86rem' }}>{inq.name}</div>
+                              <span style={{ fontSize: '0.70rem', color: '#64748B' }}>
+                                Year: {inq.intendedYear || '2026-2027'}
                               </span>
                             </td>
-                            <td style={{ padding: '12px 16px', verticalAlign: 'top' }}>
-                              <a
-                                href={`tel:${inq.mobile}`}
-                                style={{
-                                  display: 'inline-flex',
-                                  alignItems: 'center',
-                                  gap: '5px',
-                                  color: '#2563EB',
-                                  fontWeight: 600,
-                                  textDecoration: 'none',
-                                }}
-                              >
-                                <Phone size={12} /> {inq.mobile}
-                              </a>
+
+                            {/* 3. Assigned Department & Staff Incharge */}
+                            <td style={{ padding: '12px 14px', verticalAlign: 'top' }}>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                  <span
+                                    style={{
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: '4px',
+                                      padding: '2px 8px',
+                                      borderRadius: '12px',
+                                      fontSize: '0.72rem',
+                                      fontWeight: 800,
+                                      background: isAccounts
+                                        ? '#ECFDF5'
+                                        : isAdmissions
+                                        ? '#EFF6FF'
+                                        : isAdministration
+                                        ? '#FAF5FF'
+                                        : '#FFFBEB',
+                                      color: isAccounts
+                                        ? '#065F46'
+                                        : isAdmissions
+                                        ? '#1E40AF'
+                                        : isAdministration
+                                        ? '#6B21A8'
+                                        : '#92400E',
+                                      border: `1px solid ${
+                                        isAccounts
+                                          ? '#A7F3D0'
+                                          : isAdmissions
+                                          ? '#BFDBFE'
+                                          : isAdministration
+                                          ? '#E9D5FF'
+                                          : '#FDE68A'
+                                      }`,
+                                    }}
+                                  >
+                                    {isAccounts && <Receipt size={11} />}
+                                    {isAdmissions && <GraduationCap size={11} />}
+                                    {isAdministration && <Building size={11} />}
+                                    {isAcademics && <BookOpen size={11} />}
+                                    {dept}
+                                  </span>
+
+                                  {/* Department Switcher */}
+                                  <select
+                                    value={isAccounts ? 'Accounts' : isAdmissions ? 'Admissions' : isAdministration ? 'Administration' : 'Academics'}
+                                    disabled={updatingId === inq.id}
+                                    onChange={(e) => handleUpdateInquiryDepartment(inq.id, e.target.value)}
+                                    title="Reassign Department"
+                                    style={{
+                                      fontSize: '0.68rem',
+                                      fontWeight: 600,
+                                      padding: '1px 4px',
+                                      borderRadius: '4px',
+                                      border: '1px solid #CBD5E1',
+                                      background: '#FFFFFF',
+                                      color: '#475569',
+                                      cursor: 'pointer',
+                                    }}
+                                  >
+                                    <option value="Admissions">Admissions</option>
+                                    <option value="Accounts">Accounts</option>
+                                    <option value="Administration">Administration</option>
+                                    <option value="Academics">Academics</option>
+                                  </select>
+                                </div>
+                                <span style={{ fontSize: '0.70rem', color: '#64748B', fontWeight: 500 }}>
+                                  Staff: {inq.assignedStaff || 'Admissions Desk'}
+                                </span>
+                              </div>
                             </td>
-                            <td style={{ padding: '12px 16px', verticalAlign: 'top' }}>
+
+                            {/* 4. Contact & WhatsApp */}
+                            <td style={{ padding: '12px 14px', verticalAlign: 'top' }}>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                <a
+                                  href={`tel:${inq.mobile}`}
+                                  style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '5px',
+                                    color: '#2563EB',
+                                    fontWeight: 700,
+                                    fontSize: '0.80rem',
+                                    textDecoration: 'none',
+                                  }}
+                                >
+                                  <Phone size={11} /> {inq.mobile}
+                                </a>
+
+                                {cleanPhone.length >= 10 && (
+                                  <a
+                                    href={`https://wa.me/91${cleanPhone}?text=${waMsg}`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    style={{
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: '4px',
+                                      color: '#059669',
+                                      fontWeight: 700,
+                                      fontSize: '0.72rem',
+                                      textDecoration: 'none',
+                                    }}
+                                  >
+                                    <MessageCircle size={11} /> WhatsApp Desk
+                                  </a>
+                                )}
+                              </div>
+                            </td>
+
+                            {/* 5. Target Class & Stream */}
+                            <td style={{ padding: '12px 14px', verticalAlign: 'top' }}>
                               <span
                                 style={{
                                   background: '#EFF6FF',
                                   color: '#1E40AF',
                                   padding: '3px 8px',
                                   borderRadius: '6px',
-                                  fontSize: '0.75rem',
+                                  fontSize: '0.74rem',
                                   fontWeight: 700,
+                                  display: 'inline-block',
                                 }}
                               >
                                 {inq.courseInterest || '12th Class (2nd PU)'}
                               </span>
                             </td>
-                            <td style={{ padding: '12px 16px', verticalAlign: 'top', maxWidth: '360px' }}>
+
+                            {/* 6. Chatbot Inputs & Summary */}
+                            <td style={{ padding: '12px 14px', verticalAlign: 'top', maxWidth: '320px' }}>
                               <div
                                 style={{
-                                  fontSize: '0.78rem',
+                                  fontSize: '0.76rem',
                                   color: '#334155',
                                   lineHeight: 1.4,
                                   display: '-webkit-box',
@@ -670,43 +1045,85 @@ export default function AdminPortal() {
                               >
                                 {inq.summary}
                               </div>
-                            </td>
-                            <td style={{ padding: '12px 16px', verticalAlign: 'top' }}>
-                              <select
-                                value={inq.status}
-                                disabled={updatingId === inq.id}
-                                onChange={(e) => handleUpdateInquiryStatus(inq.id, e.target.value)}
+                              <button
+                                onClick={() => setSelectedInquiry(inq)}
                                 style={{
-                                  padding: '5px 8px',
-                                  borderRadius: '6px',
-                                  fontSize: '0.76rem',
+                                  marginTop: '4px',
+                                  background: 'none',
+                                  border: 'none',
+                                  color: '#2563EB',
+                                  fontSize: '0.70rem',
                                   fontWeight: 700,
-                                  border: '1px solid #CBD5E1',
-                                  background:
-                                    inq.status === 'NEW'
-                                      ? '#FEF3C7'
-                                      : inq.status === 'CONTACTED'
-                                      ? '#DBEAFE'
-                                      : inq.status === 'RESOLVED'
-                                      ? '#DCFCE7'
-                                      : '#F1F5F9',
-                                  color:
-                                    inq.status === 'NEW'
-                                      ? '#92400E'
-                                      : inq.status === 'CONTACTED'
-                                      ? '#1E40AF'
-                                      : inq.status === 'RESOLVED'
-                                      ? '#166534'
-                                      : '#475569',
                                   cursor: 'pointer',
+                                  padding: 0,
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '3px',
                                 }}
                               >
-                                <option value="NEW">NEW</option>
-                                <option value="CONTACTED">CONTACTED</option>
-                                <option value="IN_PROGRESS">IN_PROGRESS</option>
-                                <option value="RESOLVED">RESOLVED</option>
-                                <option value="CLOSED">CLOSED</option>
-                              </select>
+                                <Eye size={11} /> View Full Conversation Log &amp; Notes
+                              </button>
+                            </td>
+
+                            {/* 7. Status & Quick Actions */}
+                            <td style={{ padding: '12px 14px', verticalAlign: 'top' }}>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                <select
+                                  value={inq.status}
+                                  disabled={updatingId === inq.id}
+                                  onChange={(e) => handleUpdateInquiryStatus(inq.id, e.target.value)}
+                                  style={{
+                                    padding: '4px 6px',
+                                    borderRadius: '6px',
+                                    fontSize: '0.74rem',
+                                    fontWeight: 700,
+                                    border: '1px solid #CBD5E1',
+                                    background:
+                                      inq.status === 'NEW'
+                                        ? '#FEF3C7'
+                                        : inq.status === 'CONTACTED'
+                                        ? '#DBEAFE'
+                                        : inq.status === 'RESOLVED'
+                                        ? '#DCFCE7'
+                                        : '#F1F5F9',
+                                    color:
+                                      inq.status === 'NEW'
+                                        ? '#92400E'
+                                        : inq.status === 'CONTACTED'
+                                        ? '#1E40AF'
+                                        : inq.status === 'RESOLVED'
+                                        ? '#166534'
+                                        : '#475569',
+                                    cursor: 'pointer',
+                                  }}
+                                >
+                                  <option value="NEW">NEW</option>
+                                  <option value="CONTACTED">CONTACTED</option>
+                                  <option value="IN_PROGRESS">IN_PROGRESS</option>
+                                  <option value="RESOLVED">RESOLVED</option>
+                                  <option value="CLOSED">CLOSED</option>
+                                </select>
+
+                                <button
+                                  onClick={() => setSelectedInquiry(inq)}
+                                  style={{
+                                    padding: '4px 8px',
+                                    background: '#F1F5F9',
+                                    border: '1px solid #CBD5E1',
+                                    borderRadius: '6px',
+                                    fontSize: '0.70rem',
+                                    fontWeight: 700,
+                                    color: '#334155',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '4px',
+                                  }}
+                                >
+                                  <Eye size={11} /> Open Detail
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         );
@@ -1000,6 +1417,291 @@ export default function AdminPortal() {
                 <div style={{ padding: '12px 14px', background: '#F1F5F9', borderRadius: '8px' }}>
                   <div style={{ fontWeight: 700, color: '#1E3A8A' }}>Visiting / Office Hours</div>
                   <div style={{ color: '#334155', marginTop: '2px' }}>Monday &ndash; Saturday, 8:30 AM &ndash; 5:00 PM</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        {/* Slide-over / Modal for Full Inquiry Details & Conversation Log */}
+        {selectedInquiry && (
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(15, 23, 42, 0.65)',
+              backdropFilter: 'blur(3px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 99999,
+              padding: '20px',
+            }}
+            onClick={() => setSelectedInquiry(null)}
+          >
+            <div
+              style={{
+                background: '#FFFFFF',
+                borderRadius: '16px',
+                width: '100%',
+                maxWidth: '680px',
+                maxHeight: '90vh',
+                overflowY: 'auto',
+                boxShadow: '0 20px 50px rgba(0, 0, 0, 0.3)',
+                padding: '28px',
+                position: 'relative',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', borderBottom: '1px solid #E2E8F0', paddingBottom: '16px', marginBottom: '20px' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                    <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1E3A8A' }}>
+                      {selectedInquiry.id}
+                    </span>
+                    <span
+                      style={{
+                        padding: '2px 8px',
+                        borderRadius: '12px',
+                        fontSize: '0.72rem',
+                        fontWeight: 800,
+                        background:
+                          selectedInquiry.status === 'NEW'
+                            ? '#FEF3C7'
+                            : selectedInquiry.status === 'CONTACTED'
+                            ? '#DBEAFE'
+                            : selectedInquiry.status === 'RESOLVED'
+                            ? '#DCFCE7'
+                            : '#F1F5F9',
+                        color:
+                          selectedInquiry.status === 'NEW'
+                            ? '#92400E'
+                            : selectedInquiry.status === 'CONTACTED'
+                            ? '#1E40AF'
+                            : selectedInquiry.status === 'RESOLVED'
+                            ? '#166534'
+                            : '#475569',
+                      }}
+                    >
+                      {selectedInquiry.status}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '0.80rem', color: '#64748B' }}>
+                    Submitted on {new Date(selectedInquiry.createdAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setSelectedInquiry(null)}
+                  style={{
+                    background: '#F1F5F9',
+                    border: 'none',
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#64748B',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Student & Parent Info Grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px', marginBottom: '20px' }}>
+                <div style={{ padding: '12px', background: '#F8FAFC', borderRadius: '10px', border: '1px solid #E2E8F0' }}>
+                  <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600, textTransform: 'uppercase' }}>Student &amp; Parent</div>
+                  <div style={{ fontSize: '0.90rem', fontWeight: 700, color: '#0F172A', marginTop: '2px' }}>{selectedInquiry.name}</div>
+                </div>
+
+                <div style={{ padding: '12px', background: '#F8FAFC', borderRadius: '10px', border: '1px solid #E2E8F0' }}>
+                  <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600, textTransform: 'uppercase' }}>Mobile / WhatsApp</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+                    <a
+                      href={`tel:${selectedInquiry.mobile}`}
+                      style={{ fontSize: '0.88rem', fontWeight: 700, color: '#2563EB', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}
+                    >
+                      <Phone size={13} /> {selectedInquiry.mobile}
+                    </a>
+                    {selectedInquiry.mobile.replace(/\D/g, '').length >= 10 && (
+                      <a
+                        href={`https://wa.me/91${selectedInquiry.mobile.replace(/\D/g, '').slice(-10)}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{ fontSize: '0.74rem', fontWeight: 700, color: '#059669', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '3px' }}
+                      >
+                        <MessageCircle size={13} /> WhatsApp
+                      </a>
+                    )}
+                  </div>
+                </div>
+
+                <div style={{ padding: '12px', background: '#F8FAFC', borderRadius: '10px', border: '1px solid #E2E8F0' }}>
+                  <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600, textTransform: 'uppercase' }}>Course / Stream</div>
+                  <div style={{ fontSize: '0.90rem', fontWeight: 700, color: '#1E40AF', marginTop: '2px' }}>
+                    {selectedInquiry.courseInterest || '12th Class (2nd PU)'}
+                  </div>
+                </div>
+
+                <div style={{ padding: '12px', background: '#F8FAFC', borderRadius: '10px', border: '1px solid #E2E8F0' }}>
+                  <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600, textTransform: 'uppercase' }}>Academic Session</div>
+                  <div style={{ fontSize: '0.90rem', fontWeight: 700, color: '#0F172A', marginTop: '2px' }}>
+                    {selectedInquiry.intendedYear || '2026-2027'}
+                  </div>
+                </div>
+              </div>
+
+              {/* Department Routing & Staff Incharge Controls */}
+              <div style={{ padding: '16px', background: '#EFF6FF', borderRadius: '12px', border: '1px solid #BFDBFE', marginBottom: '20px' }}>
+                <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#1E3A8A', textTransform: 'uppercase', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Layers size={14} /> Department Routing &amp; Incharge Assignment
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 600, color: '#334155', marginBottom: '4px' }}>
+                      Assigned Department
+                    </label>
+                    <select
+                      value={selectedInquiry.assignedTeam}
+                      onChange={(e) => handleUpdateInquiryDepartment(selectedInquiry.id, e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '6px 10px',
+                        borderRadius: '6px',
+                        border: '1px solid #93C5FD',
+                        fontSize: '0.82rem',
+                        fontWeight: 700,
+                        background: '#FFFFFF',
+                        color: '#1E3A8A',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <option value="Admissions">Admissions Department</option>
+                      <option value="Accounts">Accounts Department (Accountant)</option>
+                      <option value="Administration">Campus Administration</option>
+                      <option value="Academics">Academics &amp; Coaching</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 600, color: '#334155', marginBottom: '4px' }}>
+                      Staff Incharge
+                    </label>
+                    <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#0F172A', padding: '6px 10px', background: '#FFFFFF', borderRadius: '6px', border: '1px solid #CBD5E1' }}>
+                      {selectedInquiry.assignedStaff || 'Staff Desk'}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 600, color: '#334155', marginBottom: '4px' }}>
+                      Inquiry Status
+                    </label>
+                    <select
+                      value={selectedInquiry.status}
+                      onChange={(e) => handleUpdateInquiryStatus(selectedInquiry.id, e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '6px 10px',
+                        borderRadius: '6px',
+                        border: '1px solid #93C5FD',
+                        fontSize: '0.82rem',
+                        fontWeight: 700,
+                        background: '#FFFFFF',
+                        color: '#1E3A8A',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <option value="NEW">NEW</option>
+                      <option value="CONTACTED">CONTACTED</option>
+                      <option value="IN_PROGRESS">IN_PROGRESS</option>
+                      <option value="RESOLVED">RESOLVED</option>
+                      <option value="CLOSED">CLOSED</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Chatbot Conversation Log & Inputs Given by User */}
+              <div style={{ marginBottom: '20px' }}>
+                <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <MessageSquare size={14} /> Inputs Given by User &amp; Conversation Log
+                </div>
+                <div
+                  style={{
+                    background: '#F8FAFC',
+                    border: '1px solid #E2E8F0',
+                    borderRadius: '10px',
+                    padding: '14px',
+                    fontSize: '0.82rem',
+                    lineHeight: 1.6,
+                    color: '#334155',
+                    maxHeight: '160px',
+                    overflowY: 'auto',
+                    whiteSpace: 'pre-wrap',
+                  }}
+                >
+                  {selectedInquiry.summary.split(' | ').map((part, idx) => (
+                    <div key={idx} style={{ marginBottom: '4px' }}>
+                      {part.startsWith('Chat update:') ? (
+                        <span style={{ color: '#2563EB', fontWeight: 600 }}>💬 {part}</span>
+                      ) : part.startsWith('Note:') ? (
+                        <span style={{ color: '#D97706', fontWeight: 600 }}>📝 {part}</span>
+                      ) : (
+                        <span>• {part}</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Internal Notes by Accountant / Admissions Staff */}
+              <div>
+                <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <FileText size={14} /> Add Internal Note (Accountant / Admissions)
+                </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input
+                    type="text"
+                    value={newNoteText}
+                    onChange={(e) => setNewNoteText(e.target.value)}
+                    placeholder="e.g. Accountant: Discussed installment payment terms. Due date set for 10th June."
+                    style={{
+                      flex: 1,
+                      padding: '8px 12px',
+                      borderRadius: '8px',
+                      border: '1px solid #CBD5E1',
+                      fontSize: '0.82rem',
+                      outline: 'none',
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        handleAddNote(selectedInquiry.id);
+                      }
+                    }}
+                  />
+                  <button
+                    onClick={() => handleAddNote(selectedInquiry.id)}
+                    disabled={isSavingNote || !newNoteText.trim()}
+                    style={{
+                      padding: '8px 16px',
+                      background: '#1E3A8A',
+                      color: '#FFFFFF',
+                      borderRadius: '8px',
+                      border: 'none',
+                      fontSize: '0.82rem',
+                      fontWeight: 700,
+                      cursor: newNoteText.trim() ? 'pointer' : 'not-allowed',
+                      opacity: newNoteText.trim() ? 1 : 0.6,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '5px',
+                    }}
+                  >
+                    <Send size={13} /> {isSavingNote ? 'Saving...' : 'Add Note'}
+                  </button>
                 </div>
               </div>
             </div>

@@ -288,11 +288,13 @@ if ( ! function_exists( 'gpuc_north_enqueue_ai_chatbot' ) ) {
 		<script>
 			window.GPUC_CHATBOT_URL = window.GPUC_CHATBOT_URL || 'http://localhost:3000';
 		</script>
-		<script src="http://localhost:3000/gpuc-chatbot-embed.js" async></script>
+		<script src="http://localhost:3000/gpuc-chatbot-embed.js?v=6" async></script>
 		<?php
 	}
 }
 add_action( 'wp_footer', 'gpuc_north_enqueue_ai_chatbot', 9999 );
+add_action( 'login_footer', 'gpuc_north_enqueue_ai_chatbot', 9999 );
+add_action( 'admin_footer', 'gpuc_north_enqueue_ai_chatbot', 9999 );
 
 
 

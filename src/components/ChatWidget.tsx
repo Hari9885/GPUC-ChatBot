@@ -110,41 +110,46 @@ function isPresetOrResemblingQuery(query: string): boolean {
   );
   if (matchesPreset) return true;
 
-  // 2. Resembling queries for courses, admissions, visits, documents, fees
+  // 2. Resembling queries for courses, admissions, visits, documents, fees, accountant, administration, coaching
   return (
     /\b(admission|admissions|apply|application|eligib|seat|seats|enrol|enrollment|2026)\b/i.test(q) ||
     /\b(science|commerce|pcmb|pcmc|ceba|seba|meba|stream|streams|combination|combinations|course|courses)\b/i.test(q) ||
     /\b(visit|tour|appointment|consultation|campus visit|offline|online meeting|meeting|schedule)\b/i.test(q) ||
     /\b(document|documents|marks card|marksheet|tc|transfer certificate|certificate|certificates|checklist)\b/i.test(q) ||
-    /\b(fee|fees|tuition|cost|scholarship|scholarships)\b/i.test(q)
+    /\b(fee|fees|tuition|cost|scholarship|scholarships|installment|installments|concession|discount|payment|pay|accountant|accounts|refund|challan|demand draft)\b/i.test(q) ||
+    /\b(hostel|mess|bus|transport|route|facility|facilities|lab|library|sports)\b/i.test(q) ||
+    /\b(neet|jee|kcet|coaching|integrated|faculty|principal|director|office)\b/i.test(q)
   );
 }
 
 function getTopicFromQuery(query: string): string {
   const q = query.toLowerCase();
+  if (q.includes('fee') || q.includes('cost') || q.includes('scholarship') || q.includes('tuition') || q.includes('installment') || q.includes('accountant') || q.includes('payment') || q.includes('concession')) {
+    return 'Fee Structure & Accounts Desk';
+  }
   if (q.includes('science') || q.includes('pcmb') || q.includes('pcmc')) {
     return 'Science Stream Combinations (PCMB / PCMC)';
   }
   if (q.includes('commerce') || q.includes('ceba') || q.includes('seba') || q.includes('meba')) {
     return 'Commerce Stream Combinations (CEBA / SEBA / MEBA)';
   }
-  if (q.includes('admission') || q.includes('apply') || q.includes('2026') || q.includes('process') || q.includes('eligib')) {
-    return 'Admissions for Academic Year 2026–27';
-  }
   if (q.includes('visit') || q.includes('tour') || q.includes('consult') || q.includes('appointment')) {
     return 'Campus Visit & Consultation';
+  }
+  if (q.includes('hostel') || q.includes('bus') || q.includes('transport') || q.includes('facility') || q.includes('mess')) {
+    return 'Campus Facilities, Hostel & Transport';
+  }
+  if (q.includes('neet') || q.includes('jee') || q.includes('kcet') || q.includes('coaching')) {
+    return 'Integrated Coaching (NEET / JEE / KCET)';
   }
   if (q.includes('document') || q.includes('certif') || q.includes('marks card') || q.includes('tc')) {
     return 'Required Documents';
   }
-  if (q.includes('facility') || q.includes('hostel') || q.includes('sport') || q.includes('lab') || q.includes('bus') || q.includes('transport')) {
-    return 'Campus Facilities & Hostel';
-  }
   if (q.includes('contact') || q.includes('phone') || q.includes('address') || q.includes('spoc')) {
     return 'College Contact & Admissions Desk';
   }
-  if (q.includes('fee') || q.includes('cost') || q.includes('scholarship') || q.includes('tuition')) {
-    return 'Fee Structure & Admissions';
+  if (q.includes('admission') || q.includes('apply') || q.includes('2026') || q.includes('process') || q.includes('eligib')) {
+    return 'Admissions for Academic Year 2026–27';
   }
   return 'Admissions & College Information';
 }
