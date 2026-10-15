@@ -102,25 +102,86 @@ function isPresetOrResemblingQuery(query: string): boolean {
   if (isGreetingQuery(query)) return false;
   const q = query.toLowerCase().trim();
 
-  // 1. Direct matches with preset FAQs
+  // 1. Direct matches with preset FAQs (the 6 buttons or their explicit titles)
   const matchesPreset = FAQ_PRESETS.some(
     (p) =>
       p.query.toLowerCase() === q ||
-      q.includes(p.query.toLowerCase()) ||
-      p.label.toLowerCase().includes(q)
+      q === p.title.toLowerCase() ||
+      q === p.label.toLowerCase() ||
+      q === `tell me about ${p.title.toLowerCase()}` ||
+      q === `what about ${p.title.toLowerCase()}`
   );
   if (matchesPreset) return true;
 
-  // 2. Resembling queries for courses, admissions, visits, documents, fees, accountant, administration, coaching
-  return (
-    /\b(admission|admissions|apply|application|eligib|seat|seats|enrol|enrollment|2026)\b/i.test(q) ||
-    /\b(science|commerce|pcmb|pcmc|ceba|seba|meba|stream|streams|combination|combinations|course|courses)\b/i.test(q) ||
-    /\b(visit|tour|appointment|consultation|campus visit|offline|online meeting|meeting|schedule)\b/i.test(q) ||
-    /\b(document|documents|marks card|marksheet|tc|transfer certificate|certificate|certificates|checklist)\b/i.test(q) ||
-    /\b(fee|fees|tuition|cost|scholarship|scholarships|installment|installments|concession|discount|payment|pay|accountant|accounts|refund|challan|demand draft)\b/i.test(q) ||
-    /\b(hostel|mess|bus|transport|route|facility|facilities|lab|library|sports)\b/i.test(q) ||
-    /\b(neet|jee|kcet|coaching|integrated|faculty|principal|director|office)\b/i.test(q)
-  );
+  // 2. Clear intent to register / apply / start admission / book visit
+  const isDirectApplyIntent =
+    /^(i want to (apply|register|join|admit|take admission|book|enroll))|^(how do i (apply|register|enroll|book a visit))|^(admissions? 2026|apply for admission)$/i.test(q);
+
+  return isDirectApplyIntent;
+}
+
+function getTopicOverview(text: string): { overview: string; followUp: string } {
+  const q = text.toLowerCase();
+
+  if (q.includes('science') || q.includes('pcmb') || q.includes('pcmc')) {
+    return {
+      overview: `At Gopalan Pre-University College, North Campus (Yelahanka), we offer accredited Science stream combinations:
+• PCMB: Physics, Chemistry, Mathematics, Biology
+• PCMC: Physics, Chemistry, Mathematics, Computer Science
+Both programs include integrated coaching for NEET, JEE (Main & Advanced), and KCET with experienced senior faculty and state-of-the-art laboratory facilities. Compulsory English is paired with Kannada or Hindi.`,
+      followUp: `Would you like full admission details, fee breakdown, or seat reservation? You can enter the student's name below (or skip to keep asking questions):`,
+    };
+  }
+
+  if (q.includes('commerce') || q.includes('ceba')) {
+    return {
+      overview: `At Gopalan PU College North Campus, we offer the comprehensive Commerce combination:
+• CEBA: Computer Science, Economics, Business Studies, Accountancy
+Designed to build strong foundations in commerce principles, financial accounting, and modern computer applications for future CA, CS, B.Com, and corporate career pathways. Languages offered are English with Kannada or Hindi.`,
+      followUp: `Would you like curriculum guidance, fee schedule, or seat availability? You can enter the student's name below (or skip to keep asking questions):`,
+    };
+  }
+
+  if (q.includes('fee') || q.includes('cost') || q.includes('scholarship') || q.includes('tuition')) {
+    return {
+      overview: `Tuition fee structures at Gopalan PU College follow Karnataka PU Board guidelines, tailored to the chosen stream (Science PCMB/PCMC with integrated competitive coaching or Commerce CEBA).
+Merit-based scholarships and fee concessions are available for students achieving 85%+ in their 10th / SSLC Board examinations.`,
+      followUp: `To receive the exact fee breakdown and scholarship eligibility for your stream, you can share the student's name below (or skip to continue):`,
+    };
+  }
+
+  if (q.includes('document') || q.includes('certif') || q.includes('marks card') || q.includes('tc')) {
+    return {
+      overview: `The essential documents required for 2026–2027 admissions at North Campus are:
+1. Original 10th / SSLC Marks Card + 3 attested copies
+2. Transfer Certificate (TC) & Conduct Certificate from previous school
+3. Migration Certificate (for CBSE, ICSE, or other state boards)
+4. Student & Parent Aadhaar Card copies + 5 recent passport-size photographs
+5. Caste / Income Certificate (if applying under quota).`,
+      followUp: `Would you like help with document verification or provisional seat booking? You can share the student's name below (or skip to continue):`,
+    };
+  }
+
+  if (q.includes('visit') || q.includes('tour') || q.includes('consult') || q.includes('appointment')) {
+    return {
+      overview: `We warmly welcome prospective students and parents to visit our North Campus at No. 79, Mavallipura Kondashettihalli Road, Hesaragatta Hobli, Yelahanka, Bengaluru.
+Visiting hours: Monday to Saturday, 8:30 AM to 5:00 PM. You can tour our laboratories, digital classrooms, sports facilities, and discuss options with our counselors.`,
+      followUp: `To issue a visitor gate pass or schedule a 1-on-1 counseling appointment, please enter the student's name below (or skip to continue):`,
+    };
+  }
+
+  if (q.includes('admission') || q.includes('apply') || q.includes('2026') || q.includes('process') || q.includes('eligib')) {
+    return {
+      overview: `Admissions for the 2026–2027 academic year are officially open for 1st PU (11th) and 2nd PU (12th).
+Eligibility requires passing Karnataka SSLC, CBSE 10th, ICSE 10th, or equivalent recognised board. Admissions are merit-based with direct counselor support at our Yelahanka campus.`,
+      followUp: `To begin your provisional registration or check seat availability, please enter the student's name below (or skip to keep asking questions):`,
+    };
+  }
+
+  return {
+    overview: `Gopalan Pre-University College, North Campus (Yelahanka) provides quality Pre-University education in Science (PCMB, PCMC) and Commerce (CEBA) with integrated coaching, smart classrooms, and transport.`,
+    followUp: `To help us guide you effectively, please enter the student's name below (or skip to continue):`,
+  };
 }
 
 function getTopicFromQuery(query: string): string {
@@ -216,6 +277,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
 
   // User Lead Capture & Step-by-Step Flow ("One question after another")
   const [userLead, setUserLead] = useState<UserLead | null>(null);
+  const [hasSkippedLead, setHasSkippedLead] = useState(false);
   const [leadStep, setLeadStep] = useState<
     'idle' | 'ask_student_name' | 'ask_contact' | 'ask_admission' | 'completed'
   >('idle');
@@ -347,6 +409,23 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isChatOpen, isMaximized, isEmbedded]);
+
+  // Skip option: Allows user to refuse giving contact info and freely ask questions
+  const handleSkipLead = () => {
+    setHasSkippedLead(true);
+    setLeadStep('idle');
+    setStepError('');
+    setStepStudentName('');
+    setStepParentName('');
+    setStepMobile('');
+    setStepLocation('');
+
+    const skipAckMsg: Message = {
+      role: 'assistant',
+      content: `No problem at all! Feel free to ask any questions about our Science (PCMB/PCMC), Commerce (CEBA), campus facilities, fees, or admissions. How can I help you today?`,
+    };
+    setMessages((prev) => [...prev, skipAckMsg]);
+  };
 
   // Step 1: Submit Student Name (with 1.5s bouncing dots)
   const handleStudentNameSubmit = (nameVal?: string) => {
@@ -752,8 +831,25 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
       setIsChatOpen(true);
     }
 
-    // If user is currently in the middle of lead steps, allow answering via bottom chat bar:
+    // If user is currently in the middle of lead steps, allow answering via bottom chat bar or skipping:
     if (!userLead) {
+      const lower = text.toLowerCase().trim();
+      if (
+        (leadStep === 'ask_student_name' || leadStep === 'ask_contact' || leadStep === 'ask_admission') &&
+        (lower === 'skip' ||
+          lower === 'no' ||
+          lower === 'cancel' ||
+          lower === 'later' ||
+          lower === 'x' ||
+          lower.includes('skip') ||
+          lower.includes('not now') ||
+          lower.includes('just browsing'))
+      ) {
+        setInput('');
+        handleSkipLead();
+        return;
+      }
+
       if (leadStep === 'ask_student_name') {
         setInput('');
         handleStudentNameSubmit(text);
@@ -887,29 +983,31 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
     }
 
     // PRESET QUESTIONS OR RESEMBLING QUESTIONS:
-    // "as soon as i select any preset qw or resemble those qw ask for name, details"
-    if (!userLead && isPresetOrResemblingQuery(text)) {
+    // Offer informative overview first, then offer student name input with skip option
+    if (!userLead && !hasSkippedLead && isPresetOrResemblingQuery(text)) {
       const topic = getTopicFromQuery(text);
       setPendingQuery(text);
       setPendingTopic(topic);
       setMessages((prev) => [...prev, userMsg]);
       setIsTyping(true);
 
-      // Bouncing dots for 1.5 seconds, then display assistant prompt for Student Name
+      // Bouncing dots for 1.2 seconds, then display informative answer + optional lead prompt
       setTimeout(() => {
         setIsTyping(false);
         setLeadStep('ask_student_name');
 
+        const { overview, followUp } = getTopicOverview(text);
+
         const assistantPromptMsg: Message = {
           role: 'assistant',
-          content: `I would be happy to share details about ${topic}! 🎓\n\nCould you please provide the Name of the Student?`,
+          content: `${overview}\n\n${followUp}`,
           topic,
           step: 'ask_student_name',
           pendingQuery: text,
         };
 
         setMessages((prev) => [...prev, assistantPromptMsg]);
-      }, 1500);
+      }, 1200);
 
       return;
     }
@@ -976,6 +1074,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
     setMessages([INITIAL_GREETING]);
     setInput('');
     setUserLead(null);
+    setHasSkippedLead(false);
     setLeadStep('idle');
     setPendingQuery('');
     setPendingTopic('');
@@ -1639,7 +1738,29 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                             <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#92400E', display: 'flex', alignItems: 'center', gap: '5px' }}>
                               <Sparkles size={13} color="#D97706" /> Step 1: Student Details
                             </span>
-                            <span style={{ fontSize: '0.7rem', color: '#64748B' }}>1 of 3</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <span style={{ fontSize: '0.7rem', color: '#64748B' }}>1 of 3</span>
+                              <button
+                                type="button"
+                                onClick={handleSkipLead}
+                                title="Skip for now and continue chat"
+                                style={{
+                                  background: 'rgba(239, 68, 68, 0.08)',
+                                  color: '#DC2626',
+                                  border: '1px solid rgba(239, 68, 68, 0.25)',
+                                  borderRadius: '12px',
+                                  padding: '2px 8px',
+                                  fontSize: '0.68rem',
+                                  fontWeight: 600,
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '3px',
+                                }}
+                              >
+                                <X size={11} /> Skip
+                              </button>
+                            </div>
                           </div>
 
                           {stepError && (
@@ -1697,6 +1818,24 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                               Next <ArrowRight size={14} />
                             </button>
                           </div>
+
+                          <div style={{ textAlign: 'center', marginTop: '8px' }}>
+                            <button
+                              type="button"
+                              onClick={handleSkipLead}
+                              style={{
+                                background: 'none',
+                                border: 'none',
+                                color: '#64748B',
+                                fontSize: '0.72rem',
+                                cursor: 'pointer',
+                                textDecoration: 'underline',
+                                padding: '3px',
+                              }}
+                            >
+                              Prefer not to share? Skip and continue asking questions ✕
+                            </button>
+                          </div>
                         </div>
                       )}
 
@@ -1718,7 +1857,29 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                             <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#92400E', display: 'flex', alignItems: 'center', gap: '5px' }}>
                               <Sparkles size={13} color="#D97706" /> Step 2: Contact Information & Location
                             </span>
-                            <span style={{ fontSize: '0.7rem', color: '#64748B' }}>2 of 3</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <span style={{ fontSize: '0.7rem', color: '#64748B' }}>2 of 3</span>
+                              <button
+                                type="button"
+                                onClick={handleSkipLead}
+                                title="Skip for now and continue chat"
+                                style={{
+                                  background: 'rgba(239, 68, 68, 0.08)',
+                                  color: '#DC2626',
+                                  border: '1px solid rgba(239, 68, 68, 0.25)',
+                                  borderRadius: '12px',
+                                  padding: '2px 8px',
+                                  fontSize: '0.68rem',
+                                  fontWeight: 600,
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '3px',
+                                }}
+                              >
+                                <X size={11} /> Skip
+                              </button>
+                            </div>
                           </div>
 
                           {stepError && (
@@ -1859,6 +2020,24 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                             >
                               Next: Select Class / Inquiry <ArrowRight size={14} />
                             </button>
+
+                            <div style={{ textAlign: 'center', marginTop: '6px' }}>
+                              <button
+                                type="button"
+                                onClick={handleSkipLead}
+                                style={{
+                                  background: 'none',
+                                  border: 'none',
+                                  color: '#64748B',
+                                  fontSize: '0.72rem',
+                                  cursor: 'pointer',
+                                  textDecoration: 'underline',
+                                  padding: '3px',
+                                }}
+                              >
+                                Prefer not to share? Skip and continue asking questions ✕
+                              </button>
+                            </div>
                           </div>
                         </div>
                       )}
@@ -1881,7 +2060,29 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                             <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#92400E', display: 'flex', alignItems: 'center', gap: '5px' }}>
                               <Sparkles size={13} color="#D97706" /> Step 3: Choose Admission Option
                             </span>
-                            <span style={{ fontSize: '0.7rem', color: '#64748B' }}>3 of 3</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <span style={{ fontSize: '0.7rem', color: '#64748B' }}>3 of 3</span>
+                              <button
+                                type="button"
+                                onClick={handleSkipLead}
+                                title="Skip for now and continue chat"
+                                style={{
+                                  background: 'rgba(239, 68, 68, 0.08)',
+                                  color: '#DC2626',
+                                  border: '1px solid rgba(239, 68, 68, 0.25)',
+                                  borderRadius: '12px',
+                                  padding: '2px 8px',
+                                  fontSize: '0.68rem',
+                                  fontWeight: 600,
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '3px',
+                                }}
+                              >
+                                <X size={11} /> Skip
+                              </button>
+                            </div>
                           </div>
 
                           <div style={{ fontSize: '0.76rem', color: '#475569', marginBottom: '10px' }}>
@@ -2016,6 +2217,24 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                               Registering inquiry with Gopalan admissions server...
                             </div>
                           )}
+
+                          <div style={{ textAlign: 'center', marginTop: '8px' }}>
+                            <button
+                              type="button"
+                              onClick={handleSkipLead}
+                              style={{
+                                background: 'none',
+                                border: 'none',
+                                color: '#64748B',
+                                fontSize: '0.72rem',
+                                cursor: 'pointer',
+                                textDecoration: 'underline',
+                                padding: '3px',
+                              }}
+                            >
+                              Skip and continue asking questions ✕
+                            </button>
+                          </div>
                         </div>
                       )}
 

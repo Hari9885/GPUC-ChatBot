@@ -213,11 +213,47 @@ export async function callGemini(
     };
   }
 
+  // Instant response for Science courses queries
+  const isScienceQuery = /science (combination|course|stream)|what science|pcmb|pcmc|integrated neet|integrated jee|integrated kcet/i.test(cleanQ);
+  if (isScienceQuery && !cleanQ.includes('calculate') && !cleanQ.includes('solve')) {
+    return {
+      text: "Gopalan PU College North Campus offers Science combinations: PCMB (Physics, Chemistry, Maths, Biology) and PCMC (Physics, Chemistry, Maths, Computer Science) with integrated NEET, JEE & KCET coaching.\n\nLanguages offered are English (mandatory) with Kannada or Hindi.",
+      toolCallsExecuted: [],
+    };
+  }
+
+  // Instant response for Facilities, Hostel & Transport queries
+  const isFacilityDirect = /hostel|bus|transport|cafeteria|canteen|lab|labs|library|sports|ground/i.test(cleanQ);
+  if (isFacilityDirect && (cleanQ.includes('do you have') || cleanQ.includes('available') || cleanQ.includes('facility') || cleanQ.includes('facilities') || cleanQ.includes('is there') || cleanQ.includes('what are'))) {
+    return {
+      text: "North Campus provides smart classrooms, advanced Science & CS labs, a central library, sports grounds, a dedicated girls' hostel with 24/7 security, and GPS-tracked college buses across North Bengaluru.",
+      toolCallsExecuted: [],
+    };
+  }
+
+  // Instant response for Required Documents
+  const isDocumentsDirect = /(what|which) documents? (are )?(needed|required)|admission documents|document checklist/i.test(cleanQ);
+  if (isDocumentsDirect) {
+    return {
+      text: "Required admission documents: 10th/SSLC Marks Card, Transfer Certificate (TC), Conduct Certificate, Migration Certificate (for CBSE/ICSE), Aadhaar copies (student & parent), and passport-size photographs.",
+      toolCallsExecuted: [],
+    };
+  }
+
+  // Instant response for Timings & Visiting hours
+  const isTimingsDirect = /timings|timing|visiting hour|visiting time|office hour|when can i visit/i.test(cleanQ);
+  if (isTimingsDirect) {
+    return {
+      text: "North Campus visiting and office hours are Monday to Saturday, 8:30 AM to 5:00 PM.\n\nYou can tour laboratories, smart classrooms, and library, or speak with an admissions counselor.",
+      toolCallsExecuted: [],
+    };
+  }
+
   // Instant response for Fee queries
   const isFeeQuery = /fee|fees|cost|scholarship|tuition/i.test(cleanQ);
   if (isFeeQuery) {
     return {
-      text: "Tuition fees depend on the chosen stream per Karnataka PU Board norms.\n\nFor the exact 2026-27 fee schedule, please call our North Campus help desk at +91 81053 88193.",
+      text: "Tuition fees depend on the chosen stream per Karnataka PU Board norms, with merit scholarships for students scoring above 85% in 10th/SSLC.\n\nFor the exact 2026-27 fee schedule, please call our North Campus help desk at +91 81053 88193.",
       toolCallsExecuted: [],
     };
   }

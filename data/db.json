@@ -1,6 +1,27 @@
 {
   "inquiries": [
     {
+      "id": "GPUC-2026-INQ-1023",
+      "name": "jhg (Parent: kjhgf)",
+      "mobile": "9876543212",
+      "parentName": "kjhgf",
+      "location": "hoodi 5560067",
+      "userType": "parent",
+      "courseInterest": "11th Class (1st PU)",
+      "intendedYear": "2026-2027",
+      "category": "ADMISSIONS_2026-27",
+      "preferredContact": "phone",
+      "summary": "Topic: Admissions for Academic Year 2026–27 | Class: 11th Class (1st PU) | Inquiry: Admissions 2026-27 | Student: jhg | Parent: kjhgf | Location: hoodi 5560067 | Note: Query: What is the admission process for academic year 2026-2027 at North Campus?",
+      "assignedTeam": "Admissions",
+      "assignedStaff": "Mr. Aravind J (Admissions Officer)",
+      "status": "NEW",
+      "consentGiven": true,
+      "consentPurpose": "Inquiry guidance and admission assistance",
+      "consentTimestamp": "2026-10-15T08:54:38.015Z",
+      "createdAt": "2026-10-15T08:54:38.015Z",
+      "updatedAt": "2026-10-15T08:54:38.015Z"
+    },
+    {
       "id": "GPUC-2026-INQ-1022",
       "name": "Hari Test (Parent: Rajesh)",
       "mobile": "9845012345",
@@ -421,6 +442,21 @@
     }
   ],
   "appointments": [
+    {
+      "id": "GPUC-VISIT-2026-515",
+      "inquiryId": "GPUC-2026-INQ-1023",
+      "name": "jhg (Parent: kjhgf)",
+      "mobile": "9876543212",
+      "mode": "campus_visit",
+      "date": "2026-10-16",
+      "timeSlot": "8:30 AM - 5:00 PM",
+      "purpose": "Campus Visit & Admission Consultation (11th Class (1st PU))",
+      "assignedStaff": "Admissions Desk Counselor",
+      "assignedDepartment": "Admissions",
+      "status": "CONFIRMED",
+      "meetingLinkOrVenue": "Gopalan Pre-University College, North Campus, No. 79 Mavallipura, Hesaragatta Hobli, Yelahanka, Bengaluru - 560089",
+      "createdAt": "2026-10-15T08:54:41.015Z"
+    },
     {
       "id": "GPUC-2026-APT-514",
       "inquiryId": "GPUC-2026-INQ-1020",
@@ -1407,6 +1443,15 @@
     }
   ],
   "messages": [
+    {
+      "id": "MSG-1015",
+      "type": "whatsapp",
+      "recipient": "9876543212",
+      "templateId": "visit_ticket_confirmation",
+      "content": "Dear jhg (Parent: kjhgf), your Campus Visit ticket GPUC-VISIT-2026-515 is confirmed. Visiting hours: Monday to Friday 8:30 AM to 5:00 PM.",
+      "status": "DELIVERED",
+      "timestamp": "2026-10-15T08:54:41.015Z"
+    },
     {
       "id": "MSG-9330",
       "type": "whatsapp",
