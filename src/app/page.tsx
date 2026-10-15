@@ -151,44 +151,38 @@ function getTopicFromQuery(query: string): string {
 const FAQ_PRESETS = [
   {
     icon: '🎓',
-    title: 'Admissions 2026–27',
-    tag: 'Process & Eligibility',
-    label: '🎓 Admission for 2026–27',
+    title: 'Admissions',
+    label: '🎓 Admissions',
     query: 'What is the admission process for academic year 2026-2027?',
   },
   {
     icon: '🔬',
-    title: 'Science Combinations',
-    tag: 'PCMB / PCMC + NEET/JEE',
+    title: 'Science',
     label: '🔬 Science (PCMB / PCMC)',
     query: 'What Science combinations are offered at Gopalan PU College?',
   },
   {
     icon: '📊',
-    title: 'Commerce Streams',
-    tag: 'CEBA, SEBA & MEBA',
+    title: 'Commerce',
     label: '📊 Commerce Streams',
     query: 'What Commerce combinations are offered at Gopalan PU College?',
   },
   {
     icon: '📅',
-    title: 'Book Campus Visit',
-    tag: 'Offline Tour & Meeting',
+    title: 'Campus Visit',
     label: '📅 Book a Campus Visit',
     query: 'How can I book a campus visit or consultation?',
   },
   {
     icon: '📄',
-    title: 'Required Documents',
-    tag: 'Certificates Checklist',
+    title: 'Documents',
     label: '📄 Required Documents',
     query: 'Which documents are required for admission?',
   },
   {
     icon: '💰',
-    title: 'Fee Structure & Desk',
-    tag: 'PU Board Norms & Desk',
-    label: '💰 Fee Structure & Desk',
+    title: 'Fees',
+    label: '💰 Fee Structure',
     query: 'What is the tuition fee structure for Gopalan PU College?',
   },
 ];
@@ -1257,7 +1251,7 @@ export default function Home() {
                                 style={{
                                   width: '100%',
                                   boxSizing: 'border-box',
-                                  padding: '8px 10px',
+                                  padding: '10px 12px',
                                   borderRadius: '10px',
                                   background: 'linear-gradient(135deg, #FFFFFF, #FFFBEB)',
                                   border: '1.5px solid #FDE68A',
@@ -1266,7 +1260,7 @@ export default function Home() {
                                   cursor: 'pointer',
                                   display: 'flex',
                                   alignItems: 'center',
-                                  gap: '8px',
+                                  gap: '9px',
                                   transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
                                   boxShadow: '0 1px 3px rgba(245, 158, 11, 0.08)',
                                 }}
@@ -1285,46 +1279,30 @@ export default function Home() {
                               >
                                 <div
                                   style={{
-                                    width: '28px',
-                                    height: '28px',
-                                    borderRadius: '7px',
+                                    width: '30px',
+                                    height: '30px',
+                                    borderRadius: '8px',
                                     background: '#FEF3C7',
                                     border: '1px solid #FCD34D',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    fontSize: '0.95rem',
+                                    fontSize: '1rem',
                                     flexShrink: 0,
                                   }}
                                 >
                                   {preset.icon}
                                 </div>
-                                <div style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
-                                  <div
-                                    style={{
-                                      fontSize: '0.76rem',
-                                      fontWeight: 700,
-                                      color: '#92400E',
-                                      lineHeight: 1.25,
-                                      whiteSpace: 'nowrap',
-                                      overflow: 'hidden',
-                                      textOverflow: 'ellipsis',
-                                    }}
-                                  >
-                                    {preset.title}
-                                  </div>
-                                  <div
-                                    style={{
-                                      fontSize: '0.66rem',
-                                      color: '#A16207',
-                                      marginTop: '2px',
-                                      whiteSpace: 'nowrap',
-                                      overflow: 'hidden',
-                                      textOverflow: 'ellipsis',
-                                    }}
-                                  >
-                                    {preset.tag}
-                                  </div>
+                                <div
+                                  style={{
+                                    fontSize: '0.82rem',
+                                    fontWeight: 700,
+                                    color: '#92400E',
+                                    lineHeight: 1.2,
+                                    whiteSpace: 'nowrap',
+                                  }}
+                                >
+                                  {preset.title}
                                 </div>
                               </button>
                             ))}
