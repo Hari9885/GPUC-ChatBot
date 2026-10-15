@@ -448,7 +448,7 @@ export default function Home() {
         ...prev,
         {
           role: 'assistant',
-          content: `Thank you, ${leadStudentName}! I have noted your details.\n\nFor immediate assistance, please call our admissions desk at +91 96069 41908 (Monday to Friday, 8:30 AM to 5:00 PM) or email admin@gopalanpucollege.com.`,
+          content: `Thank you, ${leadStudentName}! I have noted your details.\n\nFor immediate assistance, please call our admissions desk at +91 81053 88193 (North Campus) / +91 96069 41908 or email gpuc.north@gopalanpucollege.com.`,
         },
       ]);
     } finally {
@@ -493,14 +493,14 @@ export default function Home() {
       const apt = data.appointment || {
         id: `GPUC-VISIT-2026-${Date.now().toString().slice(-4)}`,
         mode: 'campus_visit',
-        date: 'Monday to Friday',
+        date: 'Monday to Saturday',
         timeSlot: '8:30 AM - 5:00 PM',
-        meetingLinkOrVenue: 'Gopalan Pre-University College Campus, 181/1, Hoodi Village, Whitefield, Bengaluru - 560048',
+        meetingLinkOrVenue: 'Gopalan PU College North Campus (No. 79 Mavallipura, Yelahanka) & Whitefield Campus',
       };
 
       setBookingFlowState('completed');
 
-      const replyContent = `Your campus visit ticket has been generated and recorded with Reference ${apt.id}.\n\nVisiting hours are Monday to Friday from 8:30 AM to 5:00 PM at our Whitefield campus.`;
+      const replyContent = `Your campus visit ticket has been generated and recorded with Reference ${apt.id}.\n\nVisiting hours are Monday to Saturday from 8:30 AM to 5:00 PM. Admissions help desk: +91 81053 88193.`;
 
       setMessages((prev) => [
         ...prev,
@@ -511,12 +511,12 @@ export default function Home() {
           ticketData: {
             id: apt.id,
             mode: 'campus_visit',
-            date: apt.date || 'Monday to Friday',
+            date: apt.date || 'Monday to Saturday',
             timeSlot: apt.timeSlot || '8:30 AM - 5:00 PM',
             venue: apt.meetingLinkOrVenue,
             studentName: currentLead.studentName,
             mobile: currentLead.mobile,
-            instructions: 'Please present this ticket reference at the Admissions Desk (Block A) upon arrival.',
+            instructions: 'Please present this ticket reference at the Admissions Desk upon arrival.',
           },
         },
       ]);
@@ -527,7 +527,7 @@ export default function Home() {
         ...prev,
         {
           role: 'assistant',
-          content: `Your campus visit has been noted! Please visit our campus from Monday to Friday between 8:30 AM and 5:00 PM.\n\nYou may contact the admissions desk directly at +91 96069 41908.`,
+          content: `Your campus visit has been noted! Please visit our campus from Monday to Saturday between 8:30 AM and 5:00 PM.\n\nYou may contact the admissions desk directly at +91 81053 88193 (North Campus) or +91 96069 41908 (Whitefield).`,
           step: 'completed',
         },
       ]);
@@ -665,7 +665,7 @@ export default function Home() {
     setIsTyping(false);
     setLoading(false);
 
-    const genericReply = `You can reach our Admissions Help Desk directly at +91 96069 41908 from 8:30 AM to 5:00 PM (Monday to Friday).\n\nOur counseling team will be happy to assist you in coordinating your visit or scheduling a custom meeting slot.`;
+    const genericReply = `You can reach our Admissions Help Desk directly at +91 81053 88193 (North Campus) or +91 96069 41908 from 8:30 AM to 5:00 PM (Monday to Saturday).\n\nOur counseling team will be happy to assist you in coordinating your visit or scheduling a custom meeting slot.`;
 
     setMessages((prev) => [
       ...prev,
@@ -870,7 +870,7 @@ export default function Home() {
         ...prev,
         {
           role: 'assistant',
-          content: `Sure, I will help you with your query about Gopalan PU College.\n\nYou may also contact our admissions desk directly at +91 96069 41908 (Monday to Friday, 8:30 AM to 5:00 PM) or email admin@gopalanpucollege.com.`,
+          content: `Sure, I will help you with your query about Gopalan PU College.\n\nYou may also contact our admissions desk directly at +91 81053 88193 (North Campus) / +91 96069 41908 or email gpuc.north@gopalanpucollege.com.`,
         },
       ]);
     } finally {
@@ -2275,7 +2275,7 @@ export default function Home() {
                       )}
 
                       {/* Admissions Help Desk Contact Card */}
-                      {msg.step === 'completed' && msg.content.includes('+91 96069 41908') && !msg.ticketData && (
+                      {msg.step === 'completed' && (msg.content.includes('+91 81053 88193') || msg.content.includes('+91 96069 41908')) && !msg.ticketData && (
                         <div
                           style={{
                             marginTop: '10px',
@@ -2293,17 +2293,17 @@ export default function Home() {
                               <Phone size={13} color="#D97706" /> ADMISSIONS HELP DESK
                             </span>
                             <span style={{ fontSize: '0.68rem', padding: '2px 6px', borderRadius: '4px', background: '#FEF3C7', color: '#92400E', fontWeight: 700 }}>
-                              DIRECT LINE
+                              NORTH CAMPUS
                             </span>
                           </div>
 
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', background: '#FFFFFF', padding: '8px 10px', borderRadius: '8px', border: '1px solid #FDE68A' }}>
                             <div>
-                              <div style={{ fontSize: '0.68rem', color: '#78350F', fontWeight: 600 }}>Helpline Phone</div>
-                              <div style={{ fontSize: '0.96rem', fontWeight: 800, color: '#92400E' }}>+91 96069 41908</div>
+                              <div style={{ fontSize: '0.68rem', color: '#78350F', fontWeight: 600 }}>North Campus (Yelahanka)</div>
+                              <div style={{ fontSize: '0.96rem', fontWeight: 800, color: '#92400E' }}>+91 81053 88193</div>
                             </div>
                             <a
-                              href="tel:+919606941908"
+                              href="tel:+918105388193"
                               style={{
                                 padding: '6px 12px',
                                 background: 'linear-gradient(135deg, #F59E0B, #D97706)',
@@ -2322,8 +2322,9 @@ export default function Home() {
                           </div>
 
                           <div style={{ fontSize: '0.72rem', color: '#78350F', lineHeight: 1.45 }}>
-                            🕒 <strong>Working Hours:</strong> Monday &ndash; Friday, 8:30 AM &ndash; 5:00 PM<br />
-                            📍 <strong>Admissions Office:</strong> Gopalan PU College, Whitefield, Bengaluru
+                            🕒 <strong>Working Hours:</strong> Monday &ndash; Saturday, 8:30 AM &ndash; 5:00 PM<br />
+                            📍 <strong>North Campus:</strong> No. 79 Mavallipura, Hesaragatta Hobli, Yelahanka<br />
+                            📞 <strong>Whitefield Campus:</strong> +91 96069 41908
                           </div>
                         </div>
                       )}
