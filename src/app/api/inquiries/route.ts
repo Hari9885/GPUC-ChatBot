@@ -45,6 +45,7 @@ export async function POST(req: NextRequest) {
       studentName,
       parentName,
       mobile,
+      location,
       admissionClass,
       inquiryType,
       queryTopic,
@@ -69,13 +70,14 @@ export async function POST(req: NextRequest) {
     const id = `GPUC-2026-INQ-${refNum}`;
 
     const finalParent = (parentName || '').trim();
+    const finalLocation = (location || '').trim();
     const fullName = finalParent ? `${rawName} (Parent: ${finalParent})` : rawName;
     const finalClass = admissionClass || '12th Class (2nd PU) / 11th Class';
     const finalType = inquiryType || 'Admissions';
     const finalTopic = queryTopic || 'College Information';
 
     // Intelligent Department & Staff Incharge Routing
-    const combinedContent = `${finalTopic} ${finalType} ${chatNotes || ''}`.toLowerCase();
+    const combinedContent = `${finalTopic} ${finalType} ${finalLocation} ${chatNotes || ''}`.toLowerCase();
 
     let assignedTeam = department || 'Admissions';
     let assignedStaff = staff || 'Mr. Aravind J (Admissions Officer)';
@@ -137,12 +139,14 @@ export async function POST(req: NextRequest) {
       id,
       name: fullName,
       mobile: rawMobile,
+      parentName: finalParent || undefined,
+      location: finalLocation || undefined,
       userType: finalParent ? 'parent' : 'prospective_student',
       courseInterest: finalClass,
       intendedYear: '2026-2027',
       category,
       preferredContact: 'phone',
-      summary: `Topic: ${finalTopic} | Class: ${finalClass} | Inquiry: ${finalType} | Student: ${rawName}${finalParent ? ` | Parent: ${finalParent}` : ''}${chatNotes ? ` | Note: ${chatNotes}` : ''}`,
+      summary: `Topic: ${finalTopic} | Class: ${finalClass} | Inquiry: ${finalType} | Student: ${rawName}${finalParent ? ` | Parent: ${finalParent}` : ''}${finalLocation ? ` | Location: ${finalLocation}` : ''}${chatNotes ? ` | Note: ${chatNotes}` : ''}`,
       assignedTeam,
       assignedStaff,
       status: 'NEW',

@@ -5,6 +5,8 @@ export interface Inquiry {
   id: string;
   name: string;
   mobile: string;
+  parentName?: string;
+  location?: string;
   userType?: string;
   courseInterest?: string;
   intendedYear?: string;

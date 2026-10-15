@@ -261,6 +261,7 @@ export async function callGemini(
       `- Student Name: ${userContext.studentName || userContext.name || 'N/A'}\n` +
       `- Parent/Guardian: ${userContext.parentName || 'N/A'}\n` +
       `- Contact Mobile: ${userContext.mobile || 'N/A'}\n` +
+      `- Location/Area: ${userContext.location || 'N/A'}\n` +
       `- Target Class/Stream: ${userContext.admissionClass || '12th Class (2nd PU)'}\n` +
       `- Inquiry Nature: ${userContext.inquiryType || 'Admissions 2026-27'}\n` +
       `- Reference ID: ${userContext.inquiryId || 'GPUC-2026-INQ'}\n` +

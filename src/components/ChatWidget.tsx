@@ -85,6 +85,7 @@ export interface UserLead {
   studentName: string;
   parentName?: string;
   mobile: string;
+  location?: string;
   admissionClass: string;
   inquiryType: string;
 }
@@ -225,14 +226,21 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
   const [leadStudentName, setLeadStudentName] = useState('');
   const [leadParentName, setLeadParentName] = useState('');
   const [leadMobile, setLeadMobile] = useState('');
+  const [leadLocation, setLeadLocation] = useState('');
 
   // Values in current step inputs
   const [stepStudentName, setStepStudentName] = useState('');
   const [stepParentName, setStepParentName] = useState('');
   const [stepMobile, setStepMobile] = useState('');
+  const [stepLocation, setStepLocation] = useState('');
   const [stepError, setStepError] = useState('');
   const [isSubmittingLead, setIsSubmittingLead] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+
+  // Input refs for smooth keyboard navigation & focusing parent name first
+  const parentInputRef = useRef<HTMLInputElement>(null);
+  const mobileInputRef = useRef<HTMLInputElement>(null);
+  const locationInputRef = useRef<HTMLInputElement>(null);
 
   // Appointment & Meeting Booking Flow State
   const [bookingFlowState, setBookingFlowState] = useState<
@@ -253,6 +261,16 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
       scrollToBottom();
     }
   }, [messages, loading, isTyping, isChatOpen]);
+
+  // When Step 2 (contact & location) appears, auto-focus Parent Name input (NOT mobile)
+  useEffect(() => {
+    if (leadStep === 'ask_contact') {
+      const timer = setTimeout(() => {
+        parentInputRef.current?.focus();
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [leadStep]);
 
   const [isEmbedded, setIsEmbedded] = useState(initialEmbedded);
 
@@ -350,32 +368,39 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
       setLeadStep('ask_contact');
       const botMsg: Message = {
         role: 'assistant',
-        content: `Thank you, ${name}! Could you please provide the Parent / Guardian Name and Mobile Number?`,
+        content: `Thank you, ${name}! Could you please provide the Parent / Guardian Name, Mobile Number, and your Area / Location?`,
         step: 'ask_contact',
       };
       setMessages((prev) => [...prev, botMsg]);
     }, 1500);
   };
 
-  // Step 2: Submit Parent Name & Mobile Number (with 1.5s bouncing dots)
-  const handleContactSubmit = (parentVal?: string, mobVal?: string) => {
+  // Step 2: Submit Parent Name, Mobile Number & Location (with 1.5s bouncing dots)
+  const handleContactSubmit = (parentVal?: string, mobVal?: string, locVal?: string) => {
     const parent = (parentVal !== undefined ? parentVal : stepParentName).trim();
     let mob = (mobVal !== undefined ? mobVal : stepMobile).trim();
+    const loc = (locVal !== undefined ? locVal : stepLocation).trim();
 
     const cleanDigits = mob.replace(/\D/g, '');
     if (cleanDigits.length < 10) {
       setStepError('Please enter a valid 10-digit mobile number.');
+      mobileInputRef.current?.focus();
       return;
     }
     setStepError('');
     setLeadParentName(parent);
     setLeadMobile(mob);
+    setLeadLocation(loc);
     setStepParentName('');
     setStepMobile('');
+    setStepLocation('');
 
-    const displayUserText = parent
-      ? `Parent: ${parent} • Mobile: ${mob}`
-      : `Mobile: ${mob}`;
+    const displayParts: string[] = [];
+    if (parent) displayParts.push(`Parent: ${parent}`);
+    displayParts.push(`Mobile: ${mob}`);
+    if (loc) displayParts.push(`Location: ${loc}`);
+    const displayUserText = displayParts.join(' • ');
+
     const userMsg: Message = { role: 'user', content: displayUserText };
     setMessages((prev) => [...prev, userMsg]);
     setIsTyping(true);
@@ -420,6 +445,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
           studentName: leadStudentName,
           parentName: leadParentName,
           mobile: leadMobile,
+          location: leadLocation,
           admissionClass: chosenClass,
           inquiryType: chosenType,
           queryTopic: pendingTopic || 'College Admissions',
@@ -442,6 +468,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
             studentName: leadStudentName,
             parentName: leadParentName,
             mobile: leadMobile,
+            location: leadLocation,
             admissionClass: chosenClass,
             inquiryType: chosenType,
           },
@@ -458,6 +485,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
         studentName: leadStudentName,
         parentName: leadParentName,
         mobile: leadMobile,
+        location: leadLocation,
         admissionClass: chosenClass,
         inquiryType: chosenType,
       };
@@ -503,6 +531,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
       studentName: leadStudentName || 'Prospective Student',
       parentName: leadParentName,
       mobile: leadMobile || '9845012345',
+      location: leadLocation,
       admissionClass: '12th Class (2nd PU)',
       inquiryType: 'Campus Visit',
     };
@@ -732,7 +761,33 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
       }
       if (leadStep === 'ask_contact') {
         setInput('');
-        handleContactSubmit(undefined, text);
+        const digits = text.replace(/\D/g, '');
+        // If user typed a 10+ digit mobile number directly
+        if (digits.length >= 10 && !stepMobile) {
+          setStepMobile(text);
+          setStepError('');
+          locationInputRef.current?.focus();
+          return;
+        }
+        // If parent name is not set yet and text doesn't look like phone digits
+        if (!stepParentName && digits.length < 10) {
+          setStepParentName(text);
+          mobileInputRef.current?.focus();
+          return;
+        }
+        // If mobile is not set yet
+        if (!stepMobile) {
+          if (digits.length < 10) {
+            setStepError('Please enter a valid 10-digit mobile number.');
+            mobileInputRef.current?.focus();
+            return;
+          }
+          setStepMobile(text);
+          locationInputRef.current?.focus();
+          return;
+        }
+        // If mobile is set, treat text as location and submit
+        handleContactSubmit(stepParentName, stepMobile, text);
         return;
       }
       if (leadStep === 'ask_admission') {
@@ -927,9 +982,11 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
     setLeadStudentName('');
     setLeadParentName('');
     setLeadMobile('');
+    setLeadLocation('');
     setStepStudentName('');
     setStepParentName('');
     setStepMobile('');
+    setStepLocation('');
     setStepError('');
     setIsTyping(false);
     setLoading(false);
@@ -943,7 +1000,11 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
   const getInputPlaceholder = () => {
     if (!userLead) {
       if (leadStep === 'ask_student_name') return "Enter student's full name...";
-      if (leadStep === 'ask_contact') return "Enter 10-digit mobile number...";
+      if (leadStep === 'ask_contact') {
+        if (!stepParentName) return "Enter parent name (or fill form above)...";
+        if (!stepMobile) return "Enter 10-digit mobile number...";
+        return "Enter area & pincode (e.g. Whitefield 560066)...";
+      }
       if (leadStep === 'ask_admission') return "Type class or choose an option above...";
     }
     if (bookingFlowState === 'offered_choice') return "Type 'offline' for visit or 'online' for meeting...";
@@ -1639,7 +1700,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                         </div>
                       )}
 
-                      {/* Step 2: Parent Name & Mobile Card */}
+                      {/* Step 2: Parent Name, Mobile & Location Card */}
                       {msg.step === 'ask_contact' && leadStep === 'ask_contact' && !userLead && (
                         <div
                           style={{
@@ -1655,7 +1716,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                         >
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                             <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#92400E', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                              <Sparkles size={13} color="#D97706" /> Step 2: Contact Information
+                              <Sparkles size={13} color="#D97706" /> Step 2: Contact Information & Location
                             </span>
                             <span style={{ fontSize: '0.7rem', color: '#64748B' }}>2 of 3</span>
                           </div>
@@ -1668,15 +1729,24 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                           )}
 
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%', boxSizing: 'border-box' }}>
+                            {/* 1. Parent / Guardian Name (with autoFocus) */}
                             <div>
                               <div style={{ fontSize: '0.74rem', fontWeight: 600, color: '#334155', marginBottom: '3px' }}>
                                 Parent / Guardian Name <span style={{ color: '#94A3B8', fontWeight: 400 }}>(Optional)</span>
                               </div>
                               <div style={{ position: 'relative' }}>
                                 <input
+                                  ref={parentInputRef}
                                   type="text"
                                   value={stepParentName}
+                                  autoFocus
                                   onChange={(e) => setStepParentName(e.target.value)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                      e.preventDefault();
+                                      mobileInputRef.current?.focus();
+                                    }
+                                  }}
                                   placeholder="Enter parent or guardian full name"
                                   style={{
                                     width: '100%',
@@ -1694,12 +1764,14 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                               </div>
                             </div>
 
+                            {/* 2. Mobile / WhatsApp Phone Number */}
                             <div>
                               <div style={{ fontSize: '0.74rem', fontWeight: 600, color: '#334155', marginBottom: '3px' }}>
                                 Mobile / WhatsApp Phone Number <span style={{ color: '#D97706', fontSize: '0.7rem', fontWeight: 600 }}>(Required)</span>
                               </div>
                               <div style={{ position: 'relative' }}>
                                 <input
+                                  ref={mobileInputRef}
                                   type="tel"
                                   value={stepMobile}
                                   maxLength={15}
@@ -1707,9 +1779,13 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                     setStepMobile(e.target.value);
                                     if (stepError) setStepError('');
                                   }}
-                                  onKeyDown={(e) => e.key === 'Enter' && handleContactSubmit()}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                      e.preventDefault();
+                                      locationInputRef.current?.focus();
+                                    }
+                                  }}
                                   placeholder="10-digit mobile number (e.g. 98450 12345)"
-                                  autoFocus
                                   style={{
                                     width: '100%',
                                     boxSizing: 'border-box',
@@ -1726,12 +1802,46 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                               </div>
                             </div>
 
+                            {/* 3. Location: Area & Pincode */}
+                            <div>
+                              <div style={{ fontSize: '0.74rem', fontWeight: 600, color: '#334155', marginBottom: '3px' }}>
+                                Location / Area & Pincode <span style={{ color: '#94A3B8', fontWeight: 400 }}>(e.g. Whitefield 560066)</span>
+                              </div>
+                              <div style={{ position: 'relative' }}>
+                                <input
+                                  ref={locationInputRef}
+                                  type="text"
+                                  value={stepLocation}
+                                  onChange={(e) => setStepLocation(e.target.value)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                      e.preventDefault();
+                                      handleContactSubmit();
+                                    }
+                                  }}
+                                  placeholder="Enter your area & pincode (e.g. Whitefield 560066)"
+                                  style={{
+                                    width: '100%',
+                                    boxSizing: 'border-box',
+                                    padding: '8px 12px 8px 34px',
+                                    background: '#F8FAFC',
+                                    border: '1px solid #CBD5E1',
+                                    borderRadius: '8px',
+                                    color: '#0F172A',
+                                    fontSize: '0.84rem',
+                                    outline: 'none',
+                                  }}
+                                />
+                                <MapPin size={15} color="#64748B" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }} />
+                              </div>
+                            </div>
+
                             <button
                               type="button"
                               onClick={() => handleContactSubmit()}
                               className="btn-primary"
                               style={{
-                                marginTop: '2px',
+                                marginTop: '4px',
                                 width: '100%',
                                 boxSizing: 'border-box',
                                 padding: '9px 14px',
