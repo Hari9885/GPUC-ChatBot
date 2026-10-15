@@ -491,6 +491,28 @@ body.is-embedded-body .chat-widget-window {
               box-shadow 0.25s ease;
 }
 
+@keyframes gpuc-launcher-bounce {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  25% {
+    transform: translateY(-16px) scale(1.08);
+  }
+  45% {
+    transform: translateY(0) scale(0.96);
+  }
+  65% {
+    transform: translateY(-8px) scale(1.03);
+  }
+  82% {
+    transform: translateY(0) scale(0.98);
+  }
+}
+
+.gpuc-bouncing {
+  animation: gpuc-launcher-bounce 1s cubic-bezier(0.28, 0.84, 0.42, 1) infinite !important;
+}
+
 /* Suppress Google reCAPTCHA badge / error card behind floating widget */
 .grecaptcha-badge,
 .recaptcha_v3-bottomright,

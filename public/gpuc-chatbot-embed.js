@@ -180,6 +180,28 @@
       100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
     }
 
+    @keyframes gpuc-launcher-bounce {
+      0%, 100% {
+        transform: translateY(0) scale(1);
+      }
+      25% {
+        transform: translateY(-16px) scale(1.08);
+      }
+      45% {
+        transform: translateY(0) scale(0.96);
+      }
+      65% {
+        transform: translateY(-8px) scale(1.03);
+      }
+      82% {
+        transform: translateY(0) scale(0.98);
+      }
+    }
+
+    #gpuc-widget-launcher.gpuc-bouncing {
+      animation: gpuc-launcher-bounce 1s cubic-bezier(0.28, 0.84, 0.42, 1) infinite !important;
+    }
+
     @media (max-width: 640px) {
       #gpuc-widget-launcher {
         bottom: 16px !important;
@@ -242,6 +264,7 @@
   // Toggle Functionality
   function openChat() {
     isOpen = true;
+    launcherBtn.classList.remove('gpuc-bouncing');
     containerEl.classList.add('open');
     launcherBtn.style.transform = 'scale(0.92)';
     tooltipEl.classList.remove('visible');
@@ -252,6 +275,7 @@
 
   function closeChat() {
     isOpen = false;
+    launcherBtn.classList.remove('gpuc-bouncing');
     try {
       sessionStorage.setItem('gpuc_ai_popped', 'true');
     } catch (e) {}
@@ -301,7 +325,7 @@
     toggle: toggleChat,
   };
 
-  // Auto pop-up AI assistant when user stays on page actively for more than 4 seconds (once per session)
+  // Auto bounce after 1st sec, bounce for 3 sec, then auto-open (total 4s active stay, once per session)
   function triggerAutoPopup() {
     try {
       if (sessionStorage.getItem('gpuc_ai_popped') === 'true') {
@@ -309,15 +333,30 @@
       }
     } catch (e) {}
 
+    // Step 1: Start bouncing after the 1st second (1000ms)
     setTimeout(() => {
-      if (!isOpen) {
-        try {
-          if (sessionStorage.getItem('gpuc_ai_popped') === 'true') return;
-          sessionStorage.setItem('gpuc_ai_popped', 'true');
-        } catch (e) {}
-        openChat();
-      }
-    }, 4000);
+      if (isOpen) return;
+      try {
+        if (sessionStorage.getItem('gpuc_ai_popped') === 'true') return;
+      } catch (e) {}
+
+      launcherBtn.classList.add('gpuc-bouncing');
+      tooltipEl.classList.add('visible');
+
+      // Step 2: Bounce for 3 seconds (from 1s to 4s total), then stop bouncing and auto-open
+      setTimeout(() => {
+        launcherBtn.classList.remove('gpuc-bouncing');
+        tooltipEl.classList.remove('visible');
+
+        if (!isOpen) {
+          try {
+            if (sessionStorage.getItem('gpuc_ai_popped') === 'true') return;
+            sessionStorage.setItem('gpuc_ai_popped', 'true');
+          } catch (e) {}
+          openChat();
+        }
+      }, 3000); // 3 seconds of bouncing
+    }, 1000); // starts after 1st second
   }
 
   if (document.readyState === 'complete') {

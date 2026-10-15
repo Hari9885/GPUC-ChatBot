@@ -198,6 +198,7 @@ How can I help you today? Please choose an option below or type your question:`,
 export default function ChatWidget({ initialEmbedded = false }: { initialEmbedded?: boolean }) {
   const [isChatOpen, setIsChatOpen] = useState(initialEmbedded);
   const [isHovered, setIsHovered] = useState(false);
+  const [isBouncing, setIsBouncing] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
   const [messages, setMessages] = useState<Message[]>([INITIAL_GREETING]);
   const [input, setInput] = useState('');
@@ -280,27 +281,41 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
       };
       window.addEventListener('message', handleMsg);
 
-      // Auto pop up AI assistant when user stays on page actively for more than 4 seconds (once per session)
-      let autoPopupTimer: NodeJS.Timeout | null = null;
+      // Auto bounce after 1s, bounce for 3s, then auto-open (total 4s active stay, once per session)
+      let bounceTimer: NodeJS.Timeout | null = null;
+      let openTimer: NodeJS.Timeout | null = null;
       try {
         const alreadyPopped = sessionStorage.getItem('gpuc_ai_popped');
         if (!alreadyPopped) {
-          autoPopupTimer = setTimeout(() => {
-            try {
-              sessionStorage.setItem('gpuc_ai_popped', 'true');
-            } catch (e) {}
-            setIsChatOpen(true);
-          }, 4000);
+          // Step 1: Start bouncing after 1 second (1000ms)
+          bounceTimer = setTimeout(() => {
+            setIsBouncing(true);
+
+            // Step 2: Bounce for 3 seconds (1000ms to 4000ms), then stop bouncing and auto-open
+            openTimer = setTimeout(() => {
+              setIsBouncing(false);
+              try {
+                if (sessionStorage.getItem('gpuc_ai_popped') === 'true') return;
+                sessionStorage.setItem('gpuc_ai_popped', 'true');
+              } catch (e) {}
+              setIsChatOpen(true);
+            }, 3000);
+          }, 1000);
         }
       } catch (e) {
-        autoPopupTimer = setTimeout(() => {
-          setIsChatOpen(true);
-        }, 4000);
+        bounceTimer = setTimeout(() => {
+          setIsBouncing(true);
+          openTimer = setTimeout(() => {
+            setIsBouncing(false);
+            setIsChatOpen(true);
+          }, 3000);
+        }, 1000);
       }
 
       return () => {
         window.removeEventListener('message', handleMsg);
-        if (autoPopupTimer) clearTimeout(autoPopupTimer);
+        if (bounceTimer) clearTimeout(bounceTimer);
+        if (openTimer) clearTimeout(openTimer);
       };
     }
   }, [initialEmbedded]);
@@ -971,6 +986,10 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
   };
 
   const handleWidgetClose = () => {
+    try {
+      sessionStorage.setItem('gpuc_ai_popped', 'true');
+    } catch (e) {}
+    setIsBouncing(false);
     if (isEmbedded) {
       window.parent?.postMessage({ type: 'GPUC_CHAT_CLOSE' }, '*');
     } else {
@@ -979,6 +998,10 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
   };
 
   const handleWidgetMinimize = () => {
+    try {
+      sessionStorage.setItem('gpuc_ai_popped', 'true');
+    } catch (e) {}
+    setIsBouncing(false);
     if (isEmbedded) {
       window.parent?.postMessage({ type: 'GPUC_CHAT_MINIMIZE' }, '*');
     } else {
@@ -1067,9 +1090,16 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
 
             {/* Gopalan Crest Icon Floating Circle (Responsive auto-scaling per device) */}
             <button
-              onClick={() => setIsChatOpen(true)}
+              onClick={() => {
+                try {
+                  sessionStorage.setItem('gpuc_ai_popped', 'true');
+                } catch (e) {}
+                setIsBouncing(false);
+                setIsChatOpen(true);
+              }}
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
+              className={isBouncing ? 'gpuc-bouncing' : ''}
               aria-label="Open Gopalan PU College Assistant"
               style={{
                 width: 'var(--assistant-bubble-size, 53px)',
