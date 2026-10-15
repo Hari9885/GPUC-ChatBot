@@ -1081,18 +1081,10 @@ export default function Home() {
                     }}
                   />
                 </div>
-                <div style={{ minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  <div>
                     <div style={{ fontWeight: 800, fontSize: '0.94rem', color: '#fff', whiteSpace: 'nowrap' }}>
                       GPUC AI Admissions Assistant
                     </div>
-                    {/* Small indication when maximized */}
-                    {isMaximized && (
-                      <span className="maximized-badge" title="Assistant is currently in maximized full view">
-                        <Maximize2 size={10} /> Full View
-                      </span>
-                    )}
-                  </div>
                   <div style={{ fontSize: '0.72rem', color: '#4ade80', display: 'flex', alignItems: 'center', gap: '4px' }}>
                     <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4ade80' }}></span>
                     Grounded on Gopalan PU Records
