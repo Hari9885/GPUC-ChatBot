@@ -452,3 +452,19 @@ h1, h2, h3, h4, h5, h6 {
               border-radius 0.25s ease,
               box-shadow 0.25s ease;
 }
+
+/* Suppress Google reCAPTCHA badge / error card behind floating widget */
+.grecaptcha-badge,
+.recaptcha_v3-bottomright,
+div[style*="bottom: 14px"][style*="right: 0"],
+iframe[src*="recaptcha"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  position: absolute !important;
+  left: -9999px !important;
+  z-index: -9999 !important;
+}

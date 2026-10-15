@@ -157,6 +157,22 @@
       display: block !important;
     }
 
+    /* Completely hide Google reCAPTCHA badge / error card behind the launcher */
+    .grecaptcha-badge,
+    .recaptcha_v3-bottomright,
+    div[style*="bottom: 14px"][style*="right: 0"],
+    iframe[src*="recaptcha"] {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      width: 0 !important;
+      height: 0 !important;
+      position: absolute !important;
+      left: -9999px !important;
+      z-index: -9999 !important;
+    }
+
     @keyframes gpuc-pulse-dot {
       0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
       70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }

@@ -260,6 +260,24 @@ gtag('config', 'G-XGM0HCDXQQ'); </script>
 
 
 </style>
+
+<style id="hide-recaptcha-badge">
+  .grecaptcha-badge,
+  .recaptcha_v3-bottomright,
+  div[style*="bottom: 14px"][style*="right: 0"],
+  iframe[src*="recaptcha"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    position: absolute !important;
+    left: -9999px !important;
+    z-index: -9999 !important;
+  }
+</style>
+
 </head>
 <body class="home wp-singular page-template page-template-elementor_header_footer page page-id-33 wp-embed-responsive wp-theme-hello-elementor theme--hello-elementor hello-elementor-default elementor-default elementor-template-full-width elementor-kit-28 elementor-page elementor-page-33">
 
@@ -1874,7 +1892,7 @@ var elementorFrontendConfig = {"environmentMode":{"edit":false,"wpPreview":false
 <script id="imagesloaded-js" src="https://gopalanpucnorth.com/wp-includes/js/imagesloaded.min.js?ver=5.0.0"></script>
 <script id="swiper-js" src="https://gopalanpucnorth.com/wp-content/plugins/elementor/assets/lib/swiper/v8/swiper.min.js?ver=8.4.5"></script>
 <script id="elementor-gallery-js" src="https://gopalanpucnorth.com/wp-content/plugins/elementor/assets/lib/e-gallery/js/e-gallery.min.js?ver=1.2.0"></script>
-<script id="elementor-recaptcha_v3-api-js" src="https://www.google.com/recaptcha/api.js?render=explicit&#038;ver=3.28.3"></script>
+
 <script id="elementor-pro-webpack-runtime-js" src="https://gopalanpucnorth.com/wp-content/plugins/elementor-pro/assets/js/webpack-pro.runtime.min.js?ver=3.28.3"></script>
 <script id="wp-hooks-js" src="https://gopalanpucnorth.com/wp-includes/js/dist/hooks.min.js?ver=f0f188028580e8dc1255"></script>
 <script id="wp-i18n-js" src="https://gopalanpucnorth.com/wp-includes/js/dist/i18n.min.js?ver=1dfe7db3940c23ea9216"></script>
