@@ -195,8 +195,8 @@ const INITIAL_GREETING: Message = {
 How can I help you today? Please choose an option below or type your question:`,
 };
 
-export default function Home() {
-  const [isChatOpen, setIsChatOpen] = useState(false);
+export default function Home({ initialEmbedded = false }: { initialEmbedded?: boolean }) {
+  const [isChatOpen, setIsChatOpen] = useState(initialEmbedded);
   const [isHovered, setIsHovered] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
   const [messages, setMessages] = useState<Message[]>([INITIAL_GREETING]);
@@ -248,27 +248,40 @@ export default function Home() {
     }
   }, [messages, loading, isTyping, isChatOpen]);
 
-  const [isEmbedded, setIsEmbedded] = useState(false);
+  const [isEmbedded, setIsEmbedded] = useState(initialEmbedded);
 
   // Check if running in embedded iframe mode
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const isEmb = params.get('embedded') === 'true' || window.self !== window.top;
-      if (isEmb) {
-        setIsEmbedded(true);
-        setIsChatOpen(true);
+      try {
+        const params = new URLSearchParams(window.location.search);
+        let inIframe = false;
+        try {
+          inIframe = window.self !== window.top;
+        } catch (e) {
+          inIframe = true;
+        }
+        const isEmb = initialEmbedded || params.get('embedded') === 'true' || inIframe;
+        if (isEmb) {
+          setIsEmbedded(true);
+          setIsChatOpen(true);
+        }
+      } catch (err) {
+        console.warn('Embed detection note:', err);
       }
 
       const handleMsg = (e: MessageEvent) => {
-        if (e.data && typeof e.data === 'object' && e.data.type === 'GPUC_WIDGET_SET_OPEN') {
-          setIsChatOpen(!!e.data.isOpen);
+        if (e.data && typeof e.data === 'object') {
+          if (e.data.type === 'GPUC_WIDGET_SET_OPEN') {
+            setIsChatOpen(!!e.data.isOpen);
+            setIsEmbedded(true);
+          }
         }
       };
       window.addEventListener('message', handleMsg);
       return () => window.removeEventListener('message', handleMsg);
     }
-  }, []);
+  }, [initialEmbedded]);
 
   // Handle Escape key to restore maximized view or close chat
   useEffect(() => {

@@ -153,13 +153,16 @@ export default function GpucWebsite({ onOpenChatWithQuery }: GpucWebsiteProps) {
             <div style={{ fontWeight: 800, fontSize: '1.1rem', color: '#fff', marginBottom: '8px' }}>
               GOPALAN PRE-UNIVERSITY COLLEGE
             </div>
-            <p style={{ fontSize: '0.85rem', color: '#94A3B8', maxWidth: '420px', lineHeight: 1.5, marginBottom: '12px' }}>
-              181/1, 182/1, Behind SAP Labs, Seetharam Palya, Basavanagar, Hoodi, Bengaluru, Karnataka – 560048.
+            <p style={{ fontSize: '0.85rem', color: '#94A3B8', maxWidth: '460px', lineHeight: 1.5, marginBottom: '10px' }}>
+              <strong>North Campus (Yelahanka):</strong> No. 79 Mavallipura Kondashettihalli Road, Hesaragatta Hobli, Bengaluru – 560089.
+            </p>
+            <p style={{ fontSize: '0.82rem', color: '#94A3B8', maxWidth: '460px', lineHeight: 1.5, marginBottom: '12px' }}>
+              <strong>Whitefield Campus:</strong> Behind SAP Labs, Seetharam Palya, Hoodi, Bengaluru – 560048.
             </p>
             <div style={{ fontSize: '0.82rem', color: '#CBD5E1', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <span>Admissions Helpline: +91 96069 41907 / +91 96069 41908</span>
-              <span>Admissions SPOC: Mr. Aravind J (+91 63621 66945)</span>
-              <span>Email: admin@gopalanpucollege.com</span>
+              <span>North Campus Admissions: +91 81053 88193 / +91 81230 40418</span>
+              <span>Whitefield Admissions: +91 96069 41908</span>
+              <span>Email: gpuc.north@gopalanpucollege.com</span>
             </div>
           </div>
 

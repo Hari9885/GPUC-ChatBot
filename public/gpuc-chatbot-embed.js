@@ -222,7 +222,7 @@
 
   const iframeEl = document.createElement('iframe');
   iframeEl.id = 'gpuc-widget-iframe';
-  iframeEl.src = baseUrl + '/?embedded=true';
+  iframeEl.src = baseUrl + '/embed';
   iframeEl.title = 'Gopalan Pre-University College AI Admissions Assistant';
   iframeEl.allow = 'clipboard-write; autoplay; microphone';
   containerEl.appendChild(iframeEl);
