@@ -43,3 +43,6 @@ GPUC-NORTH/wp-includes/
 GPUC-NORTH/wp-admin/
 *.mp4
 
+# Disabled Admin Portal (Local archive - disabled on localhost:3000/admin)
+_disabled_admin_portal/
+src/app/admin/
