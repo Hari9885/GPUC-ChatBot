@@ -1116,7 +1116,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
     if (bookingFlowState === 'offered_choice') return "Type 'offline' for visit or 'online' for meeting...";
     if (bookingFlowState === 'asking_check_slot') return "Select date & time above or type preferred time...";
     if (bookingFlowState === 'showing_available_slots') return "Select an available slot or type your time...";
-    return "Ask about admissions, courses, facilities, visits...";
+    return "Ask anything about GPUC...";
   };
 
   const handleFeedbackSubmit = async () => {
@@ -1322,13 +1322,13 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                 : isMaximized
                 ? 'min(1040px, calc(100vw - 36px))'
                 : 'var(--assistant-width)',
-              maxWidth: isEmbedded ? '100%' : 'calc(100vw - 20px)',
+              maxWidth: isEmbedded ? '100%' : 'calc(100vw - 16px)',
               height: isEmbedded
                 ? '100%'
                 : isMaximized
                 ? 'calc(100vh - 40px)'
                 : 'var(--assistant-height)',
-              maxHeight: isEmbedded ? '100%' : 'calc(100dvh - 32px)',
+              maxHeight: isEmbedded ? '100%' : 'calc(100dvh - 16px)',
               display: 'flex',
               flexDirection: 'column',
               background: '#FFFFFF',
@@ -1350,20 +1350,20 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
             <div
               style={{
                 flexShrink: 0,
-                padding: '12px 16px',
+                padding: '9px 12px',
                 background: 'linear-gradient(135deg, #1E3A8A, #0F172A)',
                 borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                gap: '8px',
+                gap: '6px',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '7px', minWidth: 0, flex: 1 }}>
                 <div
                   style={{
-                    width: '32px',
-                    height: '32px',
+                    width: '28px',
+                    height: '28px',
                     borderRadius: '50%',
                     background: '#FFFFFF',
                     border: '1.5px solid #F59E0B',
@@ -1379,8 +1379,8 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                     src="/gopalan_crest.svg"
                     alt="GPUC Logo"
                     style={{
-                      width: '22px',
-                      height: '22px',
+                      width: '19px',
+                      height: '19px',
                       objectFit: 'contain',
                     }}
                   />
@@ -1394,15 +1394,15 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
-                      lineHeight: 1.25,
+                      lineHeight: 1.2,
                     }}
                     title="GPUC — North Campus (Yelahanka)"
                   >
-                    GPUC — North Campus
+                    GPUC North Campus
                   </div>
                   <div
                     style={{
-                      fontSize: '0.66rem',
+                      fontSize: '0.64rem',
                       color: '#4ade80',
                       display: 'flex',
                       alignItems: 'center',
@@ -1410,17 +1410,17 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
-                      marginTop: '2px',
+                      marginTop: '1px',
                     }}
                   >
                     <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#4ade80', flexShrink: 0 }}></span>
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>Yelahanka Campus • Admissions 2026–27</span>
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>Yelahanka • Admissions 2026–27</span>
                   </div>
                 </div>
               </div>
 
               {/* Window Controls */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '2px', flexShrink: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1px', flexShrink: 0 }}>
                 {/* Reset button */}
                 <button
                   onClick={handleReset}
@@ -1430,7 +1430,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                     border: 'none',
                     color: '#94A3B8',
                     cursor: 'pointer',
-                    padding: '5px',
+                    padding: '4px',
                     borderRadius: '6px',
                     display: 'flex',
                     alignItems: 'center',
@@ -1440,7 +1440,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                   onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
                   onMouseLeave={(e) => (e.currentTarget.style.color = '#94A3B8')}
                 >
-                  <RotateCcw size={15} />
+                  <RotateCcw size={14} />
                 </button>
 
                 {/* Maximize / Restore Button */}
@@ -1453,7 +1453,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                     border: isMaximized ? '1px solid rgba(245, 158, 11, 0.55)' : '1px solid rgba(255, 255, 255, 0.1)',
                     color: isMaximized ? '#FDE68A' : '#94A3B8',
                     cursor: 'pointer',
-                    padding: '5px',
+                    padding: '4px',
                     borderRadius: '6px',
                     display: 'flex',
                     alignItems: 'center',
@@ -1463,7 +1463,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                   onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
                   onMouseLeave={(e) => (e.currentTarget.style.color = isMaximized ? '#FDE68A' : '#94A3B8')}
                 >
-                  {isMaximized ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
+                  {isMaximized ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
                 </button>
 
                 {/* Minimize to circular launcher */}
@@ -1475,7 +1475,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                     border: 'none',
                     color: '#94A3B8',
                     cursor: 'pointer',
-                    padding: '5px',
+                    padding: '4px',
                     borderRadius: '6px',
                     display: 'flex',
                     alignItems: 'center',
@@ -1485,7 +1485,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                   onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
                   onMouseLeave={(e) => (e.currentTarget.style.color = '#94A3B8')}
                 >
-                  <Minus size={16} />
+                  <Minus size={15} />
                 </button>
 
                 {/* Close Chat */}
@@ -1497,7 +1497,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                     border: 'none',
                     color: '#94A3B8',
                     cursor: 'pointer',
-                    padding: '5px',
+                    padding: '4px',
                     borderRadius: '6px',
                     display: 'flex',
                     alignItems: 'center',
@@ -1507,7 +1507,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                   onMouseEnter={(e) => (e.currentTarget.style.color = '#EF4444')}
                   onMouseLeave={(e) => (e.currentTarget.style.color = '#94A3B8')}
                 >
-                  <X size={16} />
+                  <X size={15} />
                 </button>
               </div>
             </div>
@@ -1547,10 +1547,10 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                 overflowY: 'auto',
                 overscrollBehavior: 'contain',
                 WebkitOverflowScrolling: 'touch',
-                padding: '16px',
+                padding: '12px 10px',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '14px',
+                gap: '12px',
                 background: '#F8FAFC',
               }}
             >
@@ -1561,7 +1561,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                   margin: '0 auto',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '14px',
+                  gap: '12px',
                 }}
               >
               {messages.map((msg, index) => {
@@ -1605,10 +1605,10 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                           msg.role === 'user'
                             ? '16px 16px 4px 16px'
                             : '16px 16px 16px 4px',
-                        padding: '12px 14px',
+                        padding: '10px 12px',
                         color: msg.role === 'user' ? '#FFFFFF' : '#0F172A',
-                        fontSize: '0.83rem',
-                        lineHeight: 1.55,
+                        fontSize: '0.82rem',
+                        lineHeight: 1.5,
                         border: msg.role === 'user' ? 'none' : '1px solid #E2E8F0',
                         boxShadow: msg.role === 'user' ? '0 2px 8px rgba(30, 58, 138, 0.25)' : '0 2px 10px rgba(0, 0, 0, 0.05)',
                         whiteSpace: 'pre-line',
@@ -1624,8 +1624,8 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                       {showPresetsUnderMsg && (
                         <div
                           style={{
-                            marginTop: '12px',
-                            paddingTop: '12px',
+                            marginTop: '10px',
+                            paddingTop: '10px',
                             borderTop: '1px solid #E2E8F0',
                             width: '100%',
                             boxSizing: 'border-box',
@@ -1633,19 +1633,19 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                         >
                           <div
                             style={{
-                              fontSize: '0.72rem',
+                              fontSize: '0.70rem',
                               fontWeight: 700,
                               color: '#92400E',
-                              marginBottom: '8px',
+                              marginBottom: '6px',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'space-between',
                             }}
                           >
-                            <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                              <Sparkles size={13} color="#D97706" /> Popular Inquiries &amp; Services
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <Sparkles size={12} color="#D97706" /> Popular Inquiries &amp; Services
                             </span>
-                            <span style={{ fontSize: '0.66rem', color: '#64748B', fontWeight: 500 }}>
+                            <span style={{ fontSize: '0.64rem', color: '#64748B', fontWeight: 500 }}>
                               Tap to explore
                             </span>
                           </div>
@@ -1654,7 +1654,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                             style={{
                               display: 'grid',
                               gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-                              gap: '8px',
+                              gap: '6px',
                               width: '100%',
                               boxSizing: 'border-box',
                             }}
@@ -1668,8 +1668,8 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                 style={{
                                   width: '100%',
                                   boxSizing: 'border-box',
-                                  padding: '10px 12px',
-                                  borderRadius: '10px',
+                                  padding: '7px 8px',
+                                  borderRadius: '8px',
                                   background: 'linear-gradient(135deg, #FFFFFF, #FFFBEB)',
                                   border: '1.5px solid #FDE68A',
                                   color: '#78350F',
@@ -1677,16 +1677,17 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                   cursor: 'pointer',
                                   display: 'flex',
                                   alignItems: 'center',
-                                  gap: '9px',
+                                  gap: '6px',
                                   transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
                                   boxShadow: '0 1px 3px rgba(245, 158, 11, 0.08)',
                                   gridColumn: pIdx === 4 && FAQ_PRESETS.length === 5 ? 'span 2' : 'auto',
+                                  overflow: 'hidden',
                                 }}
                                 onMouseEnter={(e) => {
                                   e.currentTarget.style.borderColor = '#F59E0B';
                                   e.currentTarget.style.background = '#FEF3C7';
-                                  e.currentTarget.style.transform = 'translateY(-1.5px)';
-                                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.18)';
+                                  e.currentTarget.style.transform = 'translateY(-1px)';
+                                  e.currentTarget.style.boxShadow = '0 3px 8px rgba(245, 158, 11, 0.16)';
                                 }}
                                 onMouseLeave={(e) => {
                                   e.currentTarget.style.borderColor = '#FDE68A';
@@ -1697,30 +1698,34 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                               >
                                 <div
                                   style={{
-                                    width: '30px',
-                                    height: '30px',
-                                    borderRadius: '8px',
+                                    width: '24px',
+                                    height: '24px',
+                                    borderRadius: '6px',
                                     background: '#FEF3C7',
                                     border: '1px solid #FCD34D',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    fontSize: '1rem',
+                                    fontSize: '0.88rem',
                                     flexShrink: 0,
                                   }}
                                 >
                                   {preset.icon}
                                 </div>
-                                <div
-                                  style={{
-                                    fontSize: '0.82rem',
-                                    fontWeight: 700,
-                                    color: '#92400E',
-                                    lineHeight: 1.2,
-                                    whiteSpace: 'nowrap',
-                                  }}
-                                >
-                                  {preset.title}
+                                <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+                                  <div
+                                    style={{
+                                      fontSize: '0.76rem',
+                                      fontWeight: 650,
+                                      color: '#92400E',
+                                      lineHeight: 1.2,
+                                      whiteSpace: 'nowrap',
+                                      overflow: 'hidden',
+                                      textOverflow: 'ellipsis',
+                                    }}
+                                  >
+                                    {preset.title}
+                                  </div>
                                 </div>
                               </button>
                             ))}
@@ -2807,61 +2812,63 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Quick Horizontal Presets Bar */}
-            <div
-              style={{
-                flexShrink: 0,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: isMaximized ? 'center' : 'flex-start',
-                gap: '6px',
-                overflowX: 'auto',
-                overscrollBehavior: 'contain',
-                padding: '8px 14px',
-                background: '#FFFFFF',
-                borderTop: '1px solid #E2E8F0',
-                scrollbarWidth: 'none',
-              }}
-            >
+            {/* Quick Horizontal Presets Bar (hidden on initial greeting to maximize vertical space) */}
+            {messages.length > 1 && (
               <div
                 style={{
+                  flexShrink: 0,
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '6px',
-                  maxWidth: isMaximized ? '860px' : 'none',
-                  width: isMaximized ? '100%' : 'auto',
+                  justifyContent: isMaximized ? 'center' : 'flex-start',
+                  gap: '5px',
                   overflowX: 'auto',
+                  overscrollBehavior: 'contain',
+                  padding: '5px 10px 3px',
+                  background: '#FFFFFF',
+                  borderTop: '1px solid #F1F5F9',
                   scrollbarWidth: 'none',
                 }}
               >
-                {FAQ_PRESETS.map((preset, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => handleSend(preset.query)}
-                    disabled={loading || isTyping}
-                    className="chip-btn"
-                    style={{
-                      flexShrink: 0,
-                      fontSize: '0.74rem',
-                      padding: '5px 10px',
-                      whiteSpace: 'nowrap',
-                      background: '#FFFDF5',
-                      border: '1px solid #FDE68A',
-                      color: '#92400E',
-                      fontWeight: 600,
-                      borderRadius: '16px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                    }}
-                  >
-                    <span>{preset.icon}</span>
-                    <span>{preset.title}</span>
-                  </button>
-                ))}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    maxWidth: isMaximized ? '860px' : 'none',
+                    width: isMaximized ? '100%' : 'auto',
+                    overflowX: 'auto',
+                    scrollbarWidth: 'none',
+                  }}
+                >
+                  {FAQ_PRESETS.map((preset, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => handleSend(preset.query)}
+                      disabled={loading || isTyping}
+                      className="chip-btn"
+                      style={{
+                        flexShrink: 0,
+                        fontSize: '0.70rem',
+                        padding: '4px 8px',
+                        whiteSpace: 'nowrap',
+                        background: '#FFFDF5',
+                        border: '1px solid #FDE68A',
+                        color: '#92400E',
+                        fontWeight: 600,
+                        borderRadius: '12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '3px',
+                      }}
+                    >
+                      <span>{preset.icon}</span>
+                      <span>{preset.title}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Chat Input Bar */}
             <form
@@ -2871,7 +2878,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
               }}
               style={{
                 flexShrink: 0,
-                padding: '10px 14px',
+                padding: '8px 10px',
                 background: '#FFFFFF',
                 borderTop: '1px solid #E2E8F0',
                 display: 'flex',

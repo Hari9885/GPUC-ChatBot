@@ -356,10 +356,10 @@ h1, h2, h3, h4, h5, h6 {
 /* Small mobile devices (iPhone SE, compact phones < 480px) */
 @media (max-width: 480px) {
   :root {
-    --assistant-width: calc(100vw - 20px);
-    --assistant-height: min(580px, calc(100dvh - 28px));
-    --assistant-bottom: 12px;
-    --assistant-right: 10px;
+    --assistant-width: calc(100vw - 16px);
+    --assistant-height: min(620px, calc(100dvh - 16px));
+    --assistant-bottom: 8px;
+    --assistant-right: 8px;
     --assistant-border-radius: 16px;
     --assistant-bubble-size: 48px;
     --assistant-crest-size: 33px;
@@ -370,10 +370,10 @@ h1, h2, h3, h4, h5, h6 {
 /* Phablets & Small Tablets (481px - 640px) */
 @media (min-width: 481px) and (max-width: 640px) {
   :root {
-    --assistant-width: min(440px, calc(100vw - 24px));
-    --assistant-height: min(620px, calc(100dvh - 36px));
-    --assistant-bottom: 16px;
-    --assistant-right: 14px;
+    --assistant-width: min(440px, calc(100vw - 20px));
+    --assistant-height: min(640px, calc(100dvh - 24px));
+    --assistant-bottom: 12px;
+    --assistant-right: 10px;
     --assistant-border-radius: 18px;
     --assistant-bubble-size: 50px;
     --assistant-crest-size: 35px;

@@ -7,13 +7,11 @@ export default function GlobalChatLoader() {
   const pathname = usePathname();
 
   useEffect(() => {
-    // Skip if running inside the iframe embed itself
-    if (pathname === '/embed') {
-      return;
-    }
+    // Normalize pathname
+    const cleanPath = (pathname || '').split('?')[0].replace(/\/+$/, '') || '/';
 
-    // Skip root page if page.tsx already renders the ChatWidget directly
-    if (pathname === '/') {
+    // Skip root page if page.tsx already renders the ChatWidget directly, or inside iframe embed
+    if (cleanPath === '/' || cleanPath === '/embed') {
       return;
     }
 

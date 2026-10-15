@@ -60,6 +60,13 @@
       -webkit-tap-highlight-color: transparent !important;
     }
 
+    #gpuc-widget-launcher.hidden {
+      display: none !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      visibility: hidden !important;
+    }
+
     #gpuc-widget-launcher:hover {
       transform: scale(1.08) translateY(-2px) !important;
       box-shadow: 0 14px 38px rgba(0, 0, 0, 0.45), 0 0 0 5px rgba(245, 158, 11, 0.35) !important;
@@ -268,8 +275,8 @@
   function openChat() {
     isOpen = true;
     launcherBtn.classList.remove('gpuc-bouncing');
+    launcherBtn.classList.add('hidden');
     containerEl.classList.add('open');
-    launcherBtn.style.transform = 'scale(0.92)';
     tooltipEl.classList.remove('visible');
     try {
       iframeEl.contentWindow?.postMessage({ type: 'GPUC_WIDGET_SET_OPEN', isOpen: true }, '*');
@@ -279,6 +286,7 @@
   function closeChat() {
     isOpen = false;
     launcherBtn.classList.remove('gpuc-bouncing');
+    launcherBtn.classList.remove('hidden');
     try {
       sessionStorage.setItem('gpuc_ai_popped', 'true');
     } catch (e) {}
