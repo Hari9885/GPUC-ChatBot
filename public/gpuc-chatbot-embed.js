@@ -155,6 +155,7 @@
       height: 100% !important;
       border: none !important;
       display: block !important;
+      background: transparent !important;
     }
 
     /* Completely hide Google reCAPTCHA badge / error card behind the launcher */

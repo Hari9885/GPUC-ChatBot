@@ -973,9 +973,10 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
 
   return (
     <div
+      className={isEmbedded ? 'is-embedded-chat' : ''}
       style={
         isEmbedded
-          ? { position: 'relative', width: '100vw', height: '100vh', overflow: 'hidden', background: '#FFFFFF' }
+          ? { position: 'relative', width: '100%', height: '100%', overflow: 'hidden', background: '#FFFFFF' }
           : { position: 'relative', minHeight: '100vh', overflowX: 'hidden' }
       }
     >
@@ -1099,7 +1100,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
         {isChatOpen && (
           <div
             id="gpuc-chat-window"
-            className={`chat-widget-window ${isMaximized ? 'is-maximized' : ''}`}
+            className={`chat-widget-window ${isEmbedded ? 'is-embedded' : ''} ${isMaximized ? 'is-maximized' : ''}`}
             onWheel={(e) => {
               // Contain wheel events within the chat window so background page never scrolls
               e.stopPropagation();

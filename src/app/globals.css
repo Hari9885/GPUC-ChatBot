@@ -423,8 +423,8 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-/* Maximized Window Mode (Overlay / Expanded Workspace) */
-.chat-widget-window.is-maximized {
+/* Maximized Window Mode (Overlay / Expanded Workspace) - for standalone non-embedded mode */
+.chat-widget-window.is-maximized:not(.is-embedded) {
   width: min(1040px, calc(100vw - 36px)) !important;
   max-width: calc(100vw - 20px) !important;
   height: calc(100vh - 40px) !important;
@@ -434,13 +434,27 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @media (max-width: 640px) {
-  .chat-widget-window.is-maximized {
+  .chat-widget-window.is-maximized:not(.is-embedded) {
     width: calc(100vw - 12px) !important;
     max-width: 100vw !important;
     height: calc(100dvh - 16px) !important;
     max-height: 100dvh !important;
     border-radius: 16px !important;
   }
+}
+
+/* Embedded Mode (iframe) - always fills the iframe 100% edge-to-edge seamlessly */
+.chat-widget-window.is-embedded,
+.is-embedded-chat .chat-widget-window,
+body.is-embedded-body .chat-widget-window {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  border-radius: 0px !important;
+  border: none !important;
+  box-shadow: none !important;
+  margin: 0 !important;
 }
 
 /* Transition for smooth scaling and maximizing */
