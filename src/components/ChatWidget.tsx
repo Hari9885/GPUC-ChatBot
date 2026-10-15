@@ -279,7 +279,16 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
         }
       };
       window.addEventListener('message', handleMsg);
-      return () => window.removeEventListener('message', handleMsg);
+
+      // Auto pop up AI assistant on page load (1.2s delay)
+      const autoPopupTimer = setTimeout(() => {
+        setIsChatOpen(true);
+      }, 1200);
+
+      return () => {
+        window.removeEventListener('message', handleMsg);
+        clearTimeout(autoPopupTimer);
+      };
     }
   }, [initialEmbedded]);
 
@@ -1097,7 +1106,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
         )}
 
         {/* EXPANDED CHAT WIDGET WINDOW */}
-        {isChatOpen && (
+        {(isChatOpen || isEmbedded) && (
           <div
             id="gpuc-chat-window"
             className={`chat-widget-window ${isEmbedded ? 'is-embedded' : ''} ${isMaximized ? 'is-maximized' : ''}`}

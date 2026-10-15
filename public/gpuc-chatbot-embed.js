@@ -297,4 +297,28 @@
     close: closeChat,
     toggle: toggleChat,
   };
+
+  // Auto pop-up AI assistant on page load
+  function triggerAutoPopup() {
+    setTimeout(() => {
+      if (!isOpen) {
+        openChat();
+      }
+    }, 1200);
+  }
+
+  if (document.readyState === 'complete') {
+    triggerAutoPopup();
+  } else {
+    window.addEventListener('load', triggerAutoPopup);
+  }
+
+  // Ensure iframe content receives open state as soon as it loads
+  iframeEl.addEventListener('load', () => {
+    if (isOpen) {
+      try {
+        iframeEl.contentWindow?.postMessage({ type: 'GPUC_WIDGET_SET_OPEN', isOpen: true }, '*');
+      } catch (e) {}
+    }
+  });
 })();

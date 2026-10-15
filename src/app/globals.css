@@ -444,6 +444,29 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Embedded Mode (iframe) - always fills the iframe 100% edge-to-edge seamlessly */
+html.is-embedded-html,
+body.is-embedded-body {
+  height: 100% !important;
+  width: 100% !important;
+  min-height: 100% !important;
+  background: #FFFFFF !important;
+  background-image: none !important;
+  overflow: hidden !important;
+}
+
+.is-embedded-chat,
+body.is-embedded-body .is-embedded-chat {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: #FFFFFF !important;
+  overflow: hidden !important;
+}
+
 .chat-widget-window.is-embedded,
 .is-embedded-chat .chat-widget-window,
 body.is-embedded-body .chat-widget-window {
@@ -455,6 +478,7 @@ body.is-embedded-body .chat-widget-window {
   border: none !important;
   box-shadow: none !important;
   margin: 0 !important;
+  background: #FFFFFF !important;
 }
 
 /* Transition for smooth scaling and maximizing */
