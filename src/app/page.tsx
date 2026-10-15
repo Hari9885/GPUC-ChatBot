@@ -556,12 +556,12 @@ export default function Home() {
         mode: 'online_meeting',
         date: targetDate,
         timeSlot: '09:00 AM',
-        meetingLinkOrVenue: 'Google Meet (meet.google.com/gpuc-adm-meet)',
+        meetingLinkOrVenue: 'Online Consultation (Admissions Team)',
       };
 
       setBookingFlowState('completed');
 
-      const replyContent = `Your online consultation is confirmed for tomorrow at 9:00 AM with Reference ${apt.id}.\n\nThe meeting link has been recorded in our timetable and sent to your mobile.`;
+      const replyContent = `Your online consultation is confirmed for tomorrow at 9:00 AM (Ref: ${apt.id}).\n\nOur Admissions team will contact you 1 minute before the allocated time and you will receive a WhatsApp notification confirming your ticket initiation and request.`;
 
       setMessages((prev) => [
         ...prev,
@@ -577,7 +577,7 @@ export default function Home() {
             venue: apt.meetingLinkOrVenue,
             studentName: currentLead.studentName,
             mobile: currentLead.mobile,
-            instructions: 'The Google Meet link will also be dispatched via WhatsApp/SMS 30 minutes before the call.',
+            instructions: 'Our Admissions team will contact you 1 minute before the allocated time and you will receive a WhatsApp notification confirming your ticket initiation and request.',
           },
         },
       ]);
@@ -665,7 +665,7 @@ export default function Home() {
         const apt = bookData.appointment;
         setBookingFlowState('completed');
 
-        const replyContent = `Your online consultation is confirmed for ${apt.date} at ${apt.timeSlot} (Ref: ${apt.id}).\n\nThe meeting link has been registered with the Admissions team.`;
+        const replyContent = `Your online consultation is confirmed for ${apt.date} at ${apt.timeSlot} (Ref: ${apt.id}).\n\nOur Admissions team will contact you 1 minute before the allocated time and you will receive a WhatsApp notification confirming your ticket initiation and request.`;
 
         setMessages((prev) => [
           ...prev,
@@ -681,7 +681,7 @@ export default function Home() {
               venue: apt.meetingLinkOrVenue,
               studentName: currentLead.studentName,
               mobile: currentLead.mobile,
-              instructions: 'The Google Meet link will be dispatched via WhatsApp/SMS 30 minutes prior.',
+              instructions: 'Our Admissions team will contact you 1 minute before the allocated time and you will receive a WhatsApp notification confirming your ticket initiation and request.',
             },
           },
         ]);
@@ -2155,16 +2155,37 @@ export default function Home() {
                             </div>
                           </div>
 
-                          <div style={{ background: '#FFFFFF', padding: '8px 10px', borderRadius: '8px', border: '1px solid #CBD5E1', marginBottom: '6px' }}>
-                            <div style={{ fontSize: '0.68rem', color: '#64748B', fontWeight: 600 }}>Venue / Meeting Location:</div>
-                            <div style={{ fontSize: '0.76rem', color: '#0F172A', fontWeight: 600, marginTop: '2px' }}>
-                              {msg.ticketData.venue}
+                          {/* Campus Visiting Location only for offline visits */}
+                          {msg.ticketData.mode === 'campus_visit' && (
+                            <div style={{ background: '#FFFFFF', padding: '8px 10px', borderRadius: '8px', border: '1px solid #CBD5E1', marginBottom: '8px' }}>
+                              <div style={{ fontSize: '0.68rem', color: '#64748B', fontWeight: 600 }}>Campus Visiting Location:</div>
+                              <div style={{ fontSize: '0.76rem', color: '#0F172A', fontWeight: 600, marginTop: '2px' }}>
+                                {msg.ticketData.venue}
+                              </div>
                             </div>
-                          </div>
+                          )}
 
+                          {/* Admissions Notification Banner (replaces Google Meet venue info) */}
                           {msg.ticketData.instructions && (
-                            <div style={{ fontSize: '0.72rem', color: '#475569', lineHeight: 1.35 }}>
-                              &bull; {msg.ticketData.instructions}
+                            <div
+                              style={{
+                                background: msg.ticketData.mode === 'online_meeting' ? '#F0FDF4' : '#F8FAFC',
+                                border: msg.ticketData.mode === 'online_meeting' ? '1.5px solid #86EFAC' : '1px solid #E2E8F0',
+                                borderRadius: '8px',
+                                padding: '9px 12px',
+                                fontSize: '0.76rem',
+                                color: msg.ticketData.mode === 'online_meeting' ? '#14532D' : '#475569',
+                                lineHeight: 1.45,
+                                fontWeight: msg.ticketData.mode === 'online_meeting' ? 600 : 500,
+                                display: 'flex',
+                                alignItems: 'flex-start',
+                                gap: '8px',
+                              }}
+                            >
+                              <span style={{ fontSize: '1rem', lineHeight: 1 }}>
+                                {msg.ticketData.mode === 'online_meeting' ? '📱' : 'ℹ️'}
+                              </span>
+                              <span>{msg.ticketData.instructions}</span>
                             </div>
                           )}
                         </div>

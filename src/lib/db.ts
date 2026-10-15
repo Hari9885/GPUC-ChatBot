@@ -331,7 +331,7 @@ export function bookAppointment(
     meetingLinkOrVenue = 'Gopalan Pre-University College Campus, 181/1, Hoodi Village, Whitefield, Bengaluru - 560048';
   } else {
     id = `GPUC-2026-APT-${refNum}`;
-    meetingLinkOrVenue = `Google Meet (meet.google.com/gpuc-adm-${refNum.toLowerCase()})`;
+    meetingLinkOrVenue = 'Online Consultation (Admissions Team)';
   }
 
   // Find slot to book if applicable
@@ -375,7 +375,7 @@ export function bookAppointment(
     templateId: params.mode === 'campus_visit' ? 'visit_ticket_confirmation' : 'appointment_confirmation',
     content: params.mode === 'campus_visit'
       ? `Dear ${params.name}, your Campus Visit ticket ${id} is confirmed. Visiting hours: Monday to Friday 8:30 AM to 5:00 PM.`
-      : `Dear ${params.name}, your online meeting ${id} with Admissions is confirmed for ${finalDate} at ${finalTime}. Link: ${meetingLinkOrVenue}.`,
+      : `Dear ${params.name}, your online consultation ${id} with Admissions is confirmed for ${finalDate} at ${finalTime}. Our Admissions team will contact you 1 minute before the allocated time and you will receive a WhatsApp notification confirming your ticket initiation and request.`,
     status: 'DELIVERED',
     timestamp: new Date().toISOString(),
   });

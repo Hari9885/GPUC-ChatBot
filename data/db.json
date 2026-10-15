@@ -192,6 +192,35 @@
   ],
   "appointments": [
     {
+      "id": "GPUC-2026-APT-506",
+      "name": "Sneha Reddy",
+      "mobile": "9845012345",
+      "mode": "online_meeting",
+      "date": "2026-10-17",
+      "timeSlot": "11:30 AM",
+      "purpose": "Online Admission Consultation",
+      "assignedStaff": "Admissions Desk Counselor",
+      "assignedDepartment": "Admissions",
+      "status": "CONFIRMED",
+      "meetingLinkOrVenue": "Online Consultation (Admissions Team)",
+      "createdAt": "2026-10-15T03:36:35.463Z"
+    },
+    {
+      "id": "GPUC-2026-APT-505",
+      "inquiryId": "GPUC-2026-INQ-1010",
+      "name": "hari (Parent: hari)",
+      "mobile": "8123456789",
+      "mode": "online_meeting",
+      "date": "2026-10-16",
+      "timeSlot": "10:00 AM",
+      "purpose": "Online Admission Consultation (General PU)",
+      "assignedStaff": "Admissions Desk Counselor",
+      "assignedDepartment": "Admissions",
+      "status": "CONFIRMED",
+      "meetingLinkOrVenue": "Google Meet (meet.google.com/gpuc-adm-505)",
+      "createdAt": "2026-10-15T03:31:50.781Z"
+    },
+    {
       "id": "GPUC-2026-APT-504",
       "name": "Aditi Rao",
       "mobile": "9845012345",
@@ -289,7 +318,8 @@
       "time": "10:00 AM",
       "department": "Admissions",
       "mode": "all",
-      "isBooked": false
+      "isBooked": true,
+      "bookedBy": "hari (Parent: hari)"
     },
     {
       "id": "slot_2026-10-16_1",
@@ -329,7 +359,8 @@
       "time": "11:30 AM",
       "department": "Academic Coordinator",
       "mode": "all",
-      "isBooked": false
+      "isBooked": true,
+      "bookedBy": "Sneha Reddy"
     },
     {
       "id": "slot_2026-10-17_2",
@@ -535,6 +566,24 @@
     }
   ],
   "messages": [
+    {
+      "id": "MSG-5463",
+      "type": "whatsapp",
+      "recipient": "9845012345",
+      "templateId": "appointment_confirmation",
+      "content": "Dear Sneha Reddy, your online consultation GPUC-2026-APT-506 with Admissions is confirmed for 2026-10-17 at 11:30 AM. Our Admissions team will contact you 1 minute before the allocated time and you will receive a WhatsApp notification confirming your ticket initiation and request.",
+      "status": "DELIVERED",
+      "timestamp": "2026-10-15T03:36:35.463Z"
+    },
+    {
+      "id": "MSG-0781",
+      "type": "whatsapp",
+      "recipient": "8123456789",
+      "templateId": "appointment_confirmation",
+      "content": "Dear hari (Parent: hari), your online meeting GPUC-2026-APT-505 with Admissions is confirmed for 2026-10-16 at 10:00 AM. Link: Google Meet (meet.google.com/gpuc-adm-505).",
+      "status": "DELIVERED",
+      "timestamp": "2026-10-15T03:31:50.781Z"
+    },
     {
       "id": "MSG-2185",
       "type": "whatsapp",
