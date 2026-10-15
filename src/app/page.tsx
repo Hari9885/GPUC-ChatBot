@@ -1055,14 +1055,14 @@ export default function Home() {
                 gap: '8px',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1 }}>
                 <div
                   style={{
-                    width: '36px',
-                    height: '36px',
+                    width: '32px',
+                    height: '32px',
                     borderRadius: '50%',
                     background: '#FFFFFF',
-                    border: '2px solid #F59E0B',
+                    border: '1.5px solid #F59E0B',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -1075,25 +1075,48 @@ export default function Home() {
                     src="/gopalan_crest.svg"
                     alt="GPUC Logo"
                     style={{
-                      width: '26px',
-                      height: '26px',
+                      width: '22px',
+                      height: '22px',
                       objectFit: 'contain',
                     }}
                   />
                 </div>
-                  <div>
-                    <div style={{ fontWeight: 800, fontSize: '0.94rem', color: '#fff', whiteSpace: 'nowrap' }}>
-                      GPUC AI Admissions Assistant
-                    </div>
-                  <div style={{ fontSize: '0.72rem', color: '#4ade80', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4ade80' }}></span>
-                    Grounded on Gopalan PU Records
+                <div style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
+                  <div
+                    style={{
+                      fontWeight: 700,
+                      fontSize: '0.80rem',
+                      color: '#fff',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      lineHeight: 1.25,
+                    }}
+                    title="GPUC AI Admissions Assistant"
+                  >
+                    GPUC AI Admissions Assistant
+                  </div>
+                  <div
+                    style={{
+                      fontSize: '0.66rem',
+                      color: '#4ade80',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      marginTop: '2px',
+                    }}
+                  >
+                    <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#4ade80', flexShrink: 0 }}></span>
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>Grounded on Gopalan PU Records</span>
                   </div>
                 </div>
               </div>
 
               {/* Window Controls */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '3px', flexShrink: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '2px', flexShrink: 0 }}>
                 {/* Reset button */}
                 <button
                   onClick={handleReset}
@@ -1103,7 +1126,7 @@ export default function Home() {
                     border: 'none',
                     color: '#94A3B8',
                     cursor: 'pointer',
-                    padding: '6px',
+                    padding: '5px',
                     borderRadius: '6px',
                     display: 'flex',
                     alignItems: 'center',
@@ -1113,10 +1136,10 @@ export default function Home() {
                   onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
                   onMouseLeave={(e) => (e.currentTarget.style.color = '#94A3B8')}
                 >
-                  <RotateCcw size={16} />
+                  <RotateCcw size={15} />
                 </button>
 
-                {/* Maximize / Restore Button with Small Indication */}
+                {/* Maximize / Restore Button */}
                 <button
                   onClick={() => setIsMaximized((prev) => !prev)}
                   title={isMaximized ? 'Restore Standard Size' : 'Maximize Assistant'}
@@ -1126,7 +1149,7 @@ export default function Home() {
                     border: isMaximized ? '1px solid rgba(245, 158, 11, 0.55)' : '1px solid rgba(255, 255, 255, 0.1)',
                     color: isMaximized ? '#FDE68A' : '#94A3B8',
                     cursor: 'pointer',
-                    padding: '6px',
+                    padding: '5px',
                     borderRadius: '6px',
                     display: 'flex',
                     alignItems: 'center',
@@ -1136,7 +1159,7 @@ export default function Home() {
                   onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
                   onMouseLeave={(e) => (e.currentTarget.style.color = isMaximized ? '#FDE68A' : '#94A3B8')}
                 >
-                  {isMaximized ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+                  {isMaximized ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
                 </button>
 
                 {/* Minimize to circular launcher */}
@@ -1148,7 +1171,7 @@ export default function Home() {
                     border: 'none',
                     color: '#94A3B8',
                     cursor: 'pointer',
-                    padding: '6px',
+                    padding: '5px',
                     borderRadius: '6px',
                     display: 'flex',
                     alignItems: 'center',
@@ -1158,7 +1181,7 @@ export default function Home() {
                   onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
                   onMouseLeave={(e) => (e.currentTarget.style.color = '#94A3B8')}
                 >
-                  <Minus size={18} />
+                  <Minus size={16} />
                 </button>
 
                 {/* Close Chat */}
@@ -1170,7 +1193,7 @@ export default function Home() {
                     border: 'none',
                     color: '#94A3B8',
                     cursor: 'pointer',
-                    padding: '6px',
+                    padding: '5px',
                     borderRadius: '6px',
                     display: 'flex',
                     alignItems: 'center',
@@ -1180,7 +1203,7 @@ export default function Home() {
                   onMouseEnter={(e) => (e.currentTarget.style.color = '#EF4444')}
                   onMouseLeave={(e) => (e.currentTarget.style.color = '#94A3B8')}
                 >
-                  <X size={18} />
+                  <X size={16} />
                 </button>
               </div>
             </div>
