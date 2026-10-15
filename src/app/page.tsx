@@ -13,6 +13,7 @@ import {
   X,
   Minus,
   Maximize2,
+  Minimize2,
   ChevronDown,
   User,
   Users,
@@ -197,6 +198,8 @@ How can I help you today? Please choose an option below or type your question:`,
 export default function Home() {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [isMaximized, setIsMaximized] = useState(false);
+  const [assistantScale, setAssistantScale] = useState<'normal' | 'compact' | 'expanded'>('normal');
   const [messages, setMessages] = useState<Message[]>([INITIAL_GREETING]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -245,6 +248,21 @@ export default function Home() {
       scrollToBottom();
     }
   }, [messages, loading, isTyping, isChatOpen]);
+
+  // Handle Escape key to restore maximized view or close chat
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isChatOpen) {
+        if (isMaximized) {
+          setIsMaximized(false);
+        } else {
+          setIsChatOpen(false);
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isChatOpen, isMaximized]);
 
   // Step 1: Submit Student Name (with 1.5s bouncing dots)
   const handleStudentNameSubmit = (nameVal?: string) => {
@@ -896,19 +914,23 @@ export default function Home() {
 
       {/* FLOATING CORNER CHATBOT WIDGET */}
       <div
+        id="gpuc-ai-assistant-container"
         style={{
           position: 'fixed',
-          bottom: '20px',
-          right: '20px',
+          bottom: 'var(--assistant-bottom, 20px)',
+          right: 'var(--assistant-right, 20px)',
           zIndex: 1000,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'flex-end',
+          maxWidth: '100vw',
+          maxHeight: '100vh',
+          pointerEvents: 'none',
         }}
       >
-        {/* Floating Chatbot Circular Button (when chat is closed - reduced by 20%) */}
+        {/* Floating Chatbot Circular Button (when chat is closed - responsive sizing) */}
         {!isChatOpen && (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', pointerEvents: 'auto' }}>
             {/* Optional lightweight tooltip shown ONLY when actively hovering */}
             {isHovered && (
               <div
@@ -935,15 +957,15 @@ export default function Home() {
               </div>
             )}
 
-            {/* Gopalan Crest Icon Floating Circle (Reduced 20%: 66px -> 53px) */}
+            {/* Gopalan Crest Icon Floating Circle (Responsive auto-scaling per device) */}
             <button
               onClick={() => setIsChatOpen(true)}
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
               aria-label="Open Gopalan PU College Assistant"
               style={{
-                width: '53px',
-                height: '53px',
+                width: 'var(--assistant-bubble-size, 53px)',
+                height: 'var(--assistant-bubble-size, 53px)',
                 borderRadius: '50%',
                 background: '#FFFFFF',
                 border: '2.5px solid #F59E0B',
@@ -956,14 +978,15 @@ export default function Home() {
                 transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
                 transform: isHovered ? 'scale(1.08)' : 'scale(1)',
                 padding: 0,
+                pointerEvents: 'auto',
               }}
             >
               <img
                 src="/gopalan_crest.svg"
                 alt="Gopalan PU College"
                 style={{
-                  width: '37px',
-                  height: '37px',
+                  width: 'var(--assistant-crest-size, 37px)',
+                  height: 'var(--assistant-crest-size, 37px)',
                   objectFit: 'contain',
                   display: 'block',
                 }}
@@ -991,68 +1014,95 @@ export default function Home() {
         {isChatOpen && (
           <div
             id="gpuc-chat-window"
-            className="chat-widget-window"
+            className={`chat-widget-window ${isMaximized ? 'is-maximized' : ''} ${
+              assistantScale === 'compact' ? 'scale-compact' : assistantScale === 'expanded' ? 'scale-expanded' : ''
+            }`}
             onWheel={(e) => {
               // Contain wheel events within the chat window so background page never scrolls
               e.stopPropagation();
             }}
             style={{
-              width: '380px',
-              maxWidth: 'calc(100vw - 28px)',
-              height: '600px',
-              maxHeight: 'calc(100vh - 40px)',
+              width: isMaximized
+                ? 'min(1040px, calc(100vw - 36px))'
+                : assistantScale === 'compact'
+                ? 'calc(var(--assistant-width) * 0.9)'
+                : assistantScale === 'expanded'
+                ? 'calc(var(--assistant-width) * 1.15)'
+                : 'var(--assistant-width)',
+              maxWidth: 'calc(100vw - 20px)',
+              height: isMaximized
+                ? 'calc(100vh - 40px)'
+                : assistantScale === 'compact'
+                ? 'calc(var(--assistant-height) * 0.9)'
+                : assistantScale === 'expanded'
+                ? 'calc(var(--assistant-height) * 1.15)'
+                : 'var(--assistant-height)',
+              maxHeight: 'calc(100dvh - 32px)',
               display: 'flex',
               flexDirection: 'column',
               background: '#FFFFFF',
               border: '1px solid #E2E8F0',
-              borderRadius: '20px',
-              boxShadow: '0 16px 48px rgba(0, 0, 0, 0.18), 0 2px 10px rgba(0, 0, 0, 0.08)',
+              borderRadius: isMaximized ? '20px' : 'var(--assistant-border-radius, 20px)',
+              boxShadow: isMaximized
+                ? '0 24px 64px rgba(0, 0, 0, 0.35), 0 4px 16px rgba(0, 0, 0, 0.15)'
+                : '0 16px 48px rgba(0, 0, 0, 0.18), 0 2px 10px rgba(0, 0, 0, 0.08)',
               animation: 'fadeIn 0.25s ease-out',
               overflow: 'hidden',
               overscrollBehavior: 'contain',
               position: 'relative',
+              pointerEvents: 'auto',
             }}
           >
             {/* Widget Header */}
             <div
               style={{
                 flexShrink: 0,
-                padding: '14px 18px',
+                padding: '12px 16px',
                 background: 'linear-gradient(135deg, #1E3A8A, #0F172A)',
                 borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
+                gap: '8px',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
                 <div
                   style={{
-                    width: '38px',
-                    height: '38px',
+                    width: '36px',
+                    height: '36px',
                     borderRadius: '50%',
                     background: '#FFFFFF',
                     border: '2px solid #F59E0B',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    padding: '3px',
+                    padding: '2px',
                     overflow: 'hidden',
+                    flexShrink: 0,
                   }}
                 >
                   <img
                     src="/gopalan_crest.svg"
                     alt="GPUC Logo"
                     style={{
-                      width: '28px',
-                      height: '28px',
+                      width: '26px',
+                      height: '26px',
                       objectFit: 'contain',
                     }}
                   />
                 </div>
-                <div>
-                  <div style={{ fontWeight: 800, fontSize: '0.98rem', color: '#fff' }}>
-                    GPUC AI Admissions Assistant
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                    <div style={{ fontWeight: 800, fontSize: '0.94rem', color: '#fff', whiteSpace: 'nowrap' }}>
+                      GPUC AI Admissions Assistant
+                    </div>
+                    {/* Small indication when maximized */}
+                    {isMaximized && (
+                      <span className="maximized-badge" title="Assistant is currently in maximized full view">
+                        <Maximize2 size={10} /> Full View
+                      </span>
+                    )}
                   </div>
                   <div style={{ fontSize: '0.72rem', color: '#4ade80', display: 'flex', alignItems: 'center', gap: '4px' }}>
                     <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4ade80' }}></span>
@@ -1062,7 +1112,8 @@ export default function Home() {
               </div>
 
               {/* Window Controls */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '3px', flexShrink: 0 }}>
+                {/* Reset button */}
                 <button
                   onClick={handleReset}
                   title="Reset Chat"
@@ -1072,10 +1123,66 @@ export default function Home() {
                     color: '#94A3B8',
                     cursor: 'pointer',
                     padding: '6px',
+                    borderRadius: '6px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'all 0.15s ease',
                   }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = '#94A3B8')}
                 >
                   <RotateCcw size={16} />
                 </button>
+
+                {/* Manual Scale Selector Button (Cycle Normal -> Large -> Compact) */}
+                <button
+                  onClick={() => {
+                    setAssistantScale((prev) => (prev === 'normal' ? 'expanded' : prev === 'expanded' ? 'compact' : 'normal'));
+                  }}
+                  title={`Assistant Size: ${assistantScale === 'expanded' ? 'Large (115%)' : assistantScale === 'compact' ? 'Compact (90%)' : 'Standard (100%)'}. Click to adjust scale`}
+                  style={{
+                    background: assistantScale !== 'normal' ? 'rgba(245, 158, 11, 0.2)' : 'transparent',
+                    border: assistantScale !== 'normal' ? '1px solid rgba(245, 158, 11, 0.5)' : '1px solid rgba(255, 255, 255, 0.1)',
+                    color: assistantScale !== 'normal' ? '#FDE68A' : '#94A3B8',
+                    cursor: 'pointer',
+                    padding: '4px 7px',
+                    borderRadius: '6px',
+                    fontSize: '0.68rem',
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '2px',
+                    letterSpacing: '0.02em',
+                  }}
+                >
+                  <span>{assistantScale === 'expanded' ? 'XL' : assistantScale === 'compact' ? 'SM' : 'MD'}</span>
+                </button>
+
+                {/* Maximize / Restore Button with Small Indication */}
+                <button
+                  onClick={() => setIsMaximized((prev) => !prev)}
+                  title={isMaximized ? 'Restore Standard Size' : 'Maximize Assistant'}
+                  aria-label={isMaximized ? 'Restore Standard Size' : 'Maximize Assistant'}
+                  style={{
+                    background: isMaximized ? 'rgba(245, 158, 11, 0.22)' : 'transparent',
+                    border: isMaximized ? '1px solid rgba(245, 158, 11, 0.55)' : '1px solid rgba(255, 255, 255, 0.1)',
+                    color: isMaximized ? '#FDE68A' : '#94A3B8',
+                    cursor: 'pointer',
+                    padding: '6px',
+                    borderRadius: '6px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'all 0.15s ease',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = isMaximized ? '#FDE68A' : '#94A3B8')}
+                >
+                  {isMaximized ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+                </button>
+
+                {/* Minimize to circular launcher */}
                 <button
                   onClick={() => setIsChatOpen(false)}
                   title="Minimize Chat"
@@ -1085,10 +1192,19 @@ export default function Home() {
                     color: '#94A3B8',
                     cursor: 'pointer',
                     padding: '6px',
+                    borderRadius: '6px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'all 0.15s ease',
                   }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = '#94A3B8')}
                 >
                   <Minus size={18} />
                 </button>
+
+                {/* Close Chat */}
                 <button
                   onClick={() => setIsChatOpen(false)}
                   title="Close Chat"
@@ -1098,7 +1214,14 @@ export default function Home() {
                     color: '#94A3B8',
                     cursor: 'pointer',
                     padding: '6px',
+                    borderRadius: '6px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'all 0.15s ease',
                   }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = '#EF4444')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = '#94A3B8')}
                 >
                   <X size={18} />
                 </button>
@@ -1147,6 +1270,16 @@ export default function Home() {
                 background: '#F8FAFC',
               }}
             >
+              <div
+                style={{
+                  width: '100%',
+                  maxWidth: isMaximized ? '860px' : '100%',
+                  margin: '0 auto',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '14px',
+                }}
+              >
               {messages.map((msg, index) => {
                 const lastAssistantIdx = messages.map((m) => m.role).lastIndexOf('assistant');
                 const showPresetsUnderMsg =
@@ -2214,6 +2347,7 @@ export default function Home() {
                   </span>
                 </div>
               )}
+              </div>
 
               <div ref={messagesEndRef} />
             </div>
@@ -2224,41 +2358,54 @@ export default function Home() {
                 flexShrink: 0,
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: isMaximized ? 'center' : 'flex-start',
                 gap: '6px',
                 overflowX: 'auto',
                 overscrollBehavior: 'contain',
-                padding: '8px 12px',
+                padding: '8px 14px',
                 background: '#FFFFFF',
                 borderTop: '1px solid #E2E8F0',
                 scrollbarWidth: 'none',
               }}
             >
-              {FAQ_PRESETS.map((preset, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => handleSend(preset.query)}
-                  disabled={loading || isTyping}
-                  className="chip-btn"
-                  style={{
-                    flexShrink: 0,
-                    fontSize: '0.74rem',
-                    padding: '5px 10px',
-                    whiteSpace: 'nowrap',
-                    background: '#FFFDF5',
-                    border: '1px solid #FDE68A',
-                    color: '#92400E',
-                    fontWeight: 600,
-                    borderRadius: '16px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                  }}
-                >
-                  <span>{preset.icon}</span>
-                  <span>{preset.title}</span>
-                </button>
-              ))}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  maxWidth: isMaximized ? '860px' : 'none',
+                  width: isMaximized ? '100%' : 'auto',
+                  overflowX: 'auto',
+                  scrollbarWidth: 'none',
+                }}
+              >
+                {FAQ_PRESETS.map((preset, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => handleSend(preset.query)}
+                    disabled={loading || isTyping}
+                    className="chip-btn"
+                    style={{
+                      flexShrink: 0,
+                      fontSize: '0.74rem',
+                      padding: '5px 10px',
+                      whiteSpace: 'nowrap',
+                      background: '#FFFDF5',
+                      border: '1px solid #FDE68A',
+                      color: '#92400E',
+                      fontWeight: 600,
+                      borderRadius: '16px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                    }}
+                  >
+                    <span>{preset.icon}</span>
+                    <span>{preset.title}</span>
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Chat Input Bar */}
@@ -2269,59 +2416,69 @@ export default function Home() {
               }}
               style={{
                 flexShrink: 0,
-                padding: '10px 12px',
+                padding: '10px 14px',
                 background: '#FFFFFF',
                 borderTop: '1px solid #E2E8F0',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
+                justifyContent: 'center',
                 width: '100%',
                 boxSizing: 'border-box',
               }}
             >
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder={getInputPlaceholder()}
+              <div
                 style={{
-                  flex: 1,
-                  minWidth: 0,
-                  background: '#F8FAFC',
-                  border: '1px solid #CBD5E1',
-                  borderRadius: '8px',
-                  color: '#0F172A',
-                  outline: 'none',
-                  fontSize: '0.86rem',
-                  padding: '9px 12px',
-                  fontFamily: 'var(--font-body)',
-                  boxSizing: 'border-box',
-                }}
-                disabled={loading || isTyping}
-              />
-
-              <button
-                type="submit"
-                className="btn-primary"
-                disabled={loading || isTyping || !input.trim()}
-                style={{
-                  flexShrink: 0,
-                  width: '38px',
-                  height: '38px',
+                  width: '100%',
+                  maxWidth: isMaximized ? '860px' : '100%',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: 0,
-                  opacity: loading || isTyping || !input.trim() ? 0.5 : 1,
-                  cursor: loading || isTyping || !input.trim() ? 'not-allowed' : 'pointer',
-                  borderRadius: '8px',
-                  background: 'linear-gradient(135deg, #F59E0B, #D97706)',
-                  color: '#FFFFFF',
-                  border: 'none',
+                  gap: '8px',
                 }}
               >
-                <Send size={15} />
-              </button>
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder={getInputPlaceholder()}
+                  style={{
+                    flex: 1,
+                    minWidth: 0,
+                    background: '#F8FAFC',
+                    border: '1px solid #CBD5E1',
+                    borderRadius: '8px',
+                    color: '#0F172A',
+                    outline: 'none',
+                    fontSize: '0.86rem',
+                    padding: '9px 12px',
+                    fontFamily: 'var(--font-body)',
+                    boxSizing: 'border-box',
+                  }}
+                  disabled={loading || isTyping}
+                />
+
+                <button
+                  type="submit"
+                  className="btn-primary"
+                  disabled={loading || isTyping || !input.trim()}
+                  style={{
+                    flexShrink: 0,
+                    width: '38px',
+                    height: '38px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: 0,
+                    opacity: loading || isTyping || !input.trim() ? 0.5 : 1,
+                    cursor: loading || isTyping || !input.trim() ? 'not-allowed' : 'pointer',
+                    borderRadius: '8px',
+                    background: 'linear-gradient(135deg, #F59E0B, #D97706)',
+                    color: '#FFFFFF',
+                    border: 'none',
+                  }}
+                >
+                  <Send size={16} />
+                </button>
+              </div>
             </form>
           </div>
         )}
