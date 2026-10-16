@@ -536,9 +536,13 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
   // Step 1: Submit Student Name (with 1.5s bouncing dots)
   const handleStudentNameSubmit = (nameVal?: string) => {
     const raw = (nameVal !== undefined ? nameVal : stepStudentName).trim();
+    if (/\d/.test(raw)) {
+      setStepError('Letters only');
+      return;
+    }
     const valResult = validatePersonName(raw);
     if (!valResult.valid) {
-      setStepError(valResult.error || 'Student name must contain only letters (no numbers).');
+      setStepError(valResult.error || 'Letters only');
       return;
     }
     const name = valResult.cleanName;
@@ -570,9 +574,14 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
 
     let cleanParent = '';
     if (parentRaw) {
+      if (/\d/.test(parentRaw)) {
+        setStepError('Letters only');
+        parentInputRef.current?.focus();
+        return;
+      }
       const parentValResult = validatePersonName(parentRaw);
       if (!parentValResult.valid) {
-        setStepError(parentValResult.error || 'Parent name must contain only letters (no numbers).');
+        setStepError(parentValResult.error || 'Letters only');
         parentInputRef.current?.focus();
         return;
       }
@@ -581,7 +590,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
 
     const mobValResult = validateIndianMobile(mobRaw);
     if (!mobValResult.valid) {
-      setStepError(mobValResult.error || 'Mobile number must start with 6, 7, 8, or 9 (e.g. 6362xxxxxx, 7372xxxxxx).');
+      setStepError(mobValResult.error || 'Mobile number must start with 6, 7, 8, or 9.');
       mobileInputRef.current?.focus();
       return;
     }
@@ -773,16 +782,20 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
   const handleProactiveCallbackSubmit = async () => {
     const mobVal = validateIndianMobile(proactiveMobile);
     if (!mobVal.valid) {
-      setProactiveError(mobVal.error || 'Mobile number must start with 6, 7, 8, or 9 (e.g. 6362xxxxxx, 7372xxxxxx).');
+      setProactiveError(mobVal.error || 'Mobile number must start with 6, 7, 8, or 9.');
       return;
     }
     const mob = mobVal.formatted;
 
     let name = (proactiveName || leadStudentName || 'Prospective Student').trim();
     if (proactiveName.trim()) {
+      if (/\d/.test(proactiveName)) {
+        setProactiveError('Letters only');
+        return;
+      }
       const nameVal = validatePersonName(proactiveName);
       if (!nameVal.valid) {
-        setProactiveError(nameVal.error || 'Name must contain only letters (no numbers).');
+        setProactiveError(nameVal.error || 'Letters only');
         return;
       }
       name = nameVal.cleanName;
@@ -840,16 +853,20 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
   const handleProactiveScheduleSubmit = async () => {
     const mobVal = validateIndianMobile(proactiveMobile);
     if (!mobVal.valid) {
-      setProactiveError(mobVal.error || 'Mobile number must start with 6, 7, 8, or 9 (e.g. 6362xxxxxx, 7372xxxxxx).');
+      setProactiveError(mobVal.error || 'Mobile number must start with 6, 7, 8, or 9.');
       return;
     }
     const mob = mobVal.formatted;
 
     let name = (proactiveName || leadStudentName || 'Prospective Student').trim();
     if (proactiveName.trim()) {
+      if (/\d/.test(proactiveName)) {
+        setProactiveError('Letters only');
+        return;
+      }
       const nameVal = validatePersonName(proactiveName);
       if (!nameVal.valid) {
-        setProactiveError(nameVal.error || 'Name must contain only letters (no numbers).');
+        setProactiveError(nameVal.error || 'Letters only');
         return;
       }
       name = nameVal.cleanName;
@@ -1064,6 +1081,9 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
   };
 
   const handleSlotDateChange = async (dateStr: string) => {
+    const scrollContainer = document.getElementById('gpuc-chat-messages');
+    const savedScrollTop = scrollContainer ? scrollContainer.scrollTop : null;
+
     setSelectedSlotDate(dateStr);
     setCustomSlotDate(dateStr);
     setLoadingSlots(true);
@@ -1079,6 +1099,11 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
       setAvailableSlotsList(allOpenSlots.filter((s) => s.date === dateStr));
     } finally {
       setLoadingSlots(false);
+      if (savedScrollTop !== null && scrollContainer) {
+        requestAnimationFrame(() => {
+          scrollContainer.scrollTop = savedScrollTop;
+        });
+      }
     }
   };
 
@@ -2268,12 +2293,16 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                 className="form-step-input"
                                 value={stepStudentName}
                                 onChange={(e) => {
-                                  const filtered = e.target.value.replace(/[^a-zA-Z\s.'-]/g, '');
-                                  setStepStudentName(filtered);
-                                  if (stepError) setStepError('');
+                                  const val = e.target.value;
+                                  if (/\d/.test(val)) {
+                                    setStepError('Letters only');
+                                  } else if (stepError) {
+                                    setStepError('');
+                                  }
+                                  setStepStudentName(val);
                                 }}
                                 onKeyDown={(e) => e.key === 'Enter' && handleStudentNameSubmit()}
-                                placeholder="Enter student's full name (letters only)"
+                                placeholder="Enter student's full name"
                                 autoFocus
                                 style={{
                                   width: '100%',
@@ -2310,9 +2339,6 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                             >
                               Next <ArrowRight size={13} />
                             </button>
-                          </div>
-                          <div style={{ fontSize: isMobile ? '0.62rem' : '0.67rem', color: '#64748B', marginTop: '3px' }}>
-                            Only letters accepted (no numbers)
                           </div>
                         </div>
                       )}
@@ -2369,7 +2395,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                             {/* 1. Parent / Guardian Name (with autoFocus) */}
                             <div>
                               <div style={{ fontSize: isMobile ? '0.67rem' : '0.72rem', fontWeight: 600, color: '#334155', marginBottom: '2px' }}>
-                                Parent / Guardian Name <span style={{ color: '#94A3B8', fontWeight: 400 }}>(Optional - letters only)</span>
+                                Parent / Guardian Name <span style={{ color: '#94A3B8', fontWeight: 400 }}>(Optional)</span>
                               </div>
                               <div style={{ position: 'relative' }}>
                                 <input
@@ -2379,9 +2405,13 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                   value={stepParentName}
                                   autoFocus
                                   onChange={(e) => {
-                                    const filtered = e.target.value.replace(/[^a-zA-Z\s.'-]/g, '');
-                                    setStepParentName(filtered);
-                                    if (stepError) setStepError('');
+                                    const val = e.target.value;
+                                    if (/\d/.test(val)) {
+                                      setStepError('Letters only');
+                                    } else if (stepError) {
+                                      setStepError('');
+                                    }
+                                    setStepParentName(val);
                                   }}
                                   onKeyDown={(e) => {
                                     if (e.key === 'Enter') {
@@ -2448,7 +2478,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                       locationInputRef.current?.focus();
                                     }
                                   }}
-                                  placeholder="e.g. 6362xxxxxx / 7372xxxxxx"
+                                  placeholder="Enter 10-digit mobile number"
                                   style={{
                                     flex: 1,
                                     minWidth: 0,
@@ -2471,7 +2501,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                             {/* 3. Location: Area & Pincode */}
                             <div>
                               <div style={{ fontSize: isMobile ? '0.67rem' : '0.72rem', fontWeight: 600, color: '#334155', marginBottom: '2px' }}>
-                                Location / Area &amp; Pincode <span style={{ color: '#94A3B8', fontWeight: 400 }}>(e.g. Yelahanka 560064)</span>
+                                Location / Area &amp; Pincode
                               </div>
                               <div style={{ position: 'relative' }}>
                                 <input
@@ -2876,7 +2906,11 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                     type="button"
                                     className="working-day-card"
                                     disabled={loading || isTyping || loadingSlots}
-                                    onClick={() => handleSlotDateChange(day.dateStr)}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.currentTarget.blur();
+                                      handleSlotDateChange(day.dateStr);
+                                    }}
                                     style={{
                                       flex: '0 0 auto',
                                       minWidth: isMobile ? '46px' : '58px',
@@ -2951,71 +2985,91 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                             </span>
                           </div>
 
-                          {loadingSlots ? (
-                            <div style={{ padding: '12px', textAlign: 'center', color: '#64748B', fontSize: isMobile ? '0.68rem' : '0.74rem' }}>
-                              Loading available slots...
-                            </div>
-                          ) : availableSlotsList.length > 0 ? (
-                            <div
-                              style={{
-                                display: 'grid',
-                                gridTemplateColumns: 'repeat(3, 1fr)',
-                                gap: isMobile ? '4px' : '6px',
-                                maxHeight: isMobile ? '140px' : '180px',
-                                overflowY: 'auto',
-                                padding: '2px',
-                                marginBottom: isMobile ? '6px' : '10px',
-                              }}
-                            >
-                              {availableSlotsList.map((slot, sIdx) => (
-                                <button
-                                  key={sIdx}
-                                  type="button"
-                                  className="time-slot-btn"
-                                  disabled={loading || isTyping}
-                                  onClick={() => handleDirectBookSlot(selectedSlotDate || slot.date, slot.time)}
-                                  style={{
-                                    padding: isMobile ? '5px 2px' : '7px 4px',
-                                    background: '#F0FDF4',
-                                    border: '1.5px solid #22C55E',
-                                    borderRadius: isMobile ? '5px' : '7px',
-                                    color: '#15803D',
-                                    fontSize: isMobile ? '0.68rem' : '0.74rem',
-                                    fontWeight: 700,
-                                    cursor: 'pointer',
-                                    textAlign: 'center',
-                                    transition: 'all 0.15s ease',
-                                    boxShadow: '0 1px 3px rgba(34, 197, 94, 0.15)',
-                                  }}
-                                  onMouseEnter={(e) => {
-                                    e.currentTarget.style.background = '#22C55E';
-                                    e.currentTarget.style.color = '#FFFFFF';
-                                  }}
-                                  onMouseLeave={(e) => {
-                                    e.currentTarget.style.background = '#F0FDF4';
-                                    e.currentTarget.style.color = '#15803D';
-                                  }}
-                                >
-                                  {slot.time}
-                                </button>
-                              ))}
-                            </div>
-                          ) : (
-                            <div
-                              style={{
-                                padding: '10px',
-                                background: '#FEF2F2',
-                                border: '1px solid #FECDD3',
-                                borderRadius: '7px',
-                                color: '#991B1B',
-                                fontSize: '0.72rem',
-                                textAlign: 'center',
-                                marginBottom: '10px',
-                              }}
-                            >
-                              All slots for this date are currently booked. Please choose another date or connect with our Help Desk.
-                            </div>
-                          )}
+                          <div
+                            style={{
+                              minHeight: isMobile ? '130px' : '160px',
+                              maxHeight: isMobile ? '140px' : '180px',
+                              overflowY: 'auto',
+                              padding: '2px',
+                              marginBottom: isMobile ? '6px' : '10px',
+                              display: 'flex',
+                              flexDirection: 'column',
+                            }}
+                          >
+                            {loadingSlots ? (
+                              <div
+                                style={{
+                                  minHeight: isMobile ? '130px' : '160px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  color: '#64748B',
+                                  fontSize: isMobile ? '0.68rem' : '0.74rem',
+                                }}
+                              >
+                                Loading available slots...
+                              </div>
+                            ) : availableSlotsList.length > 0 ? (
+                              <div
+                                style={{
+                                  display: 'grid',
+                                  gridTemplateColumns: 'repeat(3, 1fr)',
+                                  gap: isMobile ? '4px' : '6px',
+                                }}
+                              >
+                                {availableSlotsList.map((slot, sIdx) => (
+                                  <button
+                                    key={sIdx}
+                                    type="button"
+                                    className="time-slot-btn"
+                                    disabled={loading || isTyping}
+                                    onClick={() => handleDirectBookSlot(selectedSlotDate || slot.date, slot.time)}
+                                    style={{
+                                      padding: isMobile ? '5px 2px' : '7px 4px',
+                                      background: '#F0FDF4',
+                                      border: '1.5px solid #22C55E',
+                                      borderRadius: isMobile ? '5px' : '7px',
+                                      color: '#15803D',
+                                      fontSize: isMobile ? '0.68rem' : '0.74rem',
+                                      fontWeight: 700,
+                                      cursor: 'pointer',
+                                      textAlign: 'center',
+                                      transition: 'all 0.15s ease',
+                                      boxShadow: '0 1px 3px rgba(34, 197, 94, 0.15)',
+                                    }}
+                                    onMouseEnter={(e) => {
+                                      e.currentTarget.style.background = '#22C55E';
+                                      e.currentTarget.style.color = '#FFFFFF';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      e.currentTarget.style.background = '#F0FDF4';
+                                      e.currentTarget.style.color = '#15803D';
+                                    }}
+                                  >
+                                    {slot.time}
+                                  </button>
+                                ))}
+                              </div>
+                            ) : (
+                              <div
+                                style={{
+                                  minHeight: isMobile ? '130px' : '160px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  padding: '10px',
+                                  background: '#FEF2F2',
+                                  border: '1px solid #FECDD3',
+                                  borderRadius: '7px',
+                                  color: '#991B1B',
+                                  fontSize: isMobile ? '0.68rem' : '0.74rem',
+                                  textAlign: 'center',
+                                }}
+                              >
+                                All slots booked for this date. Please select another date.
+                              </div>
+                            )}
+                          </div>
 
                           {/* Fallback to Help Desk Button */}
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -3326,8 +3380,16 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                               <input
                                 type="text"
                                 value={proactiveName}
-                                onChange={(e) => setProactiveName(e.target.value.replace(/[^a-zA-Z\s.'-]/g, ''))}
-                                placeholder="Student / Parent Name (letters only)"
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  if (/\d/.test(val)) {
+                                    setProactiveError('Letters only');
+                                  } else if (proactiveError) {
+                                    setProactiveError('');
+                                  }
+                                  setProactiveName(val);
+                                }}
+                                placeholder="Student / Parent Name"
                                 style={{
                                   padding: '7px 10px',
                                   borderRadius: '6px',
@@ -3367,7 +3429,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                     setProactiveMobile(val);
                                     if (proactiveError) setProactiveError('');
                                   }}
-                                  placeholder="e.g. 6362xxxxxx / 7372xxxxxx"
+                                  placeholder="Enter 10-digit mobile number"
                                   style={{
                                     flex: 1,
                                     minWidth: 0,
@@ -3441,8 +3503,16 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                               <input
                                 type="text"
                                 value={proactiveName}
-                                onChange={(e) => setProactiveName(e.target.value.replace(/[^a-zA-Z\s.'-]/g, ''))}
-                                placeholder="Student / Parent Name (letters only)"
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  if (/\d/.test(val)) {
+                                    setProactiveError('Letters only');
+                                  } else if (proactiveError) {
+                                    setProactiveError('');
+                                  }
+                                  setProactiveName(val);
+                                }}
+                                placeholder="Student / Parent Name"
                                 style={{
                                   padding: '7px 10px',
                                   borderRadius: '6px',
@@ -3482,7 +3552,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                     setProactiveMobile(val);
                                     if (proactiveError) setProactiveError('');
                                   }}
-                                  placeholder="e.g. 6362xxxxxx / 7372xxxxxx"
+                                  placeholder="Enter 10-digit mobile number"
                                   style={{
                                     flex: 1,
                                     minWidth: 0,

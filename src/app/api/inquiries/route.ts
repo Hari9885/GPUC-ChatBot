@@ -61,20 +61,20 @@ export async function POST(req: NextRequest) {
     // Minimum requirement validation: Student Name and Mobile
     const studentVal = validatePersonName(rawName);
     if (!studentVal.valid) {
-      return NextResponse.json({ error: studentVal.error || 'Student name must contain only letters (no numbers).' }, { status: 400 });
+      return NextResponse.json({ error: studentVal.error || 'Letters only' }, { status: 400 });
     }
 
     const finalParent = (parentName || '').trim();
     if (finalParent) {
       const parentVal = validatePersonName(finalParent);
       if (!parentVal.valid) {
-        return NextResponse.json({ error: parentVal.error || 'Parent name must contain only letters (no numbers).' }, { status: 400 });
+        return NextResponse.json({ error: parentVal.error || 'Letters only' }, { status: 400 });
       }
     }
 
     const mobileVal = validateIndianMobile(rawMobile);
     if (!mobileVal.valid) {
-      return NextResponse.json({ error: mobileVal.error || 'Mobile number must start with 6, 7, 8, or 9 (e.g. 6362xxxxxx, 7372xxxxxx).' }, { status: 400 });
+      return NextResponse.json({ error: mobileVal.error || 'Mobile number must start with 6, 7, 8, or 9.' }, { status: 400 });
     }
 
     const db = readDB();

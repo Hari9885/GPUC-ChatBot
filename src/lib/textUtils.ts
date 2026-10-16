@@ -108,10 +108,10 @@ export function validatePersonName(raw: string): { valid: boolean; cleanName: st
     return { valid: false, cleanName: '', error: 'Name cannot be empty.' };
   }
   if (/\d/.test(trimmed)) {
-    return { valid: false, cleanName: trimmed, error: 'Name must contain only letters (no numbers).' };
+    return { valid: false, cleanName: trimmed, error: 'Letters only' };
   }
   if (!/^[a-zA-Z\s.'-]+$/.test(trimmed)) {
-    return { valid: false, cleanName: trimmed, error: 'Name must contain only letters.' };
+    return { valid: false, cleanName: trimmed, error: 'Letters only' };
   }
   const letterCount = trimmed.replace(/[^a-zA-Z]/g, '').length;
   if (letterCount < 2) {
@@ -143,7 +143,7 @@ export function validateIndianMobile(raw: string): { valid: boolean; cleanDigits
       valid: false,
       cleanDigits: clean,
       formatted: `+91 ${clean}`,
-      error: 'Mobile number must start with 6, 7, 8, or 9 (e.g. 6362xxxxxx, 7372xxxxxx). Numbers starting with 5, 4, 3, etc. are not accepted.',
+      error: 'Mobile number must start with 6, 7, 8, or 9. Numbers starting with 5, 4, 3, etc. are not accepted.',
     };
   }
 

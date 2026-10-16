@@ -113,12 +113,12 @@ export async function POST(req: NextRequest) {
 
     const nameValidation = validatePersonName(rawName);
     if (!nameValidation.valid) {
-      return NextResponse.json({ error: nameValidation.error || 'Name must contain only letters (no numbers).' }, { status: 400 });
+      return NextResponse.json({ error: nameValidation.error || 'Letters only' }, { status: 400 });
     }
 
     const mobileValidation = validateIndianMobile(rawMobile);
     if (!mobileValidation.valid) {
-      return NextResponse.json({ error: mobileValidation.error || 'Mobile number must start with 6, 7, 8, or 9 (e.g. 6362xxxxxx, 7372xxxxxx).' }, { status: 400 });
+      return NextResponse.json({ error: mobileValidation.error || 'Mobile number must start with 6, 7, 8, or 9.' }, { status: 400 });
     }
 
     const db = readDB();
