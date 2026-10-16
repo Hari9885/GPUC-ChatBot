@@ -1,0 +1,109 @@
+Target_URI,Link_Type,First_Found_In,Operational_Status,Notes
+assets/css/bootstrap.min.css,Asset / Resource,about-us.html,Active,Verified GPUC Whitefield asset/channel
+assets/css/jquery-ui.css,Asset / Resource,about-us.html,Active,Verified GPUC Whitefield asset/channel
+assets/css/bootstrap-icons.css,Asset / Resource,about-us.html,Active,Verified GPUC Whitefield asset/channel
+assets/css/animate.min.css,Asset / Resource,about-us.html,Active,Verified GPUC Whitefield asset/channel
+assets/css/jquery.fancybox.min.css,Asset / Resource,about-us.html,Active,Verified GPUC Whitefield asset/channel
+assets/css/swiper-bundle.min.css,Asset / Resource,about-us.html,Active,Verified GPUC Whitefield asset/channel
+assets/css/slick.css,Asset / Resource,about-us.html,Active,Verified GPUC Whitefield asset/channel
+assets/css/slick-theme.css,Asset / Resource,about-us.html,Active,Verified GPUC Whitefield asset/channel
+assets/css/daterangepicker.css,Asset / Resource,about-us.html,Active,Verified GPUC Whitefield asset/channel
+assets/css/boxicons.min.css,Asset / Resource,about-us.html,Active,Verified GPUC Whitefield asset/channel
+assets/css/style.css,Asset / Resource,about-us.html,Active,Verified GPUC Whitefield asset/channel
+assets/img/fav-icon.svg,Asset / Resource,about-us.html,Active,Verified GPUC Whitefield asset/channel
+https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css,External Group Link,about-us.html,Active,Verified GPUC Whitefield asset/channel
+index.html,Internal Navigation,about-us.html,Active,Verified GPUC Whitefield asset/channel
+about-us.html,Internal Navigation,about-us.html,Active,Verified GPUC Whitefield asset/channel
+vision-mission.html,Internal Navigation,about-us.html,Active,Verified GPUC Whitefield asset/channel
+why-choose-us.html,Internal Navigation,about-us.html,Active,Verified GPUC Whitefield asset/channel
+director-message.html,Internal Navigation,about-us.html,Active,Verified GPUC Whitefield asset/channel
+principal-message.html,Internal Navigation,about-us.html,Active,Verified GPUC Whitefield asset/channel
+faculty.html,Internal Navigation,about-us.html,Active,Verified GPUC Whitefield asset/channel
+facilities.html,Internal Navigation,about-us.html,Active,Verified GPUC Whitefield asset/channel
+rules-regulations.html,Internal Navigation,about-us.html,Active,Verified GPUC Whitefield asset/channel
+science-courses.html,Internal Navigation,about-us.html,Active,Verified GPUC Whitefield asset/channel
+commerce-courses.html,Internal Navigation,about-us.html,Active,Verified GPUC Whitefield asset/channel
+value-added-courses.html,Internal Navigation,about-us.html,Active,Verified GPUC Whitefield asset/channel
+admission.html,Internal Navigation,about-us.html,Active,Verified GPUC Whitefield asset/channel
+gallery.html,Internal Navigation,about-us.html,Active,Verified GPUC Whitefield asset/channel
+events.html,Internal Navigation,about-us.html,Active,Verified GPUC Whitefield asset/channel
+contact-us.html,Internal Navigation,about-us.html,Active,Verified GPUC Whitefield asset/channel
+tel:919606941907,Telephone Dial Link,about-us.html,Active,Verified GPUC Whitefield asset/channel
+travel-package-01.html,Internal Navigation,about-us.html,Active,Verified GPUC Whitefield asset/channel
+https://www.youtube.com/watch?v=u31qwQUeGuM,Social Media Channel,about-us.html,Active,Verified GPUC Whitefield asset/channel
+https://www.youtube.com/watch?v=MLpWrANjFbI,Social Media Channel,about-us.html,Active,Verified GPUC Whitefield asset/channel
+https://www.tripadvisor.com/,External Group Link,about-us.html,Active,Verified GPUC Whitefield asset/channel
+http://trustpilot.com/,External Group Link,about-us.html,Active,Verified GPUC Whitefield asset/channel
+https://www.facebook.com/Gopalanstudents.pucollege/,Social Media Channel,about-us.html,Active,Verified GPUC Whitefield asset/channel
+https://www.youtube.com/channel/UCk5YG1IQatFo5zNj6z4fyQw,Social Media Channel,about-us.html,Active,Verified GPUC Whitefield asset/channel
+https://www.instagram.com/gopalan.gpuc?igsh=NjUzaHd0Z3ppeDBw,Social Media Channel,about-us.html,Active,Verified GPUC Whitefield asset/channel
+campus-life.html,Internal Navigation,about-us.html,Active,Verified GPUC Whitefield asset/channel
+placement.html,Internal Navigation,about-us.html,Active,Verified GPUC Whitefield asset/channel
+testimonial.html,Internal Navigation,about-us.html,Active,Verified GPUC Whitefield asset/channel
+https://www.gopalancolleges.com/gpuc/,External Group Link,about-us.html,Active,Verified GPUC Whitefield asset/channel
+https://gopalanpucnorth.com/,External Group Link,about-us.html,Active,Verified GPUC Whitefield asset/channel
+https://www.gopalancolleges.com/gsap/,External Group Link,about-us.html,Active,Verified GPUC Whitefield asset/channel
+https://www.gopalancolleges.com/gcem/,External Group Link,about-us.html,Active,Verified GPUC Whitefield asset/channel
+https://www.gopalanskillacademy.in/,External Group Link,about-us.html,Active,Verified GPUC Whitefield asset/channel
+https://www.gopalanschool.com/international/,External Group Link,about-us.html,Active,Verified GPUC Whitefield asset/channel
+https://www.gopalanschool.com/national/,External Group Link,about-us.html,Active,Verified GPUC Whitefield asset/channel
+https://gopalannationalschoolnorth.com/,External Group Link,about-us.html,Active,Verified GPUC Whitefield asset/channel
+https://gopalanschool.com/gns-south/,External Group Link,about-us.html,Active,Verified GPUC Whitefield asset/channel
+https://gopalanschool.com/twinklers/,External Group Link,about-us.html,Active,Verified GPUC Whitefield asset/channel
+https://wa.me/918105131098,WhatsApp Direct Link,about-us.html,Active,Verified GPUC Whitefield asset/channel
+mailto:admission_gpuc@gopalanpucollege.com,Email Contact Link,about-us.html,Active,Verified GPUC Whitefield asset/channel
+tel:+919606941907,Telephone Dial Link,about-us.html,Active,Verified GPUC Whitefield asset/channel
+https://gcc.pupilpod.net/home.php,ERP / Student Portal,about-us.html,Active,Shared Gopalan Commerce domain link
+mailto:gccprincipal@gopalancolleges.com,Email Contact Link,about-us.html,Active,Shared Gopalan Commerce domain link
+assets/css/leaflet.css,Asset / Resource,admission.html,Active,Verified GPUC Whitefield asset/channel
+assets/css/calendar-css.css,Asset / Resource,admission.html,Active,Verified GPUC Whitefield asset/channel
+assets/images/favicon.png,Internal Navigation,campus-life.html,Active,Verified GPUC Whitefield asset/channel
+https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css,External Group Link,campus-life.html,Active,Verified GPUC Whitefield asset/channel
+https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.css,External Group Link,campus-life.html,Active,Verified GPUC Whitefield asset/channel
+https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Montserrat:wght@400;500;600&display=swap,External Group Link,campus-life.html,Active,Verified GPUC Whitefield asset/channel
+https://www.facebook.com/share/1Epiiymyv1/,Social Media Channel,campus-life.html,Active,Verified GPUC Whitefield asset/channel
+https://www.instagram.com/gopalan_group_of_institution?igsi=Z243aXpmMTY2cTY4,Social Media Channel,campus-life.html,Active,Verified GPUC Whitefield asset/channel
+https://www.linkedin.com/company/gopalan-group-of-institutions/?viewAsMember=true,External Group Link,campus-life.html,Active,Verified GPUC Whitefield asset/channel
+https://www.gopalancolleges.com/gcc/,External Group Link,campus-life.html,Active,Shared Gopalan Commerce domain link
+travel-package-details.html,Internal Navigation,commerce-courses.html,Active,Verified GPUC Whitefield asset/channel
+assets/css/nice-select.css,Asset / Resource,contact-us.html,Active,Verified GPUC Whitefield asset/channel
+tel:+919606941908,Telephone Dial Link,contact-us.html,Active,Verified GPUC Whitefield asset/channel
+tel:+916362166945,Telephone Dial Link,contact-us.html,Active,Verified GPUC Whitefield asset/channel
+mailto:admin@gopalanpucollege.com,Email Contact Link,contact-us.html,Active,Verified GPUC Whitefield asset/channel
+tel:+08041280227,Telephone Dial Link,contact-us.html,Active,Verified GPUC Whitefield asset/channel
+event-investiture-ceremony-2026.html,Internal Navigation,events.html,Active,Verified GPUC Whitefield asset/channel
+event-yoga-day-2026.html,Internal Navigation,events.html,Active,Verified GPUC Whitefield asset/channel
+event-drug-awareness-program-2026.html,Internal Navigation,events.html,Active,Verified GPUC Whitefield asset/channel
+event-freshers-day-2026.html,Internal Navigation,events.html,Active,Verified GPUC Whitefield asset/channel
+event-felicitation-orientation-ceremony-2026.html,Internal Navigation,events.html,Active,Verified GPUC Whitefield asset/channel
+event-ice-breaking-session-2026.html,Internal Navigation,events.html,Active,Verified GPUC Whitefield asset/channel
+event-environment-day-2026.html,Internal Navigation,events.html,Active,Verified GPUC Whitefield asset/channel
+event-felicitation-ceremony-2025.html,Internal Navigation,events.html,Active,Verified GPUC Whitefield asset/channel
+event-field-trips-2025.html,Internal Navigation,events.html,Active,Verified GPUC Whitefield asset/channel
+event-orientation-day-2025.html,Internal Navigation,events.html,Active,Verified GPUC Whitefield asset/channel
+event-yoga-day-2025.html,Internal Navigation,events.html,Active,Verified GPUC Whitefield asset/channel
+event-environment-day-2025.html,Internal Navigation,events.html,Active,Verified GPUC Whitefield asset/channel
+event-drawing-competition-2025.html,Internal Navigation,events.html,Active,Verified GPUC Whitefield asset/channel
+event-anti-drug-day.html,Internal Navigation,events.html,Active,Verified GPUC Whitefield asset/channel
+event-talents-day-2025.html,Internal Navigation,events.html,Active,Verified GPUC Whitefield asset/channel
+event-statistics-day-2025.html,Internal Navigation,events.html,Active,Verified GPUC Whitefield asset/channel
+event-saraswathi-puja-2025.html,Internal Navigation,events.html,Active,Verified GPUC Whitefield asset/channel
+event-mothers-day-2025.html,Internal Navigation,events.html,Active,Verified GPUC Whitefield asset/channel
+assets/img/gallery/001.jpg,Asset / Resource,gallery.html,Active,Verified GPUC Whitefield asset/channel
+assets/img/gallery/002.jpg,Asset / Resource,gallery.html,Active,Verified GPUC Whitefield asset/channel
+assets/img/gallery/003.jpg,Asset / Resource,gallery.html,Active,Verified GPUC Whitefield asset/channel
+assets/img/gallery/004.jpg,Asset / Resource,gallery.html,Active,Verified GPUC Whitefield asset/channel
+assets/img/gallery/005.jpg,Asset / Resource,gallery.html,Active,Verified GPUC Whitefield asset/channel
+assets/img/gallery/006.jpg,Asset / Resource,gallery.html,Active,Verified GPUC Whitefield asset/channel
+assets/img/gallery/007.jpg,Asset / Resource,gallery.html,Active,Verified GPUC Whitefield asset/channel
+assets/img/gallery/008.jpg,Asset / Resource,gallery.html,Active,Verified GPUC Whitefield asset/channel
+assets/img/gallery/009.jpg,Asset / Resource,gallery.html,Active,Verified GPUC Whitefield asset/channel
+assets/img/gallery/010.jpg,Asset / Resource,gallery.html,Active,Verified GPUC Whitefield asset/channel
+assets/img/gallery/011.jpg,Asset / Resource,gallery.html,Active,Verified GPUC Whitefield asset/channel
+assets/img/gallery/012.jpg,Asset / Resource,gallery.html,Active,Verified GPUC Whitefield asset/channel
+assets/img/gallery/013.jpg,Asset / Resource,gallery.html,Active,Verified GPUC Whitefield asset/channel
+assets/img/gallery/014.jpg,Asset / Resource,gallery.html,Active,Verified GPUC Whitefield asset/channel
+assets/img/gallery/015.jpg,Asset / Resource,gallery.html,Active,Verified GPUC Whitefield asset/channel
+assets/css/accordion.css,Asset / Resource,index.html,Active,Verified GPUC Whitefield asset/channel
+contact.html,Internal Navigation,index.html,Active,Verified GPUC Whitefield asset/channel
+https://trustpilot.com/,External Group Link,index.html,Active,Verified GPUC Whitefield asset/channel
