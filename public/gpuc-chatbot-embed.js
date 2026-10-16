@@ -140,7 +140,7 @@
       transform: translateY(16px) scale(0.97) !important;
       pointer-events: none !important;
       border: 1px solid rgba(15, 23, 42, 0.14) !important;
-      background: #1E3A8A !important;
+      background: transparent !important;
     }
 
     #gpuc-widget-container.open {
