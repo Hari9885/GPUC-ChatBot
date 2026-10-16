@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { readDB, writeDB, Inquiry } from '@/lib/db';
+import { readDB, writeDB, Inquiry, writeAnalysisDB, UserQueryLog } from '@/lib/db';
 
 export async function GET(req: NextRequest) {
   try {
@@ -159,6 +159,24 @@ export async function POST(req: NextRequest) {
 
     db.inquiries.unshift(newInquiry);
     writeDB(db);
+
+    // Save session queries to dedicated analytics JSON for algorithm improvement ONLY when phone number is provided
+    if (rawMobile) {
+      const queriesList: UserQueryLog[] = Array.isArray(body.sessionQueries) ? body.sessionQueries : [];
+      writeAnalysisDB({
+        analysisId: `ANL-2026-${refNum}`,
+        inquiryId: id,
+        timestamp: new Date().toISOString(),
+        studentName: rawName,
+        parentName: finalParent || undefined,
+        mobile: rawMobile,
+        location: finalLocation || undefined,
+        admissionClass: finalClass,
+        totalQueries: queriesList.length,
+        queries: queriesList,
+        leadSource: body.leadSource || 'chatbot_inquiry_wizard',
+      });
+    }
 
     return NextResponse.json({ success: true, inquiry: newInquiry });
   } catch (err: any) {

@@ -67,7 +67,7 @@
     "id": "admission_documents",
     "intent": "admission_documents",
     "question": "What documents are needed for admission?",
-    "answer": "Admission requires passing 10th standard (Karnataka SSLC, CBSE, or ICSE).\nFor the document checklist and enrollment procedures, please contact our North Campus help desk at +91 81053 88193 / +91 81230 40418.",
+    "answer": "Admission requires passing 10th standard (Karnataka SSLC, CBSE, or ICSE).\nFor the document checklist and enrollment procedures, please contact our Admissions & Enquiry Help Desk at +91 81053 88193 / +91 81230 40418 / +91 96320 70209.",
     "source_url": "https://gopalanpucnorth.com/admissions/",
     "release_status": "approved"
   },
@@ -91,7 +91,7 @@
     "id": "contact",
     "intent": "contact_details",
     "question": "How do I contact the college?",
-    "answer": "North Campus (Yelahanka) Admissions Desk: +91 81053 88193 / +91 81230 40418 / gpuc.north@gopalanpucollege.com. Address: No. 79 Mavallipura Kondashettihalli Road, Hesaragatta Hobli, Yelahanka, Bengaluru 560089.",
+    "answer": "North Campus Admissions & Enquiry Help Desk: +91 81053 88193 / +91 81230 40418 / +91 96320 70209 / gpuc.north@gopalanpucollege.com. Address: No. 79 Mavallipura Kondashettihalli Road, Hesaragatta Hobli, Yelahanka, Bengaluru 560089.",
     "source_url": "https://gopalanpucnorth.com/contact-us/",
     "release_status": "approved"
   },
@@ -99,7 +99,7 @@
     "id": "fees",
     "intent": "fees",
     "question": "What are the fees?",
-    "answer": "For official fee structures, installment options, and scholarship details, please contact our North Campus Help Desk directly:\nHelpline: +91 81053 88193 / +91 81230 40418 (Mon–Sat, 8:30 AM–5:00 PM)\nEmail: gpuc.north@gopalanpucollege.com",
+    "answer": "For official fee structures, installment options, and scholarship details, please contact our North Campus Help Desk directly:\nAdmissions & Enquiry Help Desk: +91 81053 88193 / +91 81230 40418 / +91 96320 70209 (Mon–Sat, 8:30 AM–5:00 PM)\nEmail: gpuc.north@gopalanpucollege.com",
     "source_url": "https://gopalanpucnorth.com/contact-us/",
     "release_status": "approved"
   },

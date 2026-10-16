@@ -1,6 +1,27 @@
 {
   "inquiries": [
     {
+      "id": "GPUC-2026-INQ-1024",
+      "name": "hari (Parent: hari kumar)",
+      "mobile": "9812345678",
+      "parentName": "hari kumar",
+      "location": "hoodi, 560067",
+      "userType": "parent",
+      "courseInterest": "General PU",
+      "intendedYear": "2026-2027",
+      "category": "ADMISSIONS_2026-27",
+      "preferredContact": "phone",
+      "summary": "Topic: Commerce Stream Combinations (CEBA / SEBA / MEBA) | Class: General PU | Inquiry: Admissions 2026-27 | Student: hari | Parent: hari kumar | Location: hoodi, 560067 | Note: Query: What Commerce combinations are offered at Gopalan PU College North Campus?",
+      "assignedTeam": "Admissions",
+      "assignedStaff": "Mr. Aravind J (Admissions Officer)",
+      "status": "NEW",
+      "consentGiven": true,
+      "consentPurpose": "Inquiry guidance and admission assistance",
+      "consentTimestamp": "2026-10-16T03:19:57.302Z",
+      "createdAt": "2026-10-16T03:19:57.302Z",
+      "updatedAt": "2026-10-16T03:19:57.302Z"
+    },
+    {
       "id": "GPUC-2026-INQ-1023",
       "name": "jhg (Parent: kjhgf)",
       "mobile": "9876543212",
@@ -442,6 +463,21 @@
     }
   ],
   "appointments": [
+    {
+      "id": "GPUC-2026-APT-516",
+      "inquiryId": "GPUC-2026-INQ-1024",
+      "name": "hari (Parent: hari kumar)",
+      "mobile": "9812345678",
+      "mode": "online_meeting",
+      "date": "2026-10-17",
+      "timeSlot": "04:30 PM",
+      "purpose": "Online Admission Consultation (General PU)",
+      "assignedStaff": "Admissions Desk Counselor",
+      "assignedDepartment": "Admissions",
+      "status": "CONFIRMED",
+      "meetingLinkOrVenue": "Online Consultation (Admissions Team)",
+      "createdAt": "2026-10-16T03:20:10.165Z"
+    },
     {
       "id": "GPUC-VISIT-2026-515",
       "inquiryId": "GPUC-2026-INQ-1023",
@@ -1095,7 +1131,8 @@
       "time": "04:30 PM",
       "department": "Admissions",
       "mode": "all",
-      "isBooked": false
+      "isBooked": true,
+      "bookedBy": "hari (Parent: hari kumar)"
     },
     {
       "id": "slot_2026-10-17_14",
@@ -1424,6 +1461,126 @@
       "department": "Admissions",
       "mode": "all",
       "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-23_0",
+      "date": "2026-10-23",
+      "time": "09:00 AM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-23_1",
+      "date": "2026-10-23",
+      "time": "09:30 AM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-23_2",
+      "date": "2026-10-23",
+      "time": "10:00 AM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-23_3",
+      "date": "2026-10-23",
+      "time": "10:30 AM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-23_4",
+      "date": "2026-10-23",
+      "time": "11:00 AM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-23_5",
+      "date": "2026-10-23",
+      "time": "11:30 AM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-23_6",
+      "date": "2026-10-23",
+      "time": "12:00 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-23_7",
+      "date": "2026-10-23",
+      "time": "12:30 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-23_8",
+      "date": "2026-10-23",
+      "time": "02:00 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-23_9",
+      "date": "2026-10-23",
+      "time": "02:30 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-23_10",
+      "date": "2026-10-23",
+      "time": "03:00 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-23_11",
+      "date": "2026-10-23",
+      "time": "03:30 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-23_12",
+      "date": "2026-10-23",
+      "time": "04:00 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-23_13",
+      "date": "2026-10-23",
+      "time": "04:30 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-23_14",
+      "date": "2026-10-23",
+      "time": "05:00 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
     }
   ],
   "feedback": [
@@ -1443,6 +1600,15 @@
     }
   ],
   "messages": [
+    {
+      "id": "MSG-0165",
+      "type": "whatsapp",
+      "recipient": "9812345678",
+      "templateId": "appointment_confirmation",
+      "content": "Dear hari (Parent: hari kumar), your online consultation GPUC-2026-APT-516 with Admissions is confirmed for 2026-10-17 at 04:30 PM. Our Admissions team will contact you 1 minute before the allocated time and you will receive a WhatsApp notification confirming your ticket initiation and request.",
+      "status": "DELIVERED",
+      "timestamp": "2026-10-16T03:20:10.165Z"
+    },
     {
       "id": "MSG-1015",
       "type": "whatsapp",

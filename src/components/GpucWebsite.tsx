@@ -157,8 +157,7 @@ export default function GpucWebsite({ onOpenChatWithQuery }: GpucWebsiteProps) {
               <strong>North Campus (Yelahanka):</strong> No. 79, Mavallipura Kondashettihalli Road, Hesaragatta Hobli, Yelahanka, Bengaluru – 560089.
             </p>
             <div style={{ fontSize: '0.82rem', color: '#CBD5E1', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <span>Admissions Helpline: +91 81053 88193 / +91 81230 40418</span>
-              <span>General Inquiry: +91 96320 70209</span>
+              <span>Admissions & Enquiry Help Desk: +91 81053 88193 / +91 81230 40418 / +91 96320 70209</span>
               <span>Email: gpuc.north@gopalanpucollege.com</span>
             </div>
           </div>

@@ -105,7 +105,7 @@ SYSTEM PROMPT — GOPALAN PRE-UNIVERSITY COLLEGE (NORTH CAMPUS, YELAHANKA) AI AS
 - When asked about admissions, requirements, or documents, reply strictly in 2 lines:
 "Admission requires passing 10th standard (Karnataka SSLC, CBSE, or ICSE).
 
-For the document checklist and enrollment procedures, please contact our North Campus help desk at +91 81053 88193 / +91 81230 40418."
+For the document checklist and enrollment procedures, please contact our Admissions & Enquiry Help Desk at +91 81053 88193 / +91 81230 40418 / +91 96320 70209."
 
 3. COURSES & COMBINATIONS (OFFICIAL & VERIFIED — MAX 3 LINES):
 - Science: PCMB (Physics, Chemistry, Mathematics, Biology) and PCMC (Physics, Chemistry, Mathematics, Computer Science) with integrated NEET, JEE, and KCET coaching.
@@ -120,7 +120,7 @@ For the document checklist and enrollment procedures, please contact our North C
 5. FEES (MAX 2 LINES):
 - When asked about fees, tuition, installment options, or scholarships, do not quote amounts or estimates. Immediately direct the user to the North Campus Help Desk:
 "For official fee structures, installment options, and scholarship details, please contact our North Campus Help Desk directly:
-Helpline: +91 81053 88193 / +91 81230 40418 (Mon–Sat, 8:30 AM–5:00 PM) | Email: gpuc.north@gopalanpucollege.com"
+Admissions & Enquiry Help Desk: +91 81053 88193 / +91 81230 40418 / +91 96320 70209 (Mon–Sat, 8:30 AM–5:00 PM) | Email: gpuc.north@gopalanpucollege.com"
 
 6. HOSTEL & FACILITIES (MAX 3 LINES):
 - "North Campus features modern science labs, computer lab, library, sports grounds (cricket, football), cafeteria, secure girls' hostel, and college bus transport across North Bengaluru."
@@ -136,7 +136,7 @@ Helpline: +91 81053 88193 / +91 81230 40418 (Mon–Sat, 8:30 AM–5:00 PM) | Ema
 
 10. LOCATION & CONTACT (MAX 3 LINES):
 - Gopalan Pre-University College, North Campus: No. 79, Mavallipura Kondashettihalli Road, Hesaragatta Hobli, Yelahanka, Bengaluru 560089.
-- Admissions Desk: +91 81053 88193 / +91 81230 40418 / +91 96320 70209 (gpuc.north@gopalanpucollege.com).
+- Admissions & Enquiry Help Desk: +91 81053 88193 / +91 81230 40418 / +91 96320 70209 (gpuc.north@gopalanpucollege.com).
 `;
 
 export async function callGemini(
@@ -183,7 +183,7 @@ export async function callGemini(
   const isPrincipalQuery = /\b(who is the principal|principal name|who is principal|principal of|college principal|director)\b/i.test(cleanQ);
   if (isPrincipalQuery) {
     return {
-      text: "The Principal of Gopalan Pre-University College, North Campus (Yelahanka) is Mr. M. Mahesh.\n\nFor admissions and inquiries, please contact our help desk at +91 81053 88193.",
+      text: "The Principal of Gopalan Pre-University College, North Campus (Yelahanka) is Mr. M. Mahesh.\n\nAdmissions & Enquiry Help Desk: +91 81053 88193 / +91 81230 40418 / +91 96320 70209.",
       toolCallsExecuted: [],
     };
   }
@@ -193,7 +193,7 @@ export async function callGemini(
     ((cleanQ.includes('fee') || cleanQ.includes('cost') || cleanQ.includes('tuition') || cleanQ.includes('installment') || cleanQ.includes('scholarship') || cleanQ.includes('concession') || cleanQ.includes('payment') || cleanQ.includes('how much')) && !cleanQ.includes('calculate') && !cleanQ.includes('solve'));
   if (isFeeQuery) {
     return {
-      text: "For official fee structures, installment options, and scholarship details, please contact our North Campus Help Desk directly:\n\nHelpline: +91 81053 88193 / +91 81230 40418 (Mon–Sat, 8:30 AM–5:00 PM)\nEmail: gpuc.north@gopalanpucollege.com",
+      text: "For official fee structures, installment options, and scholarship details, please contact our North Campus Help Desk directly:\n\nAdmissions & Enquiry Help Desk: +91 81053 88193 / +91 81230 40418 / +91 96320 70209 (Mon–Sat, 8:30 AM–5:00 PM)\nEmail: gpuc.north@gopalanpucollege.com",
       toolCallsExecuted: [],
     };
   }
@@ -229,7 +229,7 @@ export async function callGemini(
   const isLocationQuery = /where|location|address|how to reach|campus location|map/i.test(cleanQ);
   if (isLocationQuery) {
     return {
-      text: "Gopalan PU College North Campus is located at No. 79 Mavallipura Kondashettihalli Road, Hesaragatta Hobli, Yelahanka, Bengaluru 560089.\n\nAdmissions Desk: +91 81053 88193 / +91 81230 40418 (gpuc.north@gopalanpucollege.com).",
+      text: "Gopalan PU College North Campus is located at No. 79 Mavallipura Kondashettihalli Road, Hesaragatta Hobli, Yelahanka, Bengaluru 560089.\n\nAdmissions & Enquiry Help Desk: +91 81053 88193 / +91 81230 40418 / +91 96320 70209 (gpuc.north@gopalanpucollege.com).",
       toolCallsExecuted: [],
     };
   }
@@ -238,7 +238,7 @@ export async function callGemini(
   const isContactDirect = /^(how to )?(contact|phone|call|number|spoc|reach|email)/i.test(cleanQ) || /contact (us|the college|admissions|desk)/i.test(cleanQ);
   if (isContactDirect && !cleanQ.includes('calculate') && !cleanQ.includes('solve')) {
     return {
-      text: "North Campus (Yelahanka) Admissions Desk: +91 81053 88193 / +91 81230 40418.\nEmail: gpuc.north@gopalanpucollege.com.\nAddress: No. 79 Mavallipura, Hesaragatta Hobli, Yelahanka.",
+      text: "North Campus Admissions & Enquiry Help Desk: +91 81053 88193 / +91 81230 40418 / +91 96320 70209.\nEmail: gpuc.north@gopalanpucollege.com.\nAddress: No. 79 Mavallipura, Hesaragatta Hobli, Yelahanka.",
       toolCallsExecuted: [],
     };
   }
@@ -376,7 +376,7 @@ export async function callGemini(
     if (!data?.candidates?.[0]?.content) {
       console.error('All Gemini candidate models failed:', lastError);
       return {
-        text: "For questions about Gopalan PU College North Campus, please call our Admissions help desk at +91 81053 88193 or visit our campus in Yelahanka.",
+        text: "For questions about Gopalan PU College North Campus, please call our Admissions & Enquiry Help Desk at +91 81053 88193 / +91 81230 40418 / +91 96320 70209 or visit our campus in Yelahanka.",
         toolCallsExecuted,
       };
     }

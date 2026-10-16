@@ -424,3 +424,49 @@ export function bookAppointment(
   writeDB(db);
   return { success: true, appointment: newAppointment, slot: bookedSlot };
 }
+
+export interface UserQueryLog {
+  query: string;
+  timestamp: string;
+  topic?: string;
+}
+
+export interface LeadChatAnalysis {
+  analysisId: string;
+  inquiryId?: string;
+  timestamp: string;
+  studentName: string;
+  parentName?: string;
+  mobile: string;
+  location?: string;
+  admissionClass?: string;
+  totalQueries: number;
+  queries: UserQueryLog[];
+  leadSource: string;
+}
+
+const ANALYSIS_FILE = path.join(process.cwd(), 'data', 'leads_chat_analysis.json');
+
+export function readAnalysisDB(): LeadChatAnalysis[] {
+  try {
+    if (!fs.existsSync(ANALYSIS_FILE)) {
+      fs.writeFileSync(ANALYSIS_FILE, JSON.stringify([], null, 2), 'utf-8');
+      return [];
+    }
+    const data = fs.readFileSync(ANALYSIS_FILE, 'utf-8');
+    return JSON.parse(data) || [];
+  } catch (err) {
+    console.error('Error reading leads_chat_analysis.json:', err);
+    return [];
+  }
+}
+
+export function writeAnalysisDB(entry: LeadChatAnalysis) {
+  try {
+    const list = readAnalysisDB();
+    list.unshift(entry);
+    fs.writeFileSync(ANALYSIS_FILE, JSON.stringify(list, null, 2), 'utf-8');
+  } catch (err) {
+    console.error('Error writing leads_chat_analysis.json:', err);
+  }
+}

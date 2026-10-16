@@ -18,6 +18,7 @@ import {
   User,
   Users,
   Phone,
+  PhoneCall,
   Check,
   AlertCircle,
   ArrowRight,
@@ -61,6 +62,7 @@ interface Message {
     | 'completed';
   leadInquiryId?: string;
   pendingQuery?: string;
+  isProactiveCallbackCard?: boolean;
   ticketData?: {
     id: string;
     mode: 'campus_visit' | 'online_meeting';
@@ -147,7 +149,7 @@ function getTopicOverview(text: string): { overview: string; followUp: string } 
   if (q.includes('fee') || q.includes('cost') || q.includes('scholarship') || q.includes('tuition')) {
     return {
       overview: `Official Fee & Help Desk:
-• Helpline: +91 81053 88193 / +91 81230 40418
+• Helpline: +91 81053 88193 / +91 81230 40418 / +91 96320 70209
 • Email: gpuc.north@gopalanpucollege.com
 • Timings: Mon–Sat, 8:30 AM to 5:00 PM`,
       followUp: `Please let us know which stream or facility you would like to explore:`,
@@ -316,6 +318,74 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
   const [customSlotTime, setCustomSlotTime] = useState('10:00 AM');
   const [availableSlotsList, setAvailableSlotsList] = useState<Array<{ date: string; time: string; department: string }>>([]);
 
+  // Session queries tracking for lead analytics (only saved if user provides phone number)
+  const sessionQueriesRef = useRef<Array<{ query: string; timestamp: string }>>([]);
+  const generalQueryCountRef = useRef<number>(0);
+  const hasShownProactiveCardRef = useRef<boolean>(false);
+  const activeInquiryIdRef = useRef<string | null>(null);
+
+  // Proactive callback action card state
+  const [proactiveCardMode, setProactiveCardMode] = useState<
+    'idle' | 'immediate_callback' | 'schedule_call' | 'submitted' | 'dismissed'
+  >('idle');
+  const [proactiveName, setProactiveName] = useState<string>('');
+  const [proactiveMobile, setProactiveMobile] = useState<string>('');
+  const [proactiveSelectedSlot, setProactiveSelectedSlot] = useState<string>('10:00 AM (Morning)');
+  const [proactiveError, setProactiveError] = useState<string>('');
+  const [proactiveSubmitting, setProactiveSubmitting] = useState<boolean>(false);
+
+  // Prominently highlight and bold help desk phone numbers with click-to-call links
+  const renderHighlightedContent = (rawText: string, isUser: boolean = false) => {
+    if (!rawText) return null;
+    const cleaned = stripStarsAndAsterisks(rawText);
+
+    // Regex matching Indian phone numbers: +91 81053 88193, 81053 88193, +91 81230 40418, +91 96320 70209, etc.
+    const phoneRegex = /((?:\+91[\s\u00A0]?)?(?:81053[\s\u00A0]?88193|81230[\s\u00A0]?40418|96320[\s\u00A0]?70209|96069[\s\u00A0]?41908|[6-9]\d{4}[\s\u00A0]?\d{5}|[6-9]\d{9}))/g;
+
+    const parts = cleaned.split(phoneRegex);
+
+    return (
+      <>
+        {parts.map((part, idx) => {
+          if (!part) return null;
+          const isPhone = /^(?:\+91[\s\u00A0]?)?(?:81053[\s\u00A0]?88193|81230[\s\u00A0]?40418|96320[\s\u00A0]?70209|96069[\s\u00A0]?41908|[6-9]\d{4}[\s\u00A0]?\d{5}|[6-9]\d{9})$/.test(part.trim());
+          if (isPhone) {
+            const rawDigits = part.replace(/\D/g, '');
+            const telDigits = rawDigits.startsWith('91') && rawDigits.length === 12 ? rawDigits : `91${rawDigits.slice(-10)}`;
+            return (
+              <a
+                key={idx}
+                href={`tel:+${telDigits}`}
+                style={{
+                  fontWeight: 800,
+                  color: isUser ? '#FFFFFF' : '#0A4074',
+                  backgroundColor: isUser ? 'rgba(255, 255, 255, 0.22)' : '#FEF3C7',
+                  border: isUser ? '1px solid rgba(255, 255, 255, 0.35)' : '1.5px solid #F59E0B',
+                  borderRadius: '6px',
+                  padding: '2px 7px',
+                  margin: '1px 3px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  textDecoration: 'none',
+                  boxShadow: isUser ? 'none' : '0 1px 3px rgba(245, 158, 11, 0.2)',
+                  verticalAlign: 'baseline',
+                  cursor: 'pointer',
+                  letterSpacing: '0.02em',
+                }}
+                title="Click to dial Admissions & Enquiry Help Desk"
+              >
+                <span style={{ fontSize: '0.8rem' }}>📞</span>
+                <strong style={{ fontWeight: 800 }}>{formatPhoneNumbers(part)}</strong>
+              </a>
+            );
+          }
+          return <span key={idx}>{part}</span>;
+        })}
+      </>
+    );
+  };
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -473,6 +543,40 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
     setStepMobile('');
     setStepLocation('');
 
+    // Immediately save lead and all session queries to CRM and leads_chat_analysis.json
+    fetch('/api/inquiries', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        studentName: leadStudentName,
+        parentName: parent,
+        mobile: mob,
+        location: loc,
+        admissionClass: '12th Class (2nd PU) / 11th Class',
+        inquiryType: 'Admissions 2026-27',
+        queryTopic: pendingTopic || 'College Admissions',
+        chatNotes: `Captured via Step 2 Contact Form. Pending query: ${pendingQuery}`,
+        leadSource: 'onboarding_step_2',
+        sessionQueries: sessionQueriesRef.current,
+      }),
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.inquiry?.id) {
+          activeInquiryIdRef.current = data.inquiry.id;
+          setUserLead({
+            inquiryId: data.inquiry.id,
+            studentName: leadStudentName,
+            parentName: parent,
+            mobile: mob,
+            location: loc,
+            admissionClass: '12th Class (2nd PU) / 11th Class',
+            inquiryType: 'Admissions 2026-27',
+          });
+        }
+      })
+      .catch((err) => console.error('Early lead submit error:', err));
+
     const displayParts: string[] = [];
     if (parent) displayParts.push(`Parent: ${parent}`);
     displayParts.push(`Mobile: ${mob}`);
@@ -515,21 +619,32 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
       // Guarantee bouncing dots for at least 1.5 seconds
       const minWaitPromise = new Promise((res) => setTimeout(res, 1500));
 
-      // 1. Submit lead to server CRM
-      const leadPromise = fetch('/api/inquiries', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          studentName: leadStudentName,
-          parentName: leadParentName,
-          mobile: leadMobile,
-          location: leadLocation,
-          admissionClass: chosenClass,
-          inquiryType: chosenType,
-          queryTopic: pendingTopic || 'College Admissions',
-          chatNotes: `Query: ${pendingQuery}`,
-        }),
-      }).then((r) => r.json());
+      // 1. Submit or update lead in server CRM
+      const leadPromise = activeInquiryIdRef.current
+        ? fetch('/api/inquiries', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id: activeInquiryIdRef.current,
+              notes: `Admission choice: ${chosenClass} • ${chosenType}`,
+            }),
+          }).then((r) => r.json())
+        : fetch('/api/inquiries', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              studentName: leadStudentName,
+              parentName: leadParentName,
+              mobile: leadMobile,
+              location: leadLocation,
+              admissionClass: chosenClass,
+              inquiryType: chosenType,
+              queryTopic: pendingTopic || 'College Admissions',
+              chatNotes: `Query: ${pendingQuery}`,
+              leadSource: 'onboarding_step_3',
+              sessionQueries: sessionQueriesRef.current,
+            }),
+          }).then((r) => r.json());
 
       // 2. Fetch AI answer from Gemini for the user's specific question
       const chatPromise = fetch('/api/chat', {
@@ -556,7 +671,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
       const [_, inqData, chatData] = await Promise.all([minWaitPromise, leadPromise, chatPromise]);
 
       const newInquiryId =
-        inqData?.inquiry?.id || `GPUC-2026-INQ-${Date.now().toString().slice(-4)}`;
+        activeInquiryIdRef.current || inqData?.inquiry?.id || `GPUC-2026-INQ-${Date.now().toString().slice(-4)}`;
 
       const lead: UserLead = {
         inquiryId: newInquiryId,
@@ -592,13 +707,158 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
         ...prev,
         {
           role: 'assistant',
-          content: `Thank you, ${leadStudentName}! I have noted your details.\n\nFor immediate assistance, please call our admissions desk at +91 81053 88193 (North Campus) / +91 96069 41908 or email gpuc.north@gopalanpucollege.com.`,
+          content: `Thank you, ${leadStudentName}! I have noted your details.\n\nFor immediate assistance, please call our Admissions & Enquiry Help Desk at +91 81053 88193 / +91 81230 40418 / +91 96320 70209 or email gpuc.north@gopalanpucollege.com.`,
         },
       ]);
     } finally {
       setIsTyping(false);
       setIsSubmittingLead(false);
       setLoading(false);
+    }
+  };
+
+  // Proactive 4th-Query Immediate Callback Submission
+  const handleProactiveCallbackSubmit = async () => {
+    const mob = proactiveMobile.trim();
+    const cleanDigits = mob.replace(/\D/g, '');
+    if (cleanDigits.length < 10) {
+      setProactiveError('Please enter a valid 10-digit mobile number.');
+      return;
+    }
+    setProactiveError('');
+    setProactiveSubmitting(true);
+
+    const name = proactiveName.trim() || leadStudentName || 'Prospective Student';
+
+    try {
+      const res = await fetch('/api/inquiries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          studentName: name,
+          mobile: mob,
+          admissionClass: '12th Class (2nd PU) / 11th Class',
+          inquiryType: 'Immediate Callback Request',
+          queryTopic: 'North Campus Admissions Guidance',
+          chatNotes: 'Requested immediate callback after 4th general query',
+          leadSource: 'proactive_immediate_callback',
+          sessionQueries: sessionQueriesRef.current,
+        }),
+      });
+      const data = await res.json();
+      const inqId = data?.inquiry?.id || `GPUC-2026-INQ-${Date.now().toString().slice(-4)}`;
+
+      activeInquiryIdRef.current = inqId;
+      setUserLead({
+        inquiryId: inqId,
+        studentName: name,
+        mobile: mob,
+        admissionClass: '12th Class (2nd PU) / 11th Class',
+        inquiryType: 'Immediate Callback Request',
+      });
+      setLeadStudentName(name);
+      setLeadMobile(mob);
+      setProactiveCardMode('submitted');
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: `Thank you, ${name}! Your callback request has been prioritized with our Admissions & Enquiry Help Desk (+91 81053 88193 / +91 81230 40418 / +91 96320 70209). An admissions counselor will call you shortly on ${mob}.`,
+        },
+      ]);
+    } catch (err) {
+      console.error('Proactive callback error:', err);
+      setProactiveError('Failed to submit callback request. Please try again.');
+    } finally {
+      setProactiveSubmitting(false);
+    }
+  };
+
+  // Proactive 4th-Query Consultation Slot Submission
+  const handleProactiveScheduleSubmit = async () => {
+    const mob = proactiveMobile.trim();
+    const cleanDigits = mob.replace(/\D/g, '');
+    if (cleanDigits.length < 10) {
+      setProactiveError('Please enter a valid 10-digit mobile number.');
+      return;
+    }
+    setProactiveError('');
+    setProactiveSubmitting(true);
+
+    const name = proactiveName.trim() || leadStudentName || 'Prospective Student';
+    const chosenSlot = proactiveSelectedSlot || '10:00 AM (Morning)';
+
+    try {
+      const res = await fetch('/api/inquiries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          studentName: name,
+          mobile: mob,
+          admissionClass: '12th Class (2nd PU) / 11th Class',
+          inquiryType: 'Scheduled Consultation',
+          queryTopic: `Consultation Slot: ${chosenSlot}`,
+          chatNotes: `Booked consultation slot ${chosenSlot} after 4th query`,
+          leadSource: 'proactive_time_slot_booking',
+          sessionQueries: sessionQueriesRef.current,
+        }),
+      });
+      const data = await res.json();
+      const inqId = data?.inquiry?.id || `GPUC-2026-INQ-${Date.now().toString().slice(-4)}`;
+
+      // Also book official appointment ticket
+      const aptRes = await fetch('/api/appointments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: name,
+          mobile: mob,
+          mode: 'campus_visit',
+          inquiryId: inqId,
+          date: 'Next Working Day',
+          timeSlot: chosenSlot,
+          purpose: 'Admissions Consultation & Campus Tour',
+        }),
+      });
+      const aptData = await aptRes.json();
+      const ticketId = aptData?.appointment?.id || `GPUC-VISIT-${Date.now().toString().slice(-4)}`;
+
+      activeInquiryIdRef.current = inqId;
+      setUserLead({
+        inquiryId: inqId,
+        studentName: name,
+        mobile: mob,
+        admissionClass: '12th Class (2nd PU) / 11th Class',
+        inquiryType: 'Scheduled Consultation',
+      });
+      setLeadStudentName(name);
+      setLeadMobile(mob);
+      setProactiveCardMode('submitted');
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: `Your consultation and campus visit has been scheduled for ${chosenSlot}.\n\nReference: ${ticketId}. Our Admissions & Enquiry Help Desk (+91 81053 88193 / +91 81230 40418 / +91 96320 70209) looks forward to meeting you.`,
+          step: 'completed',
+          ticketData: {
+            id: ticketId,
+            mode: 'campus_visit',
+            date: 'Next Working Day',
+            timeSlot: chosenSlot,
+            venue: 'Gopalan Pre-University College, North Campus (Yelahanka)',
+            studentName: name,
+            mobile: mob,
+            instructions: 'Present this reference or phone number at Admissions Desk on arrival.',
+          },
+        },
+      ]);
+    } catch (err) {
+      console.error('Proactive schedule error:', err);
+      setProactiveError('Failed to book time slot. Please try again.');
+    } finally {
+      setProactiveSubmitting(false);
     }
   };
 
@@ -645,7 +905,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
 
       setBookingFlowState('completed');
 
-      const replyContent = `Your campus visit ticket has been generated and recorded with Reference ${apt.id}.\n\nVisiting hours are Monday to Saturday from 8:30 AM to 5:00 PM. Admissions help desk: +91 81053 88193.`;
+      const replyContent = `Your campus visit ticket has been generated and recorded with Reference ${apt.id}.\n\nVisiting hours are Monday to Saturday from 8:30 AM to 5:00 PM. Admissions Help Desk: +91 81053 88193 / +91 81230 40418 / +91 96320 70209.`;
 
       setMessages((prev) => [
         ...prev,
@@ -672,7 +932,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
         ...prev,
         {
           role: 'assistant',
-          content: `Your campus visit has been noted! Please visit our North Campus from Monday to Saturday between 8:30 AM and 5:00 PM.\n\nYou may contact the admissions desk directly at +91 81053 88193 / +91 81230 40418.`,
+          content: `Your campus visit has been noted! Please visit our North Campus from Monday to Saturday between 8:30 AM and 5:00 PM.\n\nYou may contact the Admissions & Enquiry Help Desk directly at +91 81053 88193 / +91 81230 40418 / +91 96320 70209.`,
           step: 'completed',
         },
       ]);
@@ -810,7 +1070,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
     setIsTyping(false);
     setLoading(false);
 
-    const genericReply = `You can reach our Admissions Help Desk directly at +91 81053 88193 (North Campus) or +91 96069 41908 from 8:30 AM to 5:00 PM (Monday to Saturday).\n\nOur counseling team will be happy to assist you in coordinating your visit or scheduling a custom meeting slot.`;
+    const genericReply = `You can reach our Admissions & Enquiry Help Desk directly at +91 81053 88193 / +91 81230 40418 / +91 96320 70209 from 8:30 AM to 5:00 PM (Monday to Saturday).\n\nOur counseling team will be happy to assist you in coordinating your visit or scheduling a custom meeting slot.`;
 
     setMessages((prev) => [
       ...prev,
@@ -829,6 +1089,12 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
     if (!isChatOpen) {
       setIsChatOpen(true);
     }
+
+    // Ephemeral session queries tracking (only stored in leads_chat_analysis.json if phone number is provided)
+    sessionQueriesRef.current.push({
+      query: text,
+      timestamp: new Date().toISOString(),
+    });
 
     // If a lead step card was open, any interaction in the chat input dismisses the card
     if (!userLead && leadStep !== 'idle') {
@@ -933,6 +1199,16 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
       return;
     }
 
+    // Increment general question count & check 4th query trigger for proactive callback card
+    generalQueryCountRef.current += 1;
+    let shouldTriggerProactiveCard = false;
+    if (!userLead && !leadMobile && !hasShownProactiveCardRef.current) {
+      if (generalQueryCountRef.current === 4) {
+        shouldTriggerProactiveCard = true;
+        hasShownProactiveCardRef.current = true;
+      }
+    }
+
     // PRESET QUESTIONS OR RESEMBLING QUESTIONS:
     // Offer informative overview first, then offer student name input with skip option
     if (!userLead && !hasSkippedLead && isPresetOrResemblingQuery(text)) {
@@ -955,6 +1231,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
           topic,
           step: 'ask_student_name',
           pendingQuery: text,
+          isProactiveCallbackCard: shouldTriggerProactiveCard,
         };
 
         setMessages((prev) => [...prev, assistantPromptMsg]);
@@ -1004,6 +1281,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
           role: 'assistant',
           content: botContent,
           toolCalls: data.toolCalls,
+          isProactiveCallbackCard: shouldTriggerProactiveCard,
         },
       ]);
     } catch (err) {
@@ -1012,7 +1290,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
         ...prev,
         {
           role: 'assistant',
-          content: `Sure, I will help you with your query about Gopalan PU College.\n\nYou may also contact our admissions desk directly at +91 81053 88193 (North Campus) / +91 96069 41908 or email gpuc.north@gopalanpucollege.com.`,
+          content: `Sure, I will help you with your query about Gopalan PU College.\n\nYou may also contact our Admissions & Enquiry Help Desk directly at +91 81053 88193 / +91 81230 40418 / +91 96320 70209 or email gpuc.north@gopalanpucollege.com.`,
         },
       ]);
     } finally {
@@ -1045,6 +1323,15 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
     setAvailableSlotsList([]);
     setCustomSlotDate('');
     setCustomSlotTime('10:00 AM');
+    sessionQueriesRef.current = [];
+    generalQueryCountRef.current = 0;
+    hasShownProactiveCardRef.current = false;
+    activeInquiryIdRef.current = null;
+    setProactiveCardMode('idle');
+    setProactiveName('');
+    setProactiveMobile('');
+    setProactiveError('');
+    setProactiveSubmitting(false);
   };
 
   const getInputPlaceholder = () => {
@@ -1553,7 +1840,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                       }}
                       className={msg.role === 'user' ? 'prose-chat prose-chat-user' : 'prose-chat prose-chat-bot'}
                     >
-                      {formatPhoneNumbers(stripStarsAndAsterisks(msg.content))}
+                      {renderHighlightedContent(msg.content, msg.role === 'user')}
 
                       {/* Clickable Preset Quick Actions Grid (Uses full width in 2-column layout) */}
                       {showPresetsUnderMsg && (
@@ -2542,8 +2829,330 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                         </div>
                       )}
 
+                      {/* Proactive 4th-Query Action Card */}
+                      {msg.isProactiveCallbackCard && !userLead && proactiveCardMode !== 'dismissed' && (
+                        <div
+                          style={{
+                            marginTop: '12px',
+                            background: 'linear-gradient(135deg, #FFFFFF, #FFFBEB)',
+                            border: '1.5px solid #F59E0B',
+                            borderRadius: '12px',
+                            padding: '12px 14px',
+                            boxShadow: '0 4px 16px rgba(245, 158, 11, 0.12)',
+                            width: '100%',
+                            boxSizing: 'border-box',
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                            <span style={{ fontSize: '0.76rem', fontWeight: 800, color: '#92400E', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                              <PhoneCall size={13} color="#D97706" /> GPUC NORTH ADMISSIONS HELP
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setProactiveCardMode('dismissed')}
+                              aria-label="Dismiss"
+                              style={{
+                                background: 'transparent',
+                                border: 'none',
+                                color: '#94A3B8',
+                                cursor: 'pointer',
+                                padding: '2px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                              }}
+                            >
+                              <X size={14} />
+                            </button>
+                          </div>
+
+                          <div style={{ fontSize: '0.80rem', fontWeight: 650, color: '#78350F', lineHeight: 1.45, marginBottom: '10px' }}>
+                            Can we request an immediate callback to help you out with GPUC North, or would you like to schedule a call / campus visit from our available time slots?
+                          </div>
+
+                          {proactiveCardMode === 'idle' && (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setProactiveCardMode('immediate_callback');
+                                  setProactiveError('');
+                                }}
+                                style={{
+                                  width: '100%',
+                                  padding: '9px 12px',
+                                  background: 'linear-gradient(135deg, #F59E0B, #D97706)',
+                                  color: '#FFFFFF',
+                                  border: 'none',
+                                  borderRadius: '8px',
+                                  fontWeight: 700,
+                                  fontSize: '0.80rem',
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  gap: '6px',
+                                  boxShadow: '0 2px 6px rgba(217, 119, 6, 0.25)',
+                                }}
+                              >
+                                <PhoneCall size={13} /> 📞 Request Immediate Callback
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setProactiveCardMode('schedule_call');
+                                  setProactiveError('');
+                                }}
+                                style={{
+                                  width: '100%',
+                                  padding: '8px 12px',
+                                  background: '#FFFFFF',
+                                  color: '#92400E',
+                                  border: '1.5px solid #F59E0B',
+                                  borderRadius: '8px',
+                                  fontWeight: 700,
+                                  fontSize: '0.78rem',
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  gap: '6px',
+                                }}
+                              >
+                                <Calendar size={13} /> 📅 Pick a Time Slot
+                              </button>
+                            </div>
+                          )}
+
+                          {proactiveCardMode === 'immediate_callback' && (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
+                              <div style={{ fontSize: '0.72rem', color: '#78350F', fontWeight: 600 }}>
+                                Enter your name &amp; phone number for an immediate priority callback:
+                              </div>
+
+                              {proactiveError && (
+                                <div style={{ padding: '5px 8px', borderRadius: '6px', background: '#FEF2F2', border: '1px solid #FCA5A5', color: '#B91C1C', fontSize: '0.72rem', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                  <AlertCircle size={12} /> {proactiveError}
+                                </div>
+                              )}
+
+                              <input
+                                type="text"
+                                value={proactiveName}
+                                onChange={(e) => setProactiveName(e.target.value)}
+                                placeholder="Student / Parent Name"
+                                style={{
+                                  padding: '7px 10px',
+                                  borderRadius: '6px',
+                                  border: '1px solid #CBD5E1',
+                                  fontSize: '0.80rem',
+                                  background: '#FFFFFF',
+                                  color: '#0F172A',
+                                  outline: 'none',
+                                }}
+                              />
+
+                              <input
+                                type="tel"
+                                maxLength={15}
+                                value={proactiveMobile}
+                                onChange={(e) => {
+                                  setProactiveMobile(e.target.value);
+                                  if (proactiveError) setProactiveError('');
+                                }}
+                                placeholder="10-digit Mobile Number *"
+                                style={{
+                                  padding: '7px 10px',
+                                  borderRadius: '6px',
+                                  border: '1.5px solid #F59E0B',
+                                  fontSize: '0.82rem',
+                                  background: '#FFFFFF',
+                                  color: '#0F172A',
+                                  fontWeight: 600,
+                                  outline: 'none',
+                                }}
+                              />
+
+                              <div style={{ display: 'flex', gap: '6px', marginTop: '2px' }}>
+                                <button
+                                  type="button"
+                                  disabled={proactiveSubmitting}
+                                  onClick={handleProactiveCallbackSubmit}
+                                  style={{
+                                    flex: 1,
+                                    padding: '8px',
+                                    background: 'linear-gradient(135deg, #10B981, #059669)',
+                                    color: '#FFFFFF',
+                                    border: 'none',
+                                    borderRadius: '7px',
+                                    fontWeight: 700,
+                                    fontSize: '0.78rem',
+                                    cursor: proactiveSubmitting ? 'not-allowed' : 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '5px',
+                                  }}
+                                >
+                                  <Check size={13} /> {proactiveSubmitting ? 'Submitting...' : 'Call Me Now'}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setProactiveCardMode('idle')}
+                                  style={{
+                                    padding: '8px 12px',
+                                    background: '#F1F5F9',
+                                    color: '#475569',
+                                    border: '1px solid #CBD5E1',
+                                    borderRadius: '7px',
+                                    fontSize: '0.76rem',
+                                    fontWeight: 600,
+                                    cursor: 'pointer',
+                                  }}
+                                >
+                                  Back
+                                </button>
+                              </div>
+                            </div>
+                          )}
+
+                          {proactiveCardMode === 'schedule_call' && (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
+                              <div style={{ fontSize: '0.72rem', color: '#78350F', fontWeight: 600 }}>
+                                Select your preferred call / visit time slot:
+                              </div>
+
+                              {proactiveError && (
+                                <div style={{ padding: '5px 8px', borderRadius: '6px', background: '#FEF2F2', border: '1px solid #FCA5A5', color: '#B91C1C', fontSize: '0.72rem', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                  <AlertCircle size={12} /> {proactiveError}
+                                </div>
+                              )}
+
+                              <input
+                                type="text"
+                                value={proactiveName}
+                                onChange={(e) => setProactiveName(e.target.value)}
+                                placeholder="Student / Parent Name"
+                                style={{
+                                  padding: '7px 10px',
+                                  borderRadius: '6px',
+                                  border: '1px solid #CBD5E1',
+                                  fontSize: '0.80rem',
+                                  background: '#FFFFFF',
+                                  color: '#0F172A',
+                                  outline: 'none',
+                                }}
+                              />
+
+                              <input
+                                type="tel"
+                                maxLength={15}
+                                value={proactiveMobile}
+                                onChange={(e) => {
+                                  setProactiveMobile(e.target.value);
+                                  if (proactiveError) setProactiveError('');
+                                }}
+                                placeholder="10-digit Mobile Number *"
+                                style={{
+                                  padding: '7px 10px',
+                                  borderRadius: '6px',
+                                  border: '1.5px solid #F59E0B',
+                                  fontSize: '0.82rem',
+                                  background: '#FFFFFF',
+                                  color: '#0F172A',
+                                  fontWeight: 600,
+                                  outline: 'none',
+                                }}
+                              />
+
+                              <div style={{ fontSize: '0.70rem', color: '#78350F', fontWeight: 700 }}>
+                                Available Consultation Window:
+                              </div>
+                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '5px' }}>
+                                {['10:00 AM (Morning)', '11:30 AM (Morning)', '02:30 PM (Afternoon)', '04:30 PM (Evening)'].map((slot, sIdx) => {
+                                  const isSelected = proactiveSelectedSlot === slot;
+                                  return (
+                                    <button
+                                      key={sIdx}
+                                      type="button"
+                                      onClick={() => setProactiveSelectedSlot(slot)}
+                                      style={{
+                                        padding: '6px 4px',
+                                        borderRadius: '6px',
+                                        border: isSelected ? '2px solid #D97706' : '1px solid #CBD5E1',
+                                        background: isSelected ? '#FEF3C7' : '#FFFFFF',
+                                        color: isSelected ? '#92400E' : '#334155',
+                                        fontWeight: isSelected ? 700 : 500,
+                                        fontSize: '0.72rem',
+                                        cursor: 'pointer',
+                                        textAlign: 'center',
+                                      }}
+                                    >
+                                      {slot}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+
+                              <div style={{ display: 'flex', gap: '6px', marginTop: '3px' }}>
+                                <button
+                                  type="button"
+                                  disabled={proactiveSubmitting}
+                                  onClick={handleProactiveScheduleSubmit}
+                                  style={{
+                                    flex: 1,
+                                    padding: '8px',
+                                    background: 'linear-gradient(135deg, #2563EB, #1D4ED8)',
+                                    color: '#FFFFFF',
+                                    border: 'none',
+                                    borderRadius: '7px',
+                                    fontWeight: 700,
+                                    fontSize: '0.78rem',
+                                    cursor: proactiveSubmitting ? 'not-allowed' : 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '5px',
+                                  }}
+                                >
+                                  <Calendar size={13} /> {proactiveSubmitting ? 'Booking...' : 'Confirm Call Slot'}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setProactiveCardMode('idle')}
+                                  style={{
+                                    padding: '8px 12px',
+                                    background: '#F1F5F9',
+                                    color: '#475569',
+                                    border: '1px solid #CBD5E1',
+                                    borderRadius: '7px',
+                                    fontSize: '0.76rem',
+                                    fontWeight: 600,
+                                    cursor: 'pointer',
+                                  }}
+                                >
+                                  Back
+                                </button>
+                              </div>
+                            </div>
+                          )}
+
+                          {proactiveCardMode === 'submitted' && (
+                            <div style={{ background: '#F0FDF4', border: '1px solid #86EFAC', borderRadius: '8px', padding: '10px', color: '#166534', fontSize: '0.78rem' }}>
+                              <div style={{ fontWeight: 700, marginBottom: '3px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                <Check size={14} color="#16A34A" /> Request Successfully Confirmed!
+                              </div>
+                              <div>
+                                Our Admissions Help Desk (+91 81053 88193) will connect with you on <strong>{proactiveMobile}</strong>.
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
                       {/* Admissions Help Desk Contact Card */}
-                      {msg.step === 'completed' && (msg.content.includes('+91 81053 88193') || msg.content.includes('+91 96069 41908')) && !msg.ticketData && (
+                      {msg.step === 'completed' && (msg.content.includes('+91 81053 88193') || msg.content.includes('+91 81230 40418') || msg.content.includes('+91 96320 70209') || msg.content.includes('+91 96069 41908')) && !msg.ticketData && (
                         <div
                           style={{
                             marginTop: '10px',
@@ -2558,41 +3167,60 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                         >
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                             <span style={{ fontSize: '0.74rem', fontWeight: 800, color: '#92400E', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                              <Phone size={13} color="#D97706" /> ADMISSIONS HELP DESK
+                              <Phone size={13} color="#D97706" /> ADMISSIONS &amp; ENQUIRY HELP DESK
                             </span>
                             <span style={{ fontSize: '0.68rem', padding: '2px 6px', borderRadius: '4px', background: '#FEF3C7', color: '#92400E', fontWeight: 700 }}>
                               NORTH CAMPUS
                             </span>
                           </div>
 
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', background: '#FFFFFF', padding: '8px 10px', borderRadius: '8px', border: '1px solid #FDE68A' }}>
-                            <div>
-                              <div style={{ fontSize: '0.68rem', color: '#78350F', fontWeight: 600 }}>North Campus (Yelahanka)</div>
-                              <div style={{ fontSize: '0.96rem', fontWeight: 800, color: '#92400E' }}>+91 81053 88193</div>
-                            </div>
-                            <a
-                              href="tel:+918105388193"
-                              style={{
-                                padding: '6px 12px',
-                                background: 'linear-gradient(135deg, #F59E0B, #D97706)',
-                                color: '#FFFFFF',
-                                borderRadius: '6px',
-                                fontSize: '0.75rem',
-                                fontWeight: 700,
-                                textDecoration: 'none',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '4px',
-                              }}
-                            >
-                              <Phone size={12} /> Call Desk
-                            </a>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '8px' }}>
+                            {[
+                              { label: 'Help Desk 1', number: '+91 81053 88193', tel: '+918105388193' },
+                              { label: 'Help Desk 2', number: '+91 81230 40418', tel: '+918123040418' },
+                              { label: 'Help Desk 3', number: '+91 96320 70209', tel: '+919632070209' },
+                            ].map((h, hIdx) => (
+                              <div
+                                key={hIdx}
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'space-between',
+                                  background: '#FFFFFF',
+                                  padding: '7px 10px',
+                                  borderRadius: '8px',
+                                  border: '1px solid #FDE68A',
+                                }}
+                              >
+                                <div>
+                                  <div style={{ fontSize: '0.66rem', color: '#78350F', fontWeight: 600 }}>{h.label}</div>
+                                  <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#92400E' }}>{h.number}</div>
+                                </div>
+                                <a
+                                  href={`tel:${h.tel}`}
+                                  style={{
+                                    padding: '5px 10px',
+                                    background: 'linear-gradient(135deg, #F59E0B, #D97706)',
+                                    color: '#FFFFFF',
+                                    borderRadius: '6px',
+                                    fontSize: '0.74rem',
+                                    fontWeight: 700,
+                                    textDecoration: 'none',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '4px',
+                                  }}
+                                >
+                                  <Phone size={11} /> Call
+                                </a>
+                              </div>
+                            ))}
                           </div>
 
                           <div style={{ fontSize: '0.72rem', color: '#78350F', lineHeight: 1.45 }}>
                             🕒 <strong>Working Hours:</strong> Monday &ndash; Saturday, 8:30 AM &ndash; 5:00 PM<br />
                             📍 <strong>Campus:</strong> No. 79 Mavallipura, Hesaragatta Hobli, Yelahanka<br />
-                            📞 <strong>Admissions Desk:</strong> +91 81053 88193 / +91 81230 40418
+                            ✉️ <strong>Email:</strong> gpuc.north@gopalanpucollege.com
                           </div>
                         </div>
                       )}

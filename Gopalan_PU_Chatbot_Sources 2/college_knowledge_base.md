@@ -49,11 +49,11 @@
 - Public eligibility statement: Passed Karnataka SSLC, CBSE, ICSE, or equivalent 10th standard board recognised by the Department of Pre-University Education, Karnataka.
 - Core Admission Documents: 10th Marks Card / Statement of Marks, Transfer Certificate (TC), Study/Conduct Certificate, Aadhaar Card copies (Student & Parent), passport-size photographs, caste/income certificate (if applicable), and migration certificate (for non-Karnataka boards).
 - Admissions for 2026-27 are currently open at North Campus.
-- Help Desk: +91 81053 88193 / +91 81230 40418.
+- Help Desk: +91 81053 88193 / +91 81230 40418 / +91 96320 70209.
 
 ## Fees and Payments
 For official fee structures, installment options, and scholarship details, please contact our North Campus Admissions & Accounts Help Desk directly:
-- Helpline: +91 81053 88193 / +91 81230 40418
+- Helpline: +91 81053 88193 / +91 81230 40418 / +91 96320 70209
 - Email: gpuc.north@gopalanpucollege.com
 - Office Hours: Monday to Saturday, 8:30 AM to 5:00 PM.
 
