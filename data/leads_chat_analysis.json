@@ -1,5 +1,40 @@
 [
   {
+    "analysisId": "ANL-2026-1041",
+    "inquiryId": "GPUC-2026-INQ-1041",
+    "timestamp": "2026-10-16T10:11:49.416Z",
+    "studentName": "ghggcduydgc",
+    "mobile": "+91 9876543211",
+    "location": "768576",
+    "admissionClass": "12th Class (2nd PU) / 11th Class",
+    "totalQueries": 1,
+    "queries": [
+      {
+        "query": "What is the admission process for academic year 2026-2027 at North Campus?",
+        "timestamp": "2026-10-16T10:10:59.808Z"
+      }
+    ],
+    "leadSource": "onboarding_step_2"
+  },
+  {
+    "analysisId": "ANL-2026-1040",
+    "inquiryId": "GPUC-2026-INQ-1040",
+    "timestamp": "2026-10-16T10:10:05.740Z",
+    "studentName": "qwertyuioasdfghjcxwer ff",
+    "parentName": "qwet  asdf",
+    "mobile": "+91 8134567899",
+    "location": "asdfgh.  23456789",
+    "admissionClass": "12th Class (2nd PU) / 11th Class",
+    "totalQueries": 1,
+    "queries": [
+      {
+        "query": "What is the admission process for academic year 2026-2027 at North Campus?",
+        "timestamp": "2026-10-16T10:09:32.294Z"
+      }
+    ],
+    "leadSource": "onboarding_step_2"
+  },
+  {
     "analysisId": "ANL-2026-1039",
     "inquiryId": "GPUC-2026-INQ-1039",
     "timestamp": "2026-10-16T10:04:39.189Z",

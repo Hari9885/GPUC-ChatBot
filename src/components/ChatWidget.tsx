@@ -356,8 +356,86 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
   const [proactiveName, setProactiveName] = useState<string>('');
   const [proactiveMobile, setProactiveMobile] = useState<string>('');
   const [proactiveSelectedSlot, setProactiveSelectedSlot] = useState<string>('10:00 AM (Morning)');
-  const [proactiveError, setProactiveError] = useState<string>('');
   const [proactiveSubmitting, setProactiveSubmitting] = useState<boolean>(false);
+
+  // Free Resize State (for expanding chat widget smoothly)
+  const [customWidth, setCustomWidth] = useState<number | null>(null);
+  const [customHeight, setCustomHeight] = useState<number | null>(null);
+  const isResizingRef = useRef<boolean>(false);
+
+  useEffect(() => {
+    try {
+      const savedW = localStorage.getItem('gpuc_chat_custom_width');
+      const savedH = localStorage.getItem('gpuc_chat_custom_height');
+      if (savedW && savedH) {
+        const pw = parseInt(savedW, 10);
+        const ph = parseInt(savedH, 10);
+        if (pw >= 340 && ph >= 460) {
+          setCustomWidth(pw);
+          setCustomHeight(ph);
+        }
+      }
+    } catch (e) {}
+  }, []);
+
+  const handleStartStandaloneResize = (e: React.MouseEvent | React.TouchEvent, dir: 'top' | 'left' | 'corner') => {
+    if (isMaximized) {
+      setIsMaximized(false);
+    }
+    isResizingRef.current = true;
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    const startX = clientX;
+    const startY = clientY;
+
+    const chatEl = document.getElementById('gpuc-chat-window');
+    if (!chatEl) return;
+    const rect = chatEl.getBoundingClientRect();
+    const startW = rect.width;
+    const startH = rect.height;
+
+    const onMove = (moveEvt: MouseEvent | TouchEvent) => {
+      if (!isResizingRef.current) return;
+      const curX = 'touches' in moveEvt ? moveEvt.touches[0].clientX : moveEvt.clientX;
+      const curY = 'touches' in moveEvt ? moveEvt.touches[0].clientY : moveEvt.clientY;
+
+      const deltaX = startX - curX;
+      const deltaY = startY - curY;
+
+      const maxW = Math.max(340, window.innerWidth - 32);
+      const maxH = Math.max(460, window.innerHeight - 36);
+
+      if (dir === 'left' || dir === 'corner') {
+        const newW = Math.max(340, Math.min(startW + deltaX, maxW));
+        setCustomWidth(Math.round(newW));
+      }
+      if (dir === 'top' || dir === 'corner') {
+        const newH = Math.max(460, Math.min(startH + deltaY, maxH));
+        setCustomHeight(Math.round(newH));
+      }
+    };
+
+    const onStop = () => {
+      isResizingRef.current = false;
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onStop);
+      window.removeEventListener('touchmove', onMove);
+      window.removeEventListener('touchend', onStop);
+      if (chatEl) {
+        const finalRect = chatEl.getBoundingClientRect();
+        try {
+          localStorage.setItem('gpuc_chat_custom_width', Math.round(finalRect.width).toString());
+          localStorage.setItem('gpuc_chat_custom_height', Math.round(finalRect.height).toString());
+        } catch (e) {}
+      }
+    };
+
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onStop);
+    window.addEventListener('touchmove', onMove, { passive: false });
+    window.addEventListener('touchend', onStop);
+    e.preventDefault();
+  };
 
   // Prominently highlight and bold help desk phone numbers with click-to-call links
   const renderHighlightedContent = (rawText: string, isUser: boolean = false) => {
@@ -1824,12 +1902,16 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                 ? '100%'
                 : isMaximized
                 ? 'min(1040px, calc(100vw - 36px))'
+                : customWidth
+                ? `${customWidth}px`
                 : 'var(--assistant-width)',
               maxWidth: isEmbedded || isMobile ? '100%' : 'calc(100vw - 16px)',
               height: isEmbedded || isMobile
                 ? '100%'
                 : isMaximized
                 ? 'calc(100vh - 40px)'
+                : customHeight
+                ? `${customHeight}px`
                 : 'var(--assistant-height)',
               maxHeight: isEmbedded || isMobile ? '100%' : 'calc(100dvh - 16px)',
               display: 'flex',
@@ -1849,6 +1931,30 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
               pointerEvents: 'auto',
             }}
           >
+            {/* Standalone free resize drag handles */}
+            {!isEmbedded && !isMobile && (
+              <>
+                <div
+                  onMouseDown={(e) => handleStartStandaloneResize(e, 'top')}
+                  onTouchStart={(e) => handleStartStandaloneResize(e, 'top')}
+                  title="Drag top edge to resize height"
+                  style={{ position: 'absolute', top: 0, left: 24, right: 24, height: '8px', cursor: 'ns-resize', zIndex: 100 }}
+                />
+                <div
+                  onMouseDown={(e) => handleStartStandaloneResize(e, 'left')}
+                  onTouchStart={(e) => handleStartStandaloneResize(e, 'left')}
+                  title="Drag left edge to resize width"
+                  style={{ position: 'absolute', left: 0, top: 24, bottom: 24, width: '8px', cursor: 'ew-resize', zIndex: 100 }}
+                />
+                <div
+                  onMouseDown={(e) => handleStartStandaloneResize(e, 'corner')}
+                  onTouchStart={(e) => handleStartStandaloneResize(e, 'corner')}
+                  title="Drag corner to freely expand size"
+                  style={{ position: 'absolute', top: 0, left: 0, width: '24px', height: '24px', cursor: 'nwse-resize', zIndex: 101 }}
+                />
+              </>
+            )}
+
             {/* Widget Header */}
             <div
               className="widget-header"

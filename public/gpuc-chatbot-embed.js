@@ -127,20 +127,28 @@
       position: fixed !important;
       bottom: 24px !important;
       right: 24px !important;
-      width: 420px !important;
-      height: 640px !important;
+      width: var(--gpuc-custom-width, 420px) !important;
+      height: var(--gpuc-custom-height, 640px) !important;
+      min-width: 340px !important;
+      min-height: 460px !important;
       max-width: calc(100vw - 32px) !important;
-      max-height: calc(100vh - 48px) !important;
+      max-height: calc(100vh - 36px) !important;
       border-radius: 18px !important;
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28), 0 2px 10px rgba(0, 0, 0, 0.08) !important;
       z-index: 2147483645 !important;
-      overflow: hidden !important;
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      overflow: visible !important;
+      transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
       opacity: 0 !important;
       transform: translateY(16px) scale(0.97) !important;
       pointer-events: none !important;
       border: 1px solid rgba(15, 23, 42, 0.14) !important;
       background: transparent !important;
+    }
+
+    #gpuc-widget-container.is-resizing {
+      transition: none !important;
+      user-select: none !important;
+      -webkit-user-select: none !important;
     }
 
     #gpuc-widget-container.open {
@@ -150,11 +158,20 @@
     }
 
     #gpuc-widget-container.maximized {
-      width: min(960px, calc(100vw - 40px)) !important;
+      width: min(1040px, calc(100vw - 40px)) !important;
       height: calc(100vh - 40px) !important;
       max-height: calc(100vh - 40px) !important;
       bottom: 20px !important;
       right: 20px !important;
+    }
+
+    #gpuc-widget-iframe-wrapper {
+      width: 100% !important;
+      height: 100% !important;
+      border-radius: 18px !important;
+      overflow: hidden !important;
+      position: relative !important;
+      background: transparent !important;
     }
 
     #gpuc-widget-iframe {
@@ -163,6 +180,87 @@
       border: none !important;
       display: block !important;
       background: transparent !important;
+    }
+
+    /* Resize handles for free expanding */
+    .gpuc-resize-handle {
+      position: absolute !important;
+      z-index: 2147483647 !important;
+      touch-action: none !important;
+      user-select: none !important;
+      -webkit-user-select: none !important;
+    }
+
+    .gpuc-resize-top {
+      top: -8px !important;
+      left: 18px !important;
+      right: 18px !important;
+      height: 16px !important;
+      cursor: ns-resize !important;
+    }
+
+    .gpuc-resize-left {
+      left: -8px !important;
+      top: 18px !important;
+      bottom: 18px !important;
+      width: 16px !important;
+      cursor: ew-resize !important;
+    }
+
+    .gpuc-resize-corner {
+      top: -10px !important;
+      left: -10px !important;
+      width: 36px !important;
+      height: 36px !important;
+      cursor: nwse-resize !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+
+    .gpuc-resize-corner-grip {
+      position: absolute !important;
+      top: 8px !important;
+      left: 8px !important;
+      width: 22px !important;
+      height: 22px !important;
+      border-radius: 6px !important;
+      background: rgba(15, 23, 42, 0.85) !important;
+      backdrop-filter: blur(4px) !important;
+      border: 1.5px solid rgba(255, 255, 255, 0.45) !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35) !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      transition: all 0.16s ease !important;
+      cursor: nwse-resize !important;
+      pointer-events: none !important;
+    }
+
+    .gpuc-resize-corner:hover .gpuc-resize-corner-grip {
+      background: #F59E0B !important;
+      border-color: #FFFFFF !important;
+      transform: scale(1.15) !important;
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.55) !important;
+    }
+
+    .gpuc-resize-corner-grip svg {
+      width: 12px !important;
+      height: 12px !important;
+      stroke: #FFFFFF !important;
+    }
+
+    #gpuc-resize-shield {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      z-index: 2147483647 !important;
+      display: none !important;
+      background: transparent !important;
+      user-select: none !important;
+      -webkit-user-select: none !important;
     }
 
     /* Completely hide Google reCAPTCHA badge / error card behind the launcher */
@@ -239,7 +337,11 @@
         border-radius: 0 !important;
         border: none !important;
         box-shadow: none !important;
-        background: #1E3A8A !important;
+        background: transparent !important;
+      }
+      .gpuc-resize-handle,
+      #gpuc-resize-shield {
+        display: none !important;
       }
       #gpuc-widget-tooltip {
         display: none !important;
@@ -261,17 +363,160 @@
   `;
   document.body.appendChild(tooltipEl);
 
-  // 2. Chat Window Container
+  // 2. Chat Window Container with Free Resizing
   const containerEl = document.createElement('div');
   containerEl.id = 'gpuc-widget-container';
+
+  // Restore saved custom size from localStorage if available
+  try {
+    const savedW = localStorage.getItem('gpuc_chat_custom_width');
+    const savedH = localStorage.getItem('gpuc_chat_custom_height');
+    if (savedW && savedH) {
+      const parsedW = parseInt(savedW, 10);
+      const parsedH = parseInt(savedH, 10);
+      if (parsedW >= 340 && parsedH >= 460) {
+        containerEl.style.setProperty('--gpuc-custom-width', `${parsedW}px`);
+        containerEl.style.setProperty('--gpuc-custom-height', `${parsedH}px`);
+      }
+    }
+  } catch (e) {}
+
+  const iframeWrapper = document.createElement('div');
+  iframeWrapper.id = 'gpuc-widget-iframe-wrapper';
 
   const iframeEl = document.createElement('iframe');
   iframeEl.id = 'gpuc-widget-iframe';
   iframeEl.src = baseUrl + '/embed';
   iframeEl.title = 'Gopalan Pre-University College North Campus AI Admissions Assistant';
   iframeEl.allow = 'clipboard-write; autoplay; microphone';
-  containerEl.appendChild(iframeEl);
+
+  iframeWrapper.appendChild(iframeEl);
+  containerEl.appendChild(iframeWrapper);
+
+  // Resize handles: top, left, and corner
+  const resizeHandleTop = document.createElement('div');
+  resizeHandleTop.className = 'gpuc-resize-handle gpuc-resize-top';
+  resizeHandleTop.title = 'Drag top edge to resize height';
+
+  const resizeHandleLeft = document.createElement('div');
+  resizeHandleLeft.className = 'gpuc-resize-handle gpuc-resize-left';
+  resizeHandleLeft.title = 'Drag left edge to resize width';
+
+  const resizeHandleCorner = document.createElement('div');
+  resizeHandleCorner.className = 'gpuc-resize-handle gpuc-resize-corner';
+  resizeHandleCorner.title = 'Drag corner to freely expand size';
+  resizeHandleCorner.innerHTML = `
+    <div class="gpuc-resize-corner-grip" title="Drag to resize freely">
+      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 3 21 3 21 9"></polyline>
+        <polyline points="9 21 3 21 3 15"></polyline>
+        <line x1="21" y1="3" x2="14" y2="10"></line>
+        <line x1="3" y1="21" x2="10" y2="14"></line>
+      </svg>
+    </div>
+  `;
+
+  containerEl.appendChild(resizeHandleTop);
+  containerEl.appendChild(resizeHandleLeft);
+  containerEl.appendChild(resizeHandleCorner);
   document.body.appendChild(containerEl);
+
+  // Full-screen shield for capturing drag moves over iframe
+  const shieldEl = document.createElement('div');
+  shieldEl.id = 'gpuc-resize-shield';
+  document.body.appendChild(shieldEl);
+
+  // Free Resize Drag Controller
+  let isResizing = false;
+  let resizeDir = null;
+  let startX = 0;
+  let startY = 0;
+  let startW = 420;
+  let startH = 640;
+
+  function initResize(e, direction) {
+    if (isMaximized) {
+      isMaximized = false;
+      containerEl.classList.remove('maximized');
+    }
+
+    isResizing = true;
+    resizeDir = direction;
+    containerEl.classList.add('is-resizing');
+
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    startX = clientX;
+    startY = clientY;
+
+    const rect = containerEl.getBoundingClientRect();
+    startW = rect.width;
+    startH = rect.height;
+
+    shieldEl.style.display = 'block';
+    if (direction === 'corner') shieldEl.style.cursor = 'nwse-resize';
+    else if (direction === 'top') shieldEl.style.cursor = 'ns-resize';
+    else if (direction === 'left') shieldEl.style.cursor = 'ew-resize';
+
+    window.addEventListener('mousemove', onResizing);
+    window.addEventListener('mouseup', stopResizing);
+    window.addEventListener('touchmove', onResizing, { passive: false });
+    window.addEventListener('touchend', stopResizing);
+    e.preventDefault();
+  }
+
+  function onResizing(e) {
+    if (!isResizing) return;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+    const deltaX = startX - clientX;
+    const deltaY = startY - clientY;
+
+    const maxW = Math.max(340, window.innerWidth - 32);
+    const maxH = Math.max(460, window.innerHeight - 36);
+
+    let newW = startW;
+    let newH = startH;
+
+    if (resizeDir === 'left' || resizeDir === 'corner') {
+      newW = Math.max(340, Math.min(startW + deltaX, maxW));
+      containerEl.style.setProperty('--gpuc-custom-width', `${Math.round(newW)}px`);
+    }
+
+    if (resizeDir === 'top' || resizeDir === 'corner') {
+      newH = Math.max(460, Math.min(startH + deltaY, maxH));
+      containerEl.style.setProperty('--gpuc-custom-height', `${Math.round(newH)}px`);
+    }
+
+    e.preventDefault();
+  }
+
+  function stopResizing() {
+    if (!isResizing) return;
+    isResizing = false;
+    containerEl.classList.remove('is-resizing');
+    shieldEl.style.display = 'none';
+
+    window.removeEventListener('mousemove', onResizing);
+    window.removeEventListener('mouseup', stopResizing);
+    window.removeEventListener('touchmove', onResizing);
+    window.removeEventListener('touchend', stopResizing);
+
+    const rect = containerEl.getBoundingClientRect();
+    try {
+      localStorage.setItem('gpuc_chat_custom_width', Math.round(rect.width).toString());
+      localStorage.setItem('gpuc_chat_custom_height', Math.round(rect.height).toString());
+    } catch (e) {}
+  }
+
+  resizeHandleTop.addEventListener('mousedown', (e) => initResize(e, 'top'));
+  resizeHandleLeft.addEventListener('mousedown', (e) => initResize(e, 'left'));
+  resizeHandleCorner.addEventListener('mousedown', (e) => initResize(e, 'corner'));
+
+  resizeHandleTop.addEventListener('touchstart', (e) => initResize(e, 'top'), { passive: false });
+  resizeHandleLeft.addEventListener('touchstart', (e) => initResize(e, 'left'), { passive: false });
+  resizeHandleCorner.addEventListener('touchstart', (e) => initResize(e, 'corner'), { passive: false });
 
   // 3. Floating Launcher Button
   const launcherBtn = document.createElement('button');

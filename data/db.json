@@ -1,6 +1,47 @@
 {
   "inquiries": [
     {
+      "id": "GPUC-2026-INQ-1041",
+      "name": "ghggcduydgc",
+      "mobile": "+91 9876543211",
+      "location": "768576",
+      "userType": "prospective_student",
+      "courseInterest": "12th Class (2nd PU) / 11th Class",
+      "intendedYear": "2026-2027",
+      "category": "ADMISSIONS_2026-27",
+      "preferredContact": "phone",
+      "summary": "Topic: Admissions for Academic Year 2026–27 | Class: 12th Class (2nd PU) / 11th Class | Inquiry: Admissions 2026-27 | Student: ghggcduydgc | Location: 768576 | Note: Captured via Step 2 Contact Form. Pending query: What is the admission process for academic year 2026-2027 at North Campus? | Note: Admission choice: 11th Class (1st PU) • Admissions 2026-27",
+      "assignedTeam": "Admissions",
+      "assignedStaff": "Mr. Aravind J (Admissions Officer)",
+      "status": "NEW",
+      "consentGiven": true,
+      "consentPurpose": "Inquiry guidance and admission assistance",
+      "consentTimestamp": "2026-10-16T10:11:49.414Z",
+      "createdAt": "2026-10-16T10:11:49.414Z",
+      "updatedAt": "2026-10-16T10:11:52.826Z"
+    },
+    {
+      "id": "GPUC-2026-INQ-1040",
+      "name": "qwertyuioasdfghjcxwer ff (Parent: qwet  asdf)",
+      "mobile": "+91 8134567899",
+      "parentName": "qwet  asdf",
+      "location": "asdfgh.  23456789",
+      "userType": "parent",
+      "courseInterest": "12th Class (2nd PU) / 11th Class",
+      "intendedYear": "2026-2027",
+      "category": "ADMISSIONS_2026-27",
+      "preferredContact": "phone",
+      "summary": "Topic: Admissions for Academic Year 2026–27 | Class: 12th Class (2nd PU) / 11th Class | Inquiry: Admissions 2026-27 | Student: qwertyuioasdfghjcxwer ff | Parent: qwet  asdf | Location: asdfgh.  23456789 | Note: Captured via Step 2 Contact Form. Pending query: What is the admission process for academic year 2026-2027 at North Campus? | Note: Admission choice: 11th Class (1st PU) • Admissions 2026-27",
+      "assignedTeam": "Admissions",
+      "assignedStaff": "Mr. Aravind J (Admissions Officer)",
+      "status": "NEW",
+      "consentGiven": true,
+      "consentPurpose": "Inquiry guidance and admission assistance",
+      "consentTimestamp": "2026-10-16T10:10:05.739Z",
+      "createdAt": "2026-10-16T10:10:05.739Z",
+      "updatedAt": "2026-10-16T10:10:08.237Z"
+    },
+    {
       "id": "GPUC-2026-INQ-1039",
       "name": "qwertyu (Parent: wertyui)",
       "mobile": "+91 9845012345",
@@ -773,6 +814,36 @@
     }
   ],
   "appointments": [
+    {
+      "id": "GPUC-2026-APT-529",
+      "inquiryId": "GPUC-2026-INQ-1041",
+      "name": "ghggcduydgc",
+      "mobile": "+91 9876543211",
+      "mode": "online_meeting",
+      "date": "2026-10-16",
+      "timeSlot": "09:20 AM",
+      "purpose": "Online Admission Consultation (11th Class (1st PU))",
+      "assignedStaff": "Admissions Desk Counselor",
+      "assignedDepartment": "Admissions",
+      "status": "CONFIRMED",
+      "meetingLinkOrVenue": "Online Consultation (Admissions Team)",
+      "createdAt": "2026-10-16T10:12:10.820Z"
+    },
+    {
+      "id": "GPUC-2026-APT-528",
+      "inquiryId": "GPUC-2026-INQ-1040",
+      "name": "qwertyuioasdfghjcxwer ff (Parent: qwet  asdf)",
+      "mobile": "+91 8134567899",
+      "mode": "online_meeting",
+      "date": "2026-10-16",
+      "timeSlot": "10:40 AM",
+      "purpose": "Online Admission Consultation (11th Class (1st PU))",
+      "assignedStaff": "Admissions Desk Counselor",
+      "assignedDepartment": "Admissions",
+      "status": "CONFIRMED",
+      "meetingLinkOrVenue": "Online Consultation (Admissions Team)",
+      "createdAt": "2026-10-16T10:10:13.038Z"
+    },
     {
       "id": "GPUC-2026-APT-527",
       "inquiryId": "GPUC-2026-INQ-1039",
@@ -2219,7 +2290,8 @@
       "time": "09:20 AM",
       "department": "Admissions",
       "mode": "all",
-      "isBooked": false
+      "isBooked": true,
+      "bookedBy": "ghggcduydgc"
     },
     {
       "id": "slot_2026-10-16_2",
@@ -2243,7 +2315,8 @@
       "time": "10:40 AM",
       "department": "Admissions",
       "mode": "all",
-      "isBooked": false
+      "isBooked": true,
+      "bookedBy": "qwertyuioasdfghjcxwer ff (Parent: qwet  asdf)"
     },
     {
       "id": "slot_2026-10-16_7",
@@ -2519,6 +2592,24 @@
     }
   ],
   "messages": [
+    {
+      "id": "MSG-0820",
+      "type": "whatsapp",
+      "recipient": "+91 9876543211",
+      "templateId": "appointment_confirmation",
+      "content": "Dear ghggcduydgc, your online consultation GPUC-2026-APT-529 with Admissions is confirmed for 2026-10-16 at 09:20 AM. Our Admissions team will contact you 1 minute before the allocated time and you will receive a WhatsApp notification confirming your ticket initiation and request.",
+      "status": "DELIVERED",
+      "timestamp": "2026-10-16T10:12:10.820Z"
+    },
+    {
+      "id": "MSG-3038",
+      "type": "whatsapp",
+      "recipient": "+91 8134567899",
+      "templateId": "appointment_confirmation",
+      "content": "Dear qwertyuioasdfghjcxwer ff (Parent: qwet  asdf), your online consultation GPUC-2026-APT-528 with Admissions is confirmed for 2026-10-16 at 10:40 AM. Our Admissions team will contact you 1 minute before the allocated time and you will receive a WhatsApp notification confirming your ticket initiation and request.",
+      "status": "DELIVERED",
+      "timestamp": "2026-10-16T10:10:13.038Z"
+    },
     {
       "id": "MSG-4962",
       "type": "whatsapp",
