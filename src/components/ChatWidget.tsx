@@ -2069,7 +2069,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                       )}
 
                       {/* Step 1: Student Name Card */}
-                      {msg.step === 'ask_student_name' && leadStep === 'ask_student_name' && !userLead && (
+                      {msg.step === 'ask_student_name' && leadStep === 'ask_student_name' && (
                         <div
                           style={{
                             marginTop: '10px',
@@ -2167,7 +2167,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                       )}
 
                       {/* Step 2: Parent Name, Mobile & Location Card */}
-                      {msg.step === 'ask_contact' && leadStep === 'ask_contact' && !userLead && (
+                      {msg.step === 'ask_contact' && leadStep === 'ask_contact' && (
                         <div
                           style={{
                             marginTop: '10px',
@@ -2349,7 +2349,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                       )}
 
                       {/* Step 3: Class / Inquiry Selection Card */}
-                      {msg.step === 'ask_admission' && leadStep === 'ask_admission' && !userLead && (
+                      {(msg.step === 'ask_admission' || msg.content?.includes('12th Class (2nd PU) or 11th Class (1st PU)')) && leadStep === 'ask_admission' && (
                         <div
                           style={{
                             marginTop: '10px',
@@ -2404,15 +2404,15 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                             <button
                               type="button"
                               disabled={isSubmittingLead}
-                              onClick={() => handleAdmissionSubmit('12th Class (2nd PU)', 'Admissions 2026-27')}
+                              onClick={() => handleAdmissionSubmit('11th Class (1st PU)', 'Admissions 2026-27')}
                               style={{
-                                padding: '8px 6px',
+                                padding: '10px 8px',
                                 textAlign: 'center',
-                                background: '#FEF3C7',
-                                border: '1px solid #F59E0B',
-                                color: '#92400E',
+                                background: '#EFF6FF',
+                                border: '1.5px solid #3B82F6',
+                                color: '#1E40AF',
                                 fontWeight: 700,
-                                fontSize: '0.76rem',
+                                fontSize: '0.78rem',
                                 borderRadius: '8px',
                                 cursor: isSubmittingLead ? 'not-allowed' : 'pointer',
                                 whiteSpace: 'normal',
@@ -2421,25 +2421,26 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                gap: '4px',
+                                gap: '5px',
                                 width: '100%',
                                 boxSizing: 'border-box',
+                                boxShadow: '0 2px 4px rgba(59, 130, 246, 0.1)',
                               }}
                             >
-                              🎓 12th Class (2nd PU)
+                              🎒 11th Class (1st PU)
                             </button>
                             <button
                               type="button"
                               disabled={isSubmittingLead}
-                              onClick={() => handleAdmissionSubmit('11th Class (1st PU)', 'Admissions 2026-27')}
+                              onClick={() => handleAdmissionSubmit('12th Class (2nd PU)', 'Admissions 2026-27')}
                               style={{
-                                padding: '8px 6px',
+                                padding: '10px 8px',
                                 textAlign: 'center',
-                                background: '#EFF6FF',
-                                border: '1px solid #3B82F6',
-                                color: '#1E40AF',
+                                background: '#FEF3C7',
+                                border: '1.5px solid #F59E0B',
+                                color: '#92400E',
                                 fontWeight: 700,
-                                fontSize: '0.76rem',
+                                fontSize: '0.78rem',
                                 borderRadius: '8px',
                                 cursor: isSubmittingLead ? 'not-allowed' : 'pointer',
                                 whiteSpace: 'normal',
@@ -2448,12 +2449,13 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                gap: '4px',
+                                gap: '5px',
                                 width: '100%',
                                 boxSizing: 'border-box',
+                                boxShadow: '0 2px 4px rgba(245, 158, 11, 0.1)',
                               }}
                             >
-                              🎒 11th Class (1st PU)
+                              🎓 12th Class (2nd PU)
                             </button>
                             <button
                               type="button"
