@@ -1637,7 +1637,6 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
   };
 
   const handleWidgetMaximize = () => {
-    if (isMobile) return;
     if (isEmbedded) {
       window.parent?.postMessage({ type: 'GPUC_CHAT_MAXIMIZE' }, '*');
     }
@@ -1938,30 +1937,28 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                   <RotateCcw size={isMobile ? 13 : 14} />
                 </button>
 
-                {/* Maximize / Restore Button - Only shown on desktop! On mobile screens, assistant is always full screen */}
-                {!isMobile && (
-                  <button
-                    onClick={handleWidgetMaximize}
-                    title={isMaximized ? 'Restore Standard Size' : 'Maximize Assistant'}
-                    aria-label={isMaximized ? 'Restore Standard Size' : 'Maximize Assistant'}
-                    style={{
-                      background: isMaximized ? 'rgba(245, 158, 11, 0.18)' : 'transparent',
-                      border: 'none',
-                      color: isMaximized ? '#FDE68A' : '#94A3B8',
-                      cursor: 'pointer',
-                      padding: '4px',
-                      borderRadius: '6px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      transition: 'all 0.15s ease',
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
-                    onMouseLeave={(e) => (e.currentTarget.style.color = isMaximized ? '#FDE68A' : '#94A3B8')}
-                  >
-                    {isMaximized ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
-                  </button>
-                )}
+                {/* Maximize / Restore Button - Always present */}
+                <button
+                  onClick={handleWidgetMaximize}
+                  title={isMaximized ? 'Restore Standard Size' : 'Maximize Assistant'}
+                  aria-label={isMaximized ? 'Restore Standard Size' : 'Maximize Assistant'}
+                  style={{
+                    background: isMaximized ? 'rgba(245, 158, 11, 0.22)' : 'transparent',
+                    border: isMaximized ? '1px solid rgba(245, 158, 11, 0.55)' : 'none',
+                    color: isMaximized ? '#FDE68A' : '#94A3B8',
+                    cursor: 'pointer',
+                    padding: isMobile ? '3px 4px' : '4px',
+                    borderRadius: '6px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'all 0.15s ease',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = isMaximized ? '#FDE68A' : '#94A3B8')}
+                >
+                  {isMaximized ? <Minimize2 size={isMobile ? 13 : 14} /> : <Maximize2 size={isMobile ? 13 : 14} />}
+                </button>
 
                 {/* Minimize to circular launcher */}
                 <button
@@ -2290,7 +2287,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                             <div style={{ position: 'relative', flex: 1, minWidth: 0 }}>
                               <input
                                 type="text"
-                                className="form-step-input"
+                                className="form-step-input has-left-icon"
                                 value={stepStudentName}
                                 onChange={(e) => {
                                   const val = e.target.value;
@@ -2307,7 +2304,8 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                 style={{
                                   width: '100%',
                                   boxSizing: 'border-box',
-                                  padding: isMobile ? '6px 8px 6px 28px' : '8px 12px 8px 34px',
+                                  padding: isMobile ? '6px 8px 6px 34px' : '8px 12px 8px 36px',
+                                  paddingLeft: isMobile ? '34px' : '36px',
                                   background: '#F8FAFC',
                                   border: '1px solid #CBD5E1',
                                   borderRadius: isMobile ? '7px' : '8px',
@@ -2316,7 +2314,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                   outline: 'none',
                                 }}
                               />
-                              <User size={isMobile ? 13 : 15} color="#64748B" style={{ position: 'absolute', left: isMobile ? '8px' : '10px', top: '50%', transform: 'translateY(-50%)' }} />
+                              <User size={isMobile ? 14 : 15} color="#64748B" style={{ position: 'absolute', left: isMobile ? '10px' : '11px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
                             </div>
                             <button
                               type="button"
@@ -2401,7 +2399,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                 <input
                                   ref={parentInputRef}
                                   type="text"
-                                  className="form-step-input"
+                                  className="form-step-input has-left-icon"
                                   value={stepParentName}
                                   autoFocus
                                   onChange={(e) => {
@@ -2423,7 +2421,8 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                   style={{
                                     width: '100%',
                                     boxSizing: 'border-box',
-                                    padding: isMobile ? '5px 8px 5px 28px' : '7px 10px 7px 32px',
+                                    padding: isMobile ? '5px 8px 5px 34px' : '7px 10px 7px 36px',
+                                    paddingLeft: isMobile ? '34px' : '36px',
                                     background: '#F8FAFC',
                                     border: '1px solid #CBD5E1',
                                     borderRadius: isMobile ? '7px' : '8px',
@@ -2432,7 +2431,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                     outline: 'none',
                                   }}
                                 />
-                                <Users size={13} color="#64748B" style={{ position: 'absolute', left: isMobile ? '8px' : '10px', top: '50%', transform: 'translateY(-50%)' }} />
+                                <Users size={isMobile ? 14 : 15} color="#64748B" style={{ position: 'absolute', left: isMobile ? '10px' : '11px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
                               </div>
                             </div>
 
@@ -2507,7 +2506,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                 <input
                                   ref={locationInputRef}
                                   type="text"
-                                  className="form-step-input"
+                                  className="form-step-input has-left-icon"
                                   value={stepLocation}
                                   onChange={(e) => setStepLocation(e.target.value)}
                                   onKeyDown={(e) => {
@@ -2520,7 +2519,8 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                   style={{
                                     width: '100%',
                                     boxSizing: 'border-box',
-                                    padding: isMobile ? '5px 8px 5px 28px' : '7px 10px 7px 32px',
+                                    padding: isMobile ? '5px 8px 5px 34px' : '7px 10px 7px 36px',
+                                    paddingLeft: isMobile ? '34px' : '36px',
                                     background: '#F8FAFC',
                                     border: '1px solid #CBD5E1',
                                     borderRadius: isMobile ? '7px' : '8px',
@@ -2529,7 +2529,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                     outline: 'none',
                                   }}
                                 />
-                                <MapPin size={13} color="#64748B" style={{ position: 'absolute', left: isMobile ? '8px' : '10px', top: '50%', transform: 'translateY(-50%)' }} />
+                                <MapPin size={isMobile ? 14 : 15} color="#64748B" style={{ position: 'absolute', left: isMobile ? '10px' : '11px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
                               </div>
                             </div>
 
