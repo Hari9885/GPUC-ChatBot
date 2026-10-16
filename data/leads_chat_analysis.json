@@ -1,5 +1,59 @@
 [
   {
+    "analysisId": "ANL-2026-1035",
+    "inquiryId": "GPUC-2026-INQ-1035",
+    "timestamp": "2026-10-16T08:45:39.185Z",
+    "studentName": "ertyuio",
+    "parentName": "trew",
+    "mobile": "8123456789",
+    "location": "ertyui, 56789",
+    "admissionClass": "12th Class (2nd PU) / 11th Class",
+    "totalQueries": 1,
+    "queries": [
+      {
+        "query": "What is the admission process for academic year 2026-2027 at North Campus?",
+        "timestamp": "2026-10-16T08:41:25.208Z"
+      }
+    ],
+    "leadSource": "onboarding_step_2"
+  },
+  {
+    "analysisId": "ANL-2026-1034",
+    "inquiryId": "GPUC-2026-INQ-1034",
+    "timestamp": "2026-10-16T08:39:51.556Z",
+    "studentName": "9899009900",
+    "parentName": "haru",
+    "mobile": "989765432121111",
+    "location": "560066",
+    "admissionClass": "12th Class (2nd PU) / 11th Class",
+    "totalQueries": 1,
+    "queries": [
+      {
+        "query": "What Commerce combinations are offered at Gopalan PU College North Campus?",
+        "timestamp": "2026-10-16T08:38:03.824Z"
+      }
+    ],
+    "leadSource": "onboarding_step_2"
+  },
+  {
+    "analysisId": "ANL-2026-1033",
+    "inquiryId": "GPUC-2026-INQ-1033",
+    "timestamp": "2026-10-16T06:31:44.935Z",
+    "studentName": "qwertyuiop",
+    "parentName": "wertyuiop[",
+    "mobile": "91234567890",
+    "location": "5456776",
+    "admissionClass": "12th Class (2nd PU) / 11th Class",
+    "totalQueries": 1,
+    "queries": [
+      {
+        "query": "What is the admission process for academic year 2026-2027 at North Campus?",
+        "timestamp": "2026-10-16T06:31:22.675Z"
+      }
+    ],
+    "leadSource": "onboarding_step_2"
+  },
+  {
     "analysisId": "ANL-2026-1032",
     "inquiryId": "GPUC-2026-INQ-1032",
     "timestamp": "2026-10-16T06:05:25.155Z",

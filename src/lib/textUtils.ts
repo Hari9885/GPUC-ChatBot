@@ -38,6 +38,11 @@ export function enforceMaxThreeLines(text: string): string {
   return formatPhoneNumbers(rawLines.slice(0, 3).join('\n\n'));
 }
 
+export function getTodayDateString(): string {
+  const today = new Date();
+  return today.toISOString().split('T')[0];
+}
+
 export function getTomorrowDateString(): string {
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
@@ -46,6 +51,107 @@ export function getTomorrowDateString(): string {
     tomorrow.setDate(tomorrow.getDate() + 1);
   }
   return tomorrow.toISOString().split('T')[0];
+}
+
+export interface AvailableWorkingDay {
+  dateStr: string;
+  dayName: string;
+  dateFormatted: string;
+  displayLabel: string;
+  shortDate: string;
+  isToday: boolean;
+}
+
+export function getAvailableWorkingDays(): AvailableWorkingDay[] {
+  const days: AvailableWorkingDay[] = [];
+  const today = new Date();
+
+  // Gather up to 7 working days, starting from today (on the left corner)
+  // Saturday and Sunday are off and NOT included
+  for (let d = 0; d <= 14 && days.length < 7; d++) {
+    const target = new Date(today);
+    target.setDate(today.getDate() + d);
+
+    // Skip Saturday (6) and Sunday (0)
+    const dayOfWeek = target.getDay();
+    if (dayOfWeek === 0 || dayOfWeek === 6) continue;
+
+    const dateStr = target.toISOString().split('T')[0];
+    const dayNameRaw = target.toLocaleDateString('en-US', { weekday: 'short' });
+    const dayName = `${dayNameRaw}.`;
+    const dayNum = String(target.getDate()).padStart(2, '0');
+    const monthNum = String(target.getMonth() + 1).padStart(2, '0');
+    const dateFormatted = `${dayNum}/${monthNum}`;
+    const monthName = target.toLocaleDateString('en-US', { month: 'short' });
+
+    const isToday = d === 0;
+    const displayLabel = isToday
+      ? `Today (${dayNameRaw}, ${target.getDate()} ${monthName})`
+      : `${dayNameRaw}, ${target.getDate()} ${monthName}`;
+
+    days.push({
+      dateStr,
+      dayName,
+      dateFormatted,
+      displayLabel,
+      shortDate: `${target.getDate()} ${monthName}`,
+      isToday,
+    });
+  }
+
+  return days;
+}
+
+export function validatePersonName(raw: string): { valid: boolean; cleanName: string; error?: string } {
+  const trimmed = (raw || '').trim();
+  if (!trimmed) {
+    return { valid: false, cleanName: '', error: 'Name cannot be empty.' };
+  }
+  if (/\d/.test(trimmed)) {
+    return { valid: false, cleanName: trimmed, error: 'Name must contain only letters (no numbers).' };
+  }
+  if (!/^[a-zA-Z\s.'-]+$/.test(trimmed)) {
+    return { valid: false, cleanName: trimmed, error: 'Name must contain only letters.' };
+  }
+  const letterCount = trimmed.replace(/[^a-zA-Z]/g, '').length;
+  if (letterCount < 2) {
+    return { valid: false, cleanName: trimmed, error: 'Please enter a valid name (at least 2 letters).' };
+  }
+  return { valid: true, cleanName: trimmed };
+}
+
+export function validateIndianMobile(raw: string): { valid: boolean; cleanDigits: string; formatted: string; error?: string } {
+  const digits = (raw || '').replace(/\D/g, '');
+  let clean = digits;
+  if (clean.length === 12 && clean.startsWith('91')) {
+    clean = clean.slice(2);
+  } else if (clean.length === 11 && clean.startsWith('0')) {
+    clean = clean.slice(1);
+  }
+
+  if (clean.length !== 10) {
+    return {
+      valid: false,
+      cleanDigits: clean,
+      formatted: `+91 ${clean}`,
+      error: 'Please enter a valid 10-digit mobile number.',
+    };
+  }
+
+  if (!/^[6-9]/.test(clean)) {
+    return {
+      valid: false,
+      cleanDigits: clean,
+      formatted: `+91 ${clean}`,
+      error: 'Mobile number must start with 6, 7, 8, or 9 (e.g. 6362xxxxxx, 7372xxxxxx). Numbers starting with 5, 4, 3, etc. are not accepted.',
+    };
+  }
+
+  return {
+    valid: true,
+    cleanDigits: clean,
+    formatted: `+91 ${clean}`,
+  };
 }
 
 export const INCOMPREHENSIBLE_RESPONSE =

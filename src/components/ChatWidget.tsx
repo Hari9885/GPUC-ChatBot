@@ -33,6 +33,11 @@ import {
   enforceMaxThreeLines,
   formatPhoneNumbers,
   getTomorrowDateString,
+  getTodayDateString,
+  validatePersonName,
+  validateIndianMobile,
+  getAvailableWorkingDays,
+  type AvailableWorkingDay,
   isNonsenseOrIncomprehensible,
   INCOMPREHENSIBLE_RESPONSE,
 } from '@/lib/textUtils';
@@ -331,6 +336,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
   const [customSlotDate, setCustomSlotDate] = useState('');
   const [customSlotTime, setCustomSlotTime] = useState('10:00 AM');
   const [next3DaysList, setNext3DaysList] = useState<Array<{ dateStr: string; displayLabel: string; shortDate: string }>>([]);
+  const [workingDaysList, setWorkingDaysList] = useState<AvailableWorkingDay[]>([]);
   const [selectedSlotDate, setSelectedSlotDate] = useState('');
   const [availableSlotsList, setAvailableSlotsList] = useState<Array<{ id?: string; date: string; time: string; department: string }>>([]);
   const [allOpenSlots, setAllOpenSlots] = useState<Array<{ id?: string; date: string; time: string; department: string }>>([]);
@@ -516,11 +522,13 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
 
   // Step 1: Submit Student Name (with 1.5s bouncing dots)
   const handleStudentNameSubmit = (nameVal?: string) => {
-    const name = (nameVal !== undefined ? nameVal : stepStudentName).trim();
-    if (!name) {
-      setStepError('Please enter the name of the student.');
+    const raw = (nameVal !== undefined ? nameVal : stepStudentName).trim();
+    const valResult = validatePersonName(raw);
+    if (!valResult.valid) {
+      setStepError(valResult.error || 'Student name must contain only letters (no numbers).');
       return;
     }
+    const name = valResult.cleanName;
     setStepError('');
     setLeadStudentName(name);
     setStepStudentName('');
@@ -543,19 +551,32 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
 
   // Step 2: Submit Parent Name, Mobile Number & Location (with 1.5s bouncing dots)
   const handleContactSubmit = (parentVal?: string, mobVal?: string, locVal?: string) => {
-    const parent = (parentVal !== undefined ? parentVal : stepParentName).trim();
-    let mob = (mobVal !== undefined ? mobVal : stepMobile).trim();
+    const parentRaw = (parentVal !== undefined ? parentVal : stepParentName).trim();
+    let mobRaw = (mobVal !== undefined ? mobVal : stepMobile).trim();
     const loc = (locVal !== undefined ? locVal : stepLocation).trim();
 
-    const cleanDigits = mob.replace(/\D/g, '');
-    if (cleanDigits.length < 10) {
-      setStepError('Please enter a valid 10-digit mobile number.');
+    let cleanParent = '';
+    if (parentRaw) {
+      const parentValResult = validatePersonName(parentRaw);
+      if (!parentValResult.valid) {
+        setStepError(parentValResult.error || 'Parent name must contain only letters (no numbers).');
+        parentInputRef.current?.focus();
+        return;
+      }
+      cleanParent = parentValResult.cleanName;
+    }
+
+    const mobValResult = validateIndianMobile(mobRaw);
+    if (!mobValResult.valid) {
+      setStepError(mobValResult.error || 'Mobile number must start with 6, 7, 8, or 9 (e.g. 6362xxxxxx, 7372xxxxxx).');
       mobileInputRef.current?.focus();
       return;
     }
+    const cleanMob = mobValResult.formatted;
+
     setStepError('');
-    setLeadParentName(parent);
-    setLeadMobile(mob);
+    setLeadParentName(cleanParent);
+    setLeadMobile(cleanMob);
     setLeadLocation(loc);
     setStepParentName('');
     setStepMobile('');
@@ -567,8 +588,8 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         studentName: leadStudentName,
-        parentName: parent,
-        mobile: mob,
+        parentName: cleanParent,
+        mobile: cleanMob,
         location: loc,
         admissionClass: '12th Class (2nd PU) / 11th Class',
         inquiryType: 'Admissions 2026-27',
@@ -585,8 +606,8 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
           setUserLead({
             inquiryId: data.inquiry.id,
             studentName: leadStudentName,
-            parentName: parent,
-            mobile: mob,
+            parentName: cleanParent,
+            mobile: cleanMob,
             location: loc,
             admissionClass: '12th Class (2nd PU) / 11th Class',
             inquiryType: 'Admissions 2026-27',
@@ -596,8 +617,8 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
       .catch((err) => console.error('Early lead submit error:', err));
 
     const displayParts: string[] = [];
-    if (parent) displayParts.push(`Parent: ${parent}`);
-    displayParts.push(`Mobile: ${mob}`);
+    if (cleanParent) displayParts.push(`Parent: ${cleanParent}`);
+    displayParts.push(`Mobile: ${cleanMob}`);
     if (loc) displayParts.push(`Location: ${loc}`);
     const displayUserText = displayParts.join(' • ');
 
@@ -737,16 +758,25 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
 
   // Proactive 4th-Query Immediate Callback Submission
   const handleProactiveCallbackSubmit = async () => {
-    const mob = proactiveMobile.trim();
-    const cleanDigits = mob.replace(/\D/g, '');
-    if (cleanDigits.length < 10) {
-      setProactiveError('Please enter a valid 10-digit mobile number.');
+    const mobVal = validateIndianMobile(proactiveMobile);
+    if (!mobVal.valid) {
+      setProactiveError(mobVal.error || 'Mobile number must start with 6, 7, 8, or 9 (e.g. 6362xxxxxx, 7372xxxxxx).');
       return;
     }
+    const mob = mobVal.formatted;
+
+    let name = (proactiveName || leadStudentName || 'Prospective Student').trim();
+    if (proactiveName.trim()) {
+      const nameVal = validatePersonName(proactiveName);
+      if (!nameVal.valid) {
+        setProactiveError(nameVal.error || 'Name must contain only letters (no numbers).');
+        return;
+      }
+      name = nameVal.cleanName;
+    }
+
     setProactiveError('');
     setProactiveSubmitting(true);
-
-    const name = proactiveName.trim() || leadStudentName || 'Prospective Student';
 
     try {
       const res = await fetch('/api/inquiries', {
@@ -795,16 +825,26 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
 
   // Proactive 4th-Query Consultation Slot Submission
   const handleProactiveScheduleSubmit = async () => {
-    const mob = proactiveMobile.trim();
-    const cleanDigits = mob.replace(/\D/g, '');
-    if (cleanDigits.length < 10) {
-      setProactiveError('Please enter a valid 10-digit mobile number.');
+    const mobVal = validateIndianMobile(proactiveMobile);
+    if (!mobVal.valid) {
+      setProactiveError(mobVal.error || 'Mobile number must start with 6, 7, 8, or 9 (e.g. 6362xxxxxx, 7372xxxxxx).');
       return;
     }
+    const mob = mobVal.formatted;
+
+    let name = (proactiveName || leadStudentName || 'Prospective Student').trim();
+    if (proactiveName.trim()) {
+      const nameVal = validatePersonName(proactiveName);
+      if (!nameVal.valid) {
+        setProactiveError(nameVal.error || 'Name must contain only letters (no numbers).');
+        return;
+      }
+      name = nameVal.cleanName;
+    }
+
     setProactiveError('');
     setProactiveSubmitting(true);
 
-    const name = proactiveName.trim() || leadStudentName || 'Prospective Student';
     const chosenSlot = proactiveSelectedSlot || '10:00 AM (Morning)';
 
     try {
@@ -960,14 +1000,14 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
     }
   };
 
-  // Online Meeting: Show available slots for the next 3 days with date dropdown and 20-min slots
+  // Online Meeting: Show available slots for working days with horizontal date cards and 20-min slots
   const handleInitiateOnlineMeeting = async () => {
     const userMsg: Message = { role: 'user', content: 'Request an Online Meeting' };
     setMessages((prev) => [...prev, userMsg]);
     setIsTyping(true);
     setLoading(true);
 
-    let days: Array<{ dateStr: string; displayLabel: string; shortDate: string }> = [];
+    let days: AvailableWorkingDay[] = [];
     let defDate = '';
     let openSlots: Array<{ id?: string; date: string; time: string; department: string }> = [];
     let allSlots: Array<{ id?: string; date: string; time: string; department: string }> = [];
@@ -975,16 +1015,18 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
     try {
       const res = await fetch('/api/appointments');
       const data = await res.json();
-      days = data.next3Days || [];
-      defDate = data.defaultDate || days[0]?.dateStr || getTomorrowDateString();
+      days = data.workingDays && data.workingDays.length > 0 ? data.workingDays : getAvailableWorkingDays();
+      defDate = data.defaultDate || days[0]?.dateStr || getTodayDateString();
       openSlots = data.availableSlotsForDate || [];
       allSlots = data.availableSlots || [];
     } catch (err) {
       console.error('Failed to load slots:', err);
-      defDate = getTomorrowDateString();
+      days = getAvailableWorkingDays();
+      defDate = days[0]?.dateStr || getTodayDateString();
     }
 
-    setNext3DaysList(days);
+    setWorkingDaysList(days);
+    setNext3DaysList(days.slice(0, 3));
     setSelectedSlotDate(defDate);
     setCustomSlotDate(defDate);
     setAvailableSlotsList(openSlots);
@@ -993,7 +1035,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
 
     await new Promise((res) => setTimeout(res, 600));
 
-    const replyContent = `Please select your preferred date (next 3 days) and tap an available 20-minute consultation slot with our Admissions team:`;
+    const replyContent = `Please select your preferred date and tap an available 20-minute consultation slot with our Admissions team:`;
 
     setMessages((prev) => [
       ...prev,
@@ -2184,11 +2226,12 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                 type="text"
                                 value={stepStudentName}
                                 onChange={(e) => {
-                                  setStepStudentName(e.target.value);
+                                  const filtered = e.target.value.replace(/[^a-zA-Z\s.'-]/g, '');
+                                  setStepStudentName(filtered);
                                   if (stepError) setStepError('');
                                 }}
                                 onKeyDown={(e) => e.key === 'Enter' && handleStudentNameSubmit()}
-                                placeholder="Enter student's full name"
+                                placeholder="Enter student's full name (letters only)"
                                 autoFocus
                                 style={{
                                   width: '100%',
@@ -2225,6 +2268,9 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                             >
                               Next <ArrowRight size={14} />
                             </button>
+                          </div>
+                          <div style={{ fontSize: '0.67rem', color: '#64748B', marginTop: '4px' }}>
+                            Only letters accepted (no numbers)
                           </div>
                         </div>
                       )}
@@ -2280,7 +2326,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                             {/* 1. Parent / Guardian Name (with autoFocus) */}
                             <div>
                               <div style={{ fontSize: '0.72rem', fontWeight: 600, color: '#334155', marginBottom: '2px' }}>
-                                Parent / Guardian Name <span style={{ color: '#94A3B8', fontWeight: 400 }}>(Optional)</span>
+                                Parent / Guardian Name <span style={{ color: '#94A3B8', fontWeight: 400 }}>(Optional - letters only)</span>
                               </div>
                               <div style={{ position: 'relative' }}>
                                 <input
@@ -2288,14 +2334,18 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                   type="text"
                                   value={stepParentName}
                                   autoFocus
-                                  onChange={(e) => setStepParentName(e.target.value)}
+                                  onChange={(e) => {
+                                    const filtered = e.target.value.replace(/[^a-zA-Z\s.'-]/g, '');
+                                    setStepParentName(filtered);
+                                    if (stepError) setStepError('');
+                                  }}
                                   onKeyDown={(e) => {
                                     if (e.key === 'Enter') {
                                       e.preventDefault();
                                       mobileInputRef.current?.focus();
                                     }
                                   }}
-                                  placeholder="Enter parent or guardian full name"
+                                  placeholder="Enter parent or guardian name"
                                   style={{
                                     width: '100%',
                                     boxSizing: 'border-box',
@@ -2317,14 +2367,34 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                               <div style={{ fontSize: '0.72rem', fontWeight: 600, color: '#334155', marginBottom: '2px' }}>
                                 Mobile Number <span style={{ color: '#D97706', fontSize: '0.68rem', fontWeight: 600 }}>(Required)</span>
                               </div>
-                              <div style={{ position: 'relative' }}>
+                              <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <span
+                                  style={{
+                                    padding: '7px 9px',
+                                    background: '#F1F5F9',
+                                    border: '1px solid #CBD5E1',
+                                    borderRight: 'none',
+                                    borderRadius: '8px 0 0 8px',
+                                    fontSize: '0.82rem',
+                                    fontWeight: 700,
+                                    color: '#334155',
+                                    userSelect: 'none',
+                                    whiteSpace: 'nowrap',
+                                  }}
+                                >
+                                  +91
+                                </span>
                                 <input
                                   ref={mobileInputRef}
                                   type="tel"
                                   value={stepMobile}
-                                  maxLength={15}
+                                  maxLength={10}
                                   onChange={(e) => {
-                                    setStepMobile(e.target.value);
+                                    let val = e.target.value.replace(/\D/g, '');
+                                    if (val.startsWith('91') && val.length > 10) val = val.slice(2);
+                                    if (val.startsWith('0')) val = val.slice(1);
+                                    val = val.slice(0, 10);
+                                    setStepMobile(val);
                                     if (stepError) setStepError('');
                                   }}
                                   onKeyDown={(e) => {
@@ -2333,20 +2403,23 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                       locationInputRef.current?.focus();
                                     }
                                   }}
-                                  placeholder="10-digit mobile number"
+                                  placeholder="e.g. 6362xxxxxx / 7372xxxxxx"
                                   style={{
-                                    width: '100%',
+                                    flex: 1,
+                                    minWidth: 0,
                                     boxSizing: 'border-box',
-                                    padding: '7px 10px 7px 32px',
+                                    padding: '7px 10px',
                                     background: '#F8FAFC',
                                     border: '1px solid #CBD5E1',
-                                    borderRadius: '8px',
+                                    borderRadius: '0 8px 8px 0',
                                     color: '#0F172A',
                                     fontSize: '0.82rem',
                                     outline: 'none',
                                   }}
                                 />
-                                <Phone size={14} color="#64748B" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }} />
+                              </div>
+                              <div style={{ fontSize: '0.66rem', color: '#64748B', marginTop: '2px' }}>
+                                Default +91 • Must start with 6, 7, 8, or 9
                               </div>
                             </div>
 
@@ -2722,44 +2795,100 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                           </div>
 
                           <div style={{ fontSize: '0.72rem', color: '#475569', marginBottom: '10px' }}>
-                            Select your date from the next 3 days and tap any available 20-minute consultation window to confirm your booking:
+                            Select your date and tap an available 20-minute consultation window to confirm your booking:
                           </div>
 
-                          {/* Date Selector Dropdown (Up to 3 Days Ahead) */}
-                          <div style={{ marginBottom: '10px' }}>
-                            <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>
-                              📅 Select Date (Next 3 Days):
-                            </label>
-                            <select
-                              value={selectedSlotDate || customSlotDate || (next3DaysList[0]?.dateStr || getTomorrowDateString())}
-                              onChange={(e) => handleSlotDateChange(e.target.value)}
-                              disabled={loading || isTyping || loadingSlots}
+                          {/* Date Selector: Horizontal Day Cards (Up to 7 Working Days, Today on Leftmost, Sat & Sun Off) */}
+                          <div style={{ marginBottom: '12px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                              <label style={{ fontSize: '0.72rem', fontWeight: 700, color: '#1E3A8A', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <Calendar size={13} color="#2563EB" /> Select Date (Working Days):
+                              </label>
+                              <span style={{ fontSize: '0.66rem', color: '#64748B', fontWeight: 500 }}>
+                                Sat &amp; Sun Off
+                              </span>
+                            </div>
+
+                            <div
                               style={{
-                                width: '100%',
-                                boxSizing: 'border-box',
-                                padding: '8px 10px',
-                                borderRadius: '8px',
-                                border: '1.5px solid #93C5FD',
-                                fontSize: '0.8rem',
-                                fontWeight: 600,
-                                color: '#0F172A',
-                                background: '#F0F9FF',
-                                outline: 'none',
-                                cursor: 'pointer',
+                                display: 'flex',
+                                gap: '6px',
+                                overflowX: 'auto',
+                                paddingBottom: '6px',
+                                scrollbarWidth: 'thin',
+                                WebkitOverflowScrolling: 'touch',
                               }}
                             >
-                              {next3DaysList.length > 0 ? (
-                                next3DaysList.map((day) => (
-                                  <option key={day.dateStr} value={day.dateStr}>
-                                    {day.displayLabel}
-                                  </option>
-                                ))
-                              ) : (
-                                <option value={selectedSlotDate || getTomorrowDateString()}>
-                                  {selectedSlotDate || getTomorrowDateString()}
-                                </option>
-                              )}
-                            </select>
+                              {(workingDaysList.length > 0 ? workingDaysList : getAvailableWorkingDays()).map((day) => {
+                                const isSelected = (selectedSlotDate || customSlotDate) === day.dateStr;
+                                return (
+                                  <button
+                                    key={day.dateStr}
+                                    type="button"
+                                    disabled={loading || isTyping || loadingSlots}
+                                    onClick={() => handleSlotDateChange(day.dateStr)}
+                                    style={{
+                                      flex: '0 0 auto',
+                                      minWidth: '58px',
+                                      padding: '7px 8px',
+                                      borderRadius: '10px',
+                                      border: isSelected ? '1.5px solid #2563EB' : '1px solid #CBD5E1',
+                                      background: isSelected
+                                        ? 'linear-gradient(135deg, #2563EB, #1D4ED8)'
+                                        : '#F8FAFC',
+                                      color: isSelected ? '#FFFFFF' : '#1E293B',
+                                      cursor: 'pointer',
+                                      display: 'flex',
+                                      flexDirection: 'column',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      boxShadow: isSelected
+                                        ? '0 2px 8px rgba(37, 99, 235, 0.35)'
+                                        : '0 1px 2px rgba(0, 0, 0, 0.04)',
+                                      transition: 'all 0.15s ease',
+                                    }}
+                                  >
+                                    {day.isToday && (
+                                      <span
+                                        style={{
+                                          fontSize: '0.58rem',
+                                          fontWeight: 800,
+                                          textTransform: 'uppercase',
+                                          padding: '1px 5px',
+                                          borderRadius: '999px',
+                                          marginBottom: '3px',
+                                          background: isSelected ? 'rgba(255, 255, 255, 0.25)' : '#DBEAFE',
+                                          color: isSelected ? '#FFFFFF' : '#1E40AF',
+                                          letterSpacing: '0.3px',
+                                        }}
+                                      >
+                                        Today
+                                      </span>
+                                    )}
+                                    <span
+                                      style={{
+                                        fontSize: '0.78rem',
+                                        fontWeight: 800,
+                                        lineHeight: 1.1,
+                                        color: isSelected ? '#FFFFFF' : '#0F172A',
+                                      }}
+                                    >
+                                      {day.dayName}
+                                    </span>
+                                    <span
+                                      style={{
+                                        fontSize: '0.72rem',
+                                        fontWeight: 600,
+                                        marginTop: '3px',
+                                        color: isSelected ? '#DBEAFE' : '#64748B',
+                                      }}
+                                    >
+                                      {day.dateFormatted}
+                                    </span>
+                                  </button>
+                                );
+                              })}
+                            </div>
                           </div>
 
                           {/* Available 20-Min Time Slots Section */}
@@ -3146,8 +3275,8 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                               <input
                                 type="text"
                                 value={proactiveName}
-                                onChange={(e) => setProactiveName(e.target.value)}
-                                placeholder="Student / Parent Name"
+                                onChange={(e) => setProactiveName(e.target.value.replace(/[^a-zA-Z\s.'-]/g, ''))}
+                                placeholder="Student / Parent Name (letters only)"
                                 style={{
                                   padding: '7px 10px',
                                   borderRadius: '6px',
@@ -3159,26 +3288,49 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                 }}
                               />
 
-                              <input
-                                type="tel"
-                                maxLength={15}
-                                value={proactiveMobile}
-                                onChange={(e) => {
-                                  setProactiveMobile(e.target.value);
-                                  if (proactiveError) setProactiveError('');
-                                }}
-                                placeholder="10-digit Mobile Number *"
-                                style={{
-                                  padding: '7px 10px',
-                                  borderRadius: '6px',
-                                  border: '1.5px solid #F59E0B',
-                                  fontSize: '0.82rem',
-                                  background: '#FFFFFF',
-                                  color: '#0F172A',
-                                  fontWeight: 600,
-                                  outline: 'none',
-                                }}
-                              />
+                              <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <span
+                                  style={{
+                                    padding: '7px 8px',
+                                    background: '#F1F5F9',
+                                    border: '1px solid #F59E0B',
+                                    borderRight: 'none',
+                                    borderRadius: '6px 0 0 6px',
+                                    fontSize: '0.80rem',
+                                    fontWeight: 700,
+                                    color: '#334155',
+                                    userSelect: 'none',
+                                  }}
+                                >
+                                  +91
+                                </span>
+                                <input
+                                  type="tel"
+                                  maxLength={10}
+                                  value={proactiveMobile}
+                                  onChange={(e) => {
+                                    let val = e.target.value.replace(/\D/g, '');
+                                    if (val.startsWith('91') && val.length > 10) val = val.slice(2);
+                                    if (val.startsWith('0')) val = val.slice(1);
+                                    val = val.slice(0, 10);
+                                    setProactiveMobile(val);
+                                    if (proactiveError) setProactiveError('');
+                                  }}
+                                  placeholder="e.g. 6362xxxxxx / 7372xxxxxx"
+                                  style={{
+                                    flex: 1,
+                                    minWidth: 0,
+                                    padding: '7px 10px',
+                                    borderRadius: '0 6px 6px 0',
+                                    border: '1.5px solid #F59E0B',
+                                    fontSize: '0.82rem',
+                                    background: '#FFFFFF',
+                                    color: '#0F172A',
+                                    fontWeight: 600,
+                                    outline: 'none',
+                                  }}
+                                />
+                              </div>
 
                               <div style={{ display: 'flex', gap: '6px', marginTop: '2px' }}>
                                 <button
@@ -3238,8 +3390,8 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                               <input
                                 type="text"
                                 value={proactiveName}
-                                onChange={(e) => setProactiveName(e.target.value)}
-                                placeholder="Student / Parent Name"
+                                onChange={(e) => setProactiveName(e.target.value.replace(/[^a-zA-Z\s.'-]/g, ''))}
+                                placeholder="Student / Parent Name (letters only)"
                                 style={{
                                   padding: '7px 10px',
                                   borderRadius: '6px',
@@ -3251,26 +3403,49 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                 }}
                               />
 
-                              <input
-                                type="tel"
-                                maxLength={15}
-                                value={proactiveMobile}
-                                onChange={(e) => {
-                                  setProactiveMobile(e.target.value);
-                                  if (proactiveError) setProactiveError('');
-                                }}
-                                placeholder="10-digit Mobile Number *"
-                                style={{
-                                  padding: '7px 10px',
-                                  borderRadius: '6px',
-                                  border: '1.5px solid #F59E0B',
-                                  fontSize: '0.82rem',
-                                  background: '#FFFFFF',
-                                  color: '#0F172A',
-                                  fontWeight: 600,
-                                  outline: 'none',
-                                }}
-                              />
+                              <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <span
+                                  style={{
+                                    padding: '7px 8px',
+                                    background: '#F1F5F9',
+                                    border: '1.5px solid #F59E0B',
+                                    borderRight: 'none',
+                                    borderRadius: '6px 0 0 6px',
+                                    fontSize: '0.80rem',
+                                    fontWeight: 700,
+                                    color: '#334155',
+                                    userSelect: 'none',
+                                  }}
+                                >
+                                  +91
+                                </span>
+                                <input
+                                  type="tel"
+                                  maxLength={10}
+                                  value={proactiveMobile}
+                                  onChange={(e) => {
+                                    let val = e.target.value.replace(/\D/g, '');
+                                    if (val.startsWith('91') && val.length > 10) val = val.slice(2);
+                                    if (val.startsWith('0')) val = val.slice(1);
+                                    val = val.slice(0, 10);
+                                    setProactiveMobile(val);
+                                    if (proactiveError) setProactiveError('');
+                                  }}
+                                  placeholder="e.g. 6362xxxxxx / 7372xxxxxx"
+                                  style={{
+                                    flex: 1,
+                                    minWidth: 0,
+                                    padding: '7px 10px',
+                                    borderRadius: '0 6px 6px 0',
+                                    border: '1.5px solid #F59E0B',
+                                    fontSize: '0.82rem',
+                                    background: '#FFFFFF',
+                                    color: '#0F172A',
+                                    fontWeight: 600,
+                                    outline: 'none',
+                                  }}
+                                />
+                              </div>
 
                               <div style={{ fontSize: '0.70rem', color: '#78350F', fontWeight: 700 }}>
                                 Available Consultation Window:

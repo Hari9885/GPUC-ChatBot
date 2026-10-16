@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readDB, writeDB, Inquiry, writeAnalysisDB, UserQueryLog } from '@/lib/db';
+import { validatePersonName, validateIndianMobile } from '@/lib/textUtils';
 
 export async function GET(req: NextRequest) {
   try {
@@ -58,20 +59,30 @@ export async function POST(req: NextRequest) {
     const rawMobile = (mobile || '').trim();
 
     // Minimum requirement validation: Student Name and Mobile
-    if (!rawName) {
-      return NextResponse.json({ error: 'Student name is required' }, { status: 400 });
+    const studentVal = validatePersonName(rawName);
+    if (!studentVal.valid) {
+      return NextResponse.json({ error: studentVal.error || 'Student name must contain only letters (no numbers).' }, { status: 400 });
     }
-    if (!rawMobile || rawMobile.replace(/\D/g, '').length < 8) {
-      return NextResponse.json({ error: 'Valid mobile number is required' }, { status: 400 });
+
+    const finalParent = (parentName || '').trim();
+    if (finalParent) {
+      const parentVal = validatePersonName(finalParent);
+      if (!parentVal.valid) {
+        return NextResponse.json({ error: parentVal.error || 'Parent name must contain only letters (no numbers).' }, { status: 400 });
+      }
+    }
+
+    const mobileVal = validateIndianMobile(rawMobile);
+    if (!mobileVal.valid) {
+      return NextResponse.json({ error: mobileVal.error || 'Mobile number must start with 6, 7, 8, or 9 (e.g. 6362xxxxxx, 7372xxxxxx).' }, { status: 400 });
     }
 
     const db = readDB();
     const refNum = (1000 + db.inquiries.length + 1).toString();
     const id = `GPUC-2026-INQ-${refNum}`;
 
-    const finalParent = (parentName || '').trim();
     const finalLocation = (location || '').trim();
-    const fullName = finalParent ? `${rawName} (Parent: ${finalParent})` : rawName;
+    const fullName = finalParent ? `${studentVal.cleanName} (Parent: ${finalParent})` : studentVal.cleanName;
     const finalClass = admissionClass || '12th Class (2nd PU) / 11th Class';
     const finalType = inquiryType || 'Admissions';
     const finalTopic = queryTopic || 'College Information';
@@ -138,7 +149,7 @@ export async function POST(req: NextRequest) {
     const newInquiry: Inquiry = {
       id,
       name: fullName,
-      mobile: rawMobile,
+      mobile: mobileVal.formatted,
       parentName: finalParent || undefined,
       location: finalLocation || undefined,
       userType: finalParent ? 'parent' : 'prospective_student',
@@ -146,7 +157,7 @@ export async function POST(req: NextRequest) {
       intendedYear: '2026-2027',
       category,
       preferredContact: 'phone',
-      summary: `Topic: ${finalTopic} | Class: ${finalClass} | Inquiry: ${finalType} | Student: ${rawName}${finalParent ? ` | Parent: ${finalParent}` : ''}${finalLocation ? ` | Location: ${finalLocation}` : ''}${chatNotes ? ` | Note: ${chatNotes}` : ''}`,
+      summary: `Topic: ${finalTopic} | Class: ${finalClass} | Inquiry: ${finalType} | Student: ${studentVal.cleanName}${finalParent ? ` | Parent: ${finalParent}` : ''}${finalLocation ? ` | Location: ${finalLocation}` : ''}${chatNotes ? ` | Note: ${chatNotes}` : ''}`,
       assignedTeam,
       assignedStaff,
       status: 'NEW',

@@ -104,58 +104,30 @@ export const ADMISSION_TIMES = [
   '05:00 PM',
 ];
 
+import { getAvailableWorkingDays, type AvailableWorkingDay } from './textUtils';
+export { getAvailableWorkingDays, type AvailableWorkingDay };
+
 export function getNext3Days(): Array<{ dateStr: string; displayLabel: string; shortDate: string }> {
-  const days: Array<{ dateStr: string; displayLabel: string; shortDate: string }> = [];
-  const today = new Date();
-  let d = 1;
-
-  while (days.length < 3 && d <= 7) {
-    const nextDate = new Date(today);
-    nextDate.setDate(today.getDate() + d);
-    d++;
-    if (nextDate.getDay() === 0) continue; // Skip Sunday
-
-    const dateStr = nextDate.toISOString().split('T')[0];
-    const dayName = nextDate.toLocaleDateString('en-US', { weekday: 'short' });
-    const monthName = nextDate.toLocaleDateString('en-US', { month: 'short' });
-    const dayNum = nextDate.getDate();
-    const isTomorrow = days.length === 0;
-
-    const displayLabel = isTomorrow
-      ? `Tomorrow (${dayName}, ${dayNum} ${monthName})`
-      : `${dayName}, ${dayNum} ${monthName}`;
-
-    const shortDate = `${dayNum} ${monthName}`;
-
-    days.push({ dateStr, displayLabel, shortDate });
-  }
-
-  return days;
+  return getAvailableWorkingDays().slice(0, 3);
 }
 
 function initializeSlots(): TimeSlot[] {
   const slots: TimeSlot[] = [];
-  const today = new Date();
+  const workingDays = getAvailableWorkingDays();
 
-  // Generate slots for the next 7 business days
-  for (let d = 1; d <= 7; d++) {
-    const nextDate = new Date(today);
-    nextDate.setDate(today.getDate() + d);
-    if (nextDate.getDay() === 0) continue; // Skip Sunday
-
-    const dateStr = nextDate.toISOString().split('T')[0];
-
+  workingDays.forEach((day) => {
     ADMISSION_TIMES.forEach((time, idx) => {
       slots.push({
-        id: `slot_${dateStr}_${idx}`,
-        date: dateStr,
+        id: `slot_${day.dateStr}_${idx}`,
+        date: day.dateStr,
         time,
         department: 'Admissions',
         mode: 'all',
         isBooked: false,
       });
     });
-  }
+  });
+
   return slots;
 }
 
@@ -166,29 +138,29 @@ export function ensureSlots(db: DatabaseSchema): boolean {
   }
   let modified = false;
 
-  // Filter out any unbooked legacy slots that do not match the new 20-minute schedule
+  // Filter out any unbooked weekend slots or legacy slots not matching 20-min schedule
   const validTimes = new Set(ADMISSION_TIMES);
-  const filteredSlots = db.slots.filter((s) => s.isBooked || validTimes.has(s.time));
+  const filteredSlots = db.slots.filter((s) => {
+    if (s.isBooked) return true;
+    const d = new Date(s.date);
+    if (d.getDay() === 0 || d.getDay() === 6) return false; // weekends off
+    return validTimes.has(s.time);
+  });
+
   if (filteredSlots.length !== db.slots.length) {
     db.slots = filteredSlots;
     modified = true;
   }
 
-  const today = new Date();
+  const workingDays = getAvailableWorkingDays();
 
-  for (let d = 1; d <= 7; d++) {
-    const nextDate = new Date(today);
-    nextDate.setDate(today.getDate() + d);
-    if (nextDate.getDay() === 0) continue;
-
-    const dateStr = nextDate.toISOString().split('T')[0];
-
+  workingDays.forEach((day) => {
     ADMISSION_TIMES.forEach((time, idx) => {
-      const exists = db.slots.some((s) => s.date === dateStr && s.time === time);
+      const exists = db.slots.some((s) => s.date === day.dateStr && s.time === time);
       if (!exists) {
         db.slots.push({
-          id: `slot_${dateStr}_${idx}`,
-          date: dateStr,
+          id: `slot_${day.dateStr}_${idx}`,
+          date: day.dateStr,
           time,
           department: 'Admissions',
           mode: 'all',
@@ -197,7 +169,8 @@ export function ensureSlots(db: DatabaseSchema): boolean {
         modified = true;
       }
     });
-  }
+  });
+
   return modified;
 }
 

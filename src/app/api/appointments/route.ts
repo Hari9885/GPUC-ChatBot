@@ -3,19 +3,22 @@ import {
   readDB,
   writeDB,
   getTomorrowDateString,
+  getAvailableWorkingDays,
   getNext3Days,
   checkSlotAvailability,
   getNextAvailableSlot,
   bookAppointment,
   normalizeTime,
 } from '@/lib/db';
+import { validatePersonName, validateIndianMobile, getTodayDateString } from '@/lib/textUtils';
 
 export async function GET(req: NextRequest) {
   try {
     const db = readDB();
     const url = new URL(req.url);
-    const next3Days = getNext3Days();
-    const defaultDate = next3Days[0]?.dateStr || getTomorrowDateString();
+    const workingDays = getAvailableWorkingDays();
+    const next3Days = workingDays.slice(0, 3);
+    const defaultDate = workingDays[0]?.dateStr || getTodayDateString();
 
 function parseTimeToMinutes(timeStr: string): number {
   const match = timeStr.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)?$/i);
@@ -53,7 +56,9 @@ function sortSlotsChronologically<T extends { time: string }>(slots: T[]): T[] {
         reason: check.reason,
         nextAvailableSlot: nextSlot,
         availableSlotsForDate: dateSlots,
+        workingDays,
         next3Days,
+        defaultDate,
       });
     }
 
@@ -65,29 +70,32 @@ function sortSlotsChronologically<T extends { time: string }>(slots: T[]): T[] {
       );
       return NextResponse.json({
         availableSlotsForDate: dateSlots,
+        workingDays,
         next3Days,
         selectedDate: queryDate,
+        defaultDate,
       });
     }
 
-    // Default: return next 3 days and available slots for day 1 as well as all 3 days
-    const next3Dates = next3Days.map((d) => d.dateStr);
+    // Default: return all working days slots and default date slots
+    const workingDates = workingDays.map((d) => d.dateStr);
     const defaultDateSlots = sortSlotsChronologically(
       db.slots.filter(
         (s) => s.date === defaultDate && !s.isBooked && s.department.toLowerCase().includes('admissions')
       )
     );
-    const all3DaysSlots = sortSlotsChronologically(
+    const allWorkingDaysSlots = sortSlotsChronologically(
       db.slots.filter(
-        (s) => next3Dates.includes(s.date) && !s.isBooked && s.department.toLowerCase().includes('admissions')
+        (s) => workingDates.includes(s.date) && !s.isBooked && s.department.toLowerCase().includes('admissions')
       )
     );
 
     return NextResponse.json({
+      workingDays,
       next3Days,
       defaultDate,
       availableSlotsForDate: defaultDateSlots,
-      availableSlots: all3DaysSlots,
+      availableSlots: allWorkingDaysSlots,
       appointments: db.appointments,
     });
   } catch (err: any) {
@@ -103,11 +111,14 @@ export async function POST(req: NextRequest) {
     const rawName = (name || '').trim();
     const rawMobile = (mobile || '').trim();
 
-    if (!rawName) {
-      return NextResponse.json({ error: 'Name is required' }, { status: 400 });
+    const nameValidation = validatePersonName(rawName);
+    if (!nameValidation.valid) {
+      return NextResponse.json({ error: nameValidation.error || 'Name must contain only letters (no numbers).' }, { status: 400 });
     }
-    if (!rawMobile) {
-      return NextResponse.json({ error: 'Mobile number is required' }, { status: 400 });
+
+    const mobileValidation = validateIndianMobile(rawMobile);
+    if (!mobileValidation.valid) {
+      return NextResponse.json({ error: mobileValidation.error || 'Mobile number must start with 6, 7, 8, or 9 (e.g. 6362xxxxxx, 7372xxxxxx).' }, { status: 400 });
     }
 
     const db = readDB();
@@ -116,7 +127,8 @@ export async function POST(req: NextRequest) {
 
     // If online meeting, verify availability if date and time provided
     if (finalMode === 'online_meeting') {
-      const checkDate = date || getTomorrowDateString();
+      const workingDays = getAvailableWorkingDays();
+      const checkDate = date || workingDays[0]?.dateStr || getTodayDateString();
       const checkTime = timeSlot ? normalizeTime(timeSlot) : '09:00 AM';
       const check = checkSlotAvailability(db, checkDate, checkTime, 'Admissions');
 
@@ -135,7 +147,7 @@ export async function POST(req: NextRequest) {
 
     const result = bookAppointment(db, {
       name: rawName,
-      mobile: rawMobile,
+      mobile: mobileValidation.formatted,
       mode: finalMode,
       date,
       timeSlot,

@@ -1,6 +1,69 @@
 {
   "inquiries": [
     {
+      "id": "GPUC-2026-INQ-1035",
+      "name": "ertyuio (Parent: trew)",
+      "mobile": "8123456789",
+      "parentName": "trew",
+      "location": "ertyui, 56789",
+      "userType": "parent",
+      "courseInterest": "12th Class (2nd PU) / 11th Class",
+      "intendedYear": "2026-2027",
+      "category": "ADMISSIONS_2026-27",
+      "preferredContact": "phone",
+      "summary": "Topic: Admissions for Academic Year 2026–27 | Class: 12th Class (2nd PU) / 11th Class | Inquiry: Admissions 2026-27 | Student: ertyuio | Parent: trew | Location: ertyui, 56789 | Note: Captured via Step 2 Contact Form. Pending query: What is the admission process for academic year 2026-2027 at North Campus? | Note: Admission choice: 11th Class (1st PU) • Admissions 2026-27",
+      "assignedTeam": "Admissions",
+      "assignedStaff": "Mr. Aravind J (Admissions Officer)",
+      "status": "NEW",
+      "consentGiven": true,
+      "consentPurpose": "Inquiry guidance and admission assistance",
+      "consentTimestamp": "2026-10-16T08:45:39.184Z",
+      "createdAt": "2026-10-16T08:45:39.184Z",
+      "updatedAt": "2026-10-16T08:45:42.521Z"
+    },
+    {
+      "id": "GPUC-2026-INQ-1034",
+      "name": "9899009900 (Parent: haru)",
+      "mobile": "989765432121111",
+      "parentName": "haru",
+      "location": "560066",
+      "userType": "parent",
+      "courseInterest": "12th Class (2nd PU) / 11th Class",
+      "intendedYear": "2026-2027",
+      "category": "ADMISSIONS_2026-27",
+      "preferredContact": "phone",
+      "summary": "Topic: Commerce Stream Combinations (CEBA / SEBA / MEBA) | Class: 12th Class (2nd PU) / 11th Class | Inquiry: Admissions 2026-27 | Student: 9899009900 | Parent: haru | Location: 560066 | Note: Captured via Step 2 Contact Form. Pending query: What Commerce combinations are offered at Gopalan PU College North Campus? | Note: Admission choice: 11th Class (1st PU) • Admissions 2026-27",
+      "assignedTeam": "Admissions",
+      "assignedStaff": "Mr. Aravind J (Admissions Officer)",
+      "status": "NEW",
+      "consentGiven": true,
+      "consentPurpose": "Inquiry guidance and admission assistance",
+      "consentTimestamp": "2026-10-16T08:39:51.554Z",
+      "createdAt": "2026-10-16T08:39:51.554Z",
+      "updatedAt": "2026-10-16T08:39:55.332Z"
+    },
+    {
+      "id": "GPUC-2026-INQ-1033",
+      "name": "qwertyuiop (Parent: wertyuiop[)",
+      "mobile": "91234567890",
+      "parentName": "wertyuiop[",
+      "location": "5456776",
+      "userType": "parent",
+      "courseInterest": "12th Class (2nd PU) / 11th Class",
+      "intendedYear": "2026-2027",
+      "category": "ADMISSIONS_2026-27",
+      "preferredContact": "phone",
+      "summary": "Topic: Admissions for Academic Year 2026–27 | Class: 12th Class (2nd PU) / 11th Class | Inquiry: Admissions 2026-27 | Student: qwertyuiop | Parent: wertyuiop[ | Location: 5456776 | Note: Captured via Step 2 Contact Form. Pending query: What is the admission process for academic year 2026-2027 at North Campus? | Note: Admission choice: 11th/12th PU • Campus Visit",
+      "assignedTeam": "Admissions",
+      "assignedStaff": "Mr. Aravind J (Admissions Officer)",
+      "status": "NEW",
+      "consentGiven": true,
+      "consentPurpose": "Inquiry guidance and admission assistance",
+      "consentTimestamp": "2026-10-16T06:31:44.935Z",
+      "createdAt": "2026-10-16T06:31:44.935Z",
+      "updatedAt": "2026-10-16T06:31:48.919Z"
+    },
+    {
       "id": "GPUC-2026-INQ-1032",
       "name": "qwerty (Parent: qwertyui)",
       "mobile": "8123456789",
@@ -627,6 +690,49 @@
   ],
   "appointments": [
     {
+      "id": "GPUC-VISIT-2026-524",
+      "name": "Alice Smith",
+      "mobile": "+91 7372123456",
+      "mode": "campus_visit",
+      "date": "2026-10-17",
+      "timeSlot": "8:30 AM - 5:00 PM",
+      "purpose": "Campus Visit & Document Verification",
+      "assignedStaff": "Admissions Desk Counselor",
+      "assignedDepartment": "Admissions",
+      "status": "CONFIRMED",
+      "meetingLinkOrVenue": "Gopalan Pre-University College, North Campus, No. 79 Mavallipura, Hesaragatta Hobli, Yelahanka, Bengaluru - 560089",
+      "createdAt": "2026-10-16T08:58:55.748Z"
+    },
+    {
+      "id": "GPUC-VISIT-2026-523",
+      "name": "John Doe",
+      "mobile": "+91 6362123456",
+      "mode": "campus_visit",
+      "date": "2026-10-17",
+      "timeSlot": "8:30 AM - 5:00 PM",
+      "purpose": "Campus Visit & Document Verification",
+      "assignedStaff": "Admissions Desk Counselor",
+      "assignedDepartment": "Admissions",
+      "status": "CONFIRMED",
+      "meetingLinkOrVenue": "Gopalan Pre-University College, North Campus, No. 79 Mavallipura, Hesaragatta Hobli, Yelahanka, Bengaluru - 560089",
+      "createdAt": "2026-10-16T08:58:48.478Z"
+    },
+    {
+      "id": "GPUC-2026-APT-522",
+      "inquiryId": "GPUC-2026-INQ-1033",
+      "name": "qwertyuiop (Parent: wertyuiop[)",
+      "mobile": "91234567890",
+      "mode": "online_meeting",
+      "date": "2026-10-17",
+      "timeSlot": "12:00 PM",
+      "purpose": "Online Admission Consultation (11th/12th PU)",
+      "assignedStaff": "Admissions Desk Counselor",
+      "assignedDepartment": "Admissions",
+      "status": "CONFIRMED",
+      "meetingLinkOrVenue": "Online Consultation (Admissions Team)",
+      "createdAt": "2026-10-16T06:32:09.030Z"
+    },
+    {
       "id": "GPUC-2026-APT-521",
       "name": "Madan Test",
       "mobile": "9845012345",
@@ -1057,14 +1163,6 @@
       "bookedBy": "Aditi Rao"
     },
     {
-      "id": "slot_2026-10-17_0",
-      "date": "2026-10-17",
-      "time": "09:00 AM",
-      "department": "Admissions",
-      "mode": "all",
-      "isBooked": false
-    },
-    {
       "id": "slot_2026-10-19_0",
       "date": "2026-10-19",
       "time": "09:00 AM",
@@ -1172,20 +1270,13 @@
       "isBooked": false
     },
     {
-      "id": "slot_2026-10-17_4",
-      "date": "2026-10-17",
-      "time": "11:00 AM",
-      "department": "Admissions",
-      "mode": "all",
-      "isBooked": false
-    },
-    {
       "id": "slot_2026-10-17_6",
       "date": "2026-10-17",
       "time": "12:00 PM",
       "department": "Admissions",
       "mode": "all",
-      "isBooked": false
+      "isBooked": true,
+      "bookedBy": "qwertyuiop (Parent: wertyuiop[)"
     },
     {
       "id": "slot_2026-10-17_9",
@@ -1197,22 +1288,6 @@
       "bookedBy": "jhgfds (Parent: iuytrew)"
     },
     {
-      "id": "slot_2026-10-17_10",
-      "date": "2026-10-17",
-      "time": "03:00 PM",
-      "department": "Admissions",
-      "mode": "all",
-      "isBooked": false
-    },
-    {
-      "id": "slot_2026-10-17_12",
-      "date": "2026-10-17",
-      "time": "04:00 PM",
-      "department": "Admissions",
-      "mode": "all",
-      "isBooked": false
-    },
-    {
       "id": "slot_2026-10-17_13",
       "date": "2026-10-17",
       "time": "04:30 PM",
@@ -1220,14 +1295,6 @@
       "mode": "all",
       "isBooked": true,
       "bookedBy": "hari (Parent: hari kumar)"
-    },
-    {
-      "id": "slot_2026-10-17_14",
-      "date": "2026-10-17",
-      "time": "05:00 PM",
-      "department": "Admissions",
-      "mode": "all",
-      "isBooked": false
     },
     {
       "id": "slot_2026-10-19_4",
@@ -1449,118 +1516,6 @@
       "id": "slot_2026-10-23_14",
       "date": "2026-10-23",
       "time": "05:00 PM",
-      "department": "Admissions",
-      "mode": "all",
-      "isBooked": false
-    },
-    {
-      "id": "slot_2026-10-17_1",
-      "date": "2026-10-17",
-      "time": "09:20 AM",
-      "department": "Admissions",
-      "mode": "all",
-      "isBooked": false
-    },
-    {
-      "id": "slot_2026-10-17_2",
-      "date": "2026-10-17",
-      "time": "09:40 AM",
-      "department": "Admissions",
-      "mode": "all",
-      "isBooked": false
-    },
-    {
-      "id": "slot_2026-10-17_4",
-      "date": "2026-10-17",
-      "time": "10:20 AM",
-      "department": "Admissions",
-      "mode": "all",
-      "isBooked": false
-    },
-    {
-      "id": "slot_2026-10-17_5",
-      "date": "2026-10-17",
-      "time": "10:40 AM",
-      "department": "Admissions",
-      "mode": "all",
-      "isBooked": false
-    },
-    {
-      "id": "slot_2026-10-17_7",
-      "date": "2026-10-17",
-      "time": "11:20 AM",
-      "department": "Admissions",
-      "mode": "all",
-      "isBooked": false
-    },
-    {
-      "id": "slot_2026-10-17_8",
-      "date": "2026-10-17",
-      "time": "11:40 AM",
-      "department": "Admissions",
-      "mode": "all",
-      "isBooked": false
-    },
-    {
-      "id": "slot_2026-10-17_10",
-      "date": "2026-10-17",
-      "time": "12:20 PM",
-      "department": "Admissions",
-      "mode": "all",
-      "isBooked": false
-    },
-    {
-      "id": "slot_2026-10-17_11",
-      "date": "2026-10-17",
-      "time": "12:40 PM",
-      "department": "Admissions",
-      "mode": "all",
-      "isBooked": false
-    },
-    {
-      "id": "slot_2026-10-17_13",
-      "date": "2026-10-17",
-      "time": "02:20 PM",
-      "department": "Admissions",
-      "mode": "all",
-      "isBooked": false
-    },
-    {
-      "id": "slot_2026-10-17_14",
-      "date": "2026-10-17",
-      "time": "02:40 PM",
-      "department": "Admissions",
-      "mode": "all",
-      "isBooked": false
-    },
-    {
-      "id": "slot_2026-10-17_16",
-      "date": "2026-10-17",
-      "time": "03:20 PM",
-      "department": "Admissions",
-      "mode": "all",
-      "isBooked": false
-    },
-    {
-      "id": "slot_2026-10-17_17",
-      "date": "2026-10-17",
-      "time": "03:40 PM",
-      "department": "Admissions",
-      "mode": "all",
-      "isBooked": false
-    },
-    {
-      "id": "slot_2026-10-17_19",
-      "date": "2026-10-17",
-      "time": "04:20 PM",
-      "department": "Admissions",
-      "mode": "all",
-      "isBooked": false
-    },
-    {
-      "id": "slot_2026-10-17_20",
-      "date": "2026-10-17",
-      "time": "04:40 PM",
       "department": "Admissions",
       "mode": "all",
       "isBooked": false
@@ -2125,6 +2080,294 @@
       "department": "Admissions",
       "mode": "all",
       "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-16_1",
+      "date": "2026-10-16",
+      "time": "09:20 AM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-16_2",
+      "date": "2026-10-16",
+      "time": "09:40 AM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-16_4",
+      "date": "2026-10-16",
+      "time": "10:20 AM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-16_5",
+      "date": "2026-10-16",
+      "time": "10:40 AM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-16_7",
+      "date": "2026-10-16",
+      "time": "11:20 AM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-16_8",
+      "date": "2026-10-16",
+      "time": "11:40 AM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-16_10",
+      "date": "2026-10-16",
+      "time": "12:20 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-16_11",
+      "date": "2026-10-16",
+      "time": "12:40 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-16_13",
+      "date": "2026-10-16",
+      "time": "02:20 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-16_14",
+      "date": "2026-10-16",
+      "time": "02:40 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-16_16",
+      "date": "2026-10-16",
+      "time": "03:20 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-16_17",
+      "date": "2026-10-16",
+      "time": "03:40 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-16_19",
+      "date": "2026-10-16",
+      "time": "04:20 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-16_20",
+      "date": "2026-10-16",
+      "time": "04:40 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-26_0",
+      "date": "2026-10-26",
+      "time": "09:00 AM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-26_1",
+      "date": "2026-10-26",
+      "time": "09:20 AM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-26_2",
+      "date": "2026-10-26",
+      "time": "09:40 AM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-26_3",
+      "date": "2026-10-26",
+      "time": "10:00 AM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-26_4",
+      "date": "2026-10-26",
+      "time": "10:20 AM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-26_5",
+      "date": "2026-10-26",
+      "time": "10:40 AM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-26_6",
+      "date": "2026-10-26",
+      "time": "11:00 AM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-26_7",
+      "date": "2026-10-26",
+      "time": "11:20 AM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-26_8",
+      "date": "2026-10-26",
+      "time": "11:40 AM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-26_9",
+      "date": "2026-10-26",
+      "time": "12:00 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-26_10",
+      "date": "2026-10-26",
+      "time": "12:20 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-26_11",
+      "date": "2026-10-26",
+      "time": "12:40 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-26_12",
+      "date": "2026-10-26",
+      "time": "02:00 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-26_13",
+      "date": "2026-10-26",
+      "time": "02:20 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-26_14",
+      "date": "2026-10-26",
+      "time": "02:40 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-26_15",
+      "date": "2026-10-26",
+      "time": "03:00 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-26_16",
+      "date": "2026-10-26",
+      "time": "03:20 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-26_17",
+      "date": "2026-10-26",
+      "time": "03:40 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-26_18",
+      "date": "2026-10-26",
+      "time": "04:00 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-26_19",
+      "date": "2026-10-26",
+      "time": "04:20 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-26_20",
+      "date": "2026-10-26",
+      "time": "04:40 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
+    },
+    {
+      "id": "slot_2026-10-26_21",
+      "date": "2026-10-26",
+      "time": "05:00 PM",
+      "department": "Admissions",
+      "mode": "all",
+      "isBooked": false
     }
   ],
   "feedback": [
@@ -2144,6 +2387,33 @@
     }
   ],
   "messages": [
+    {
+      "id": "MSG-5748",
+      "type": "whatsapp",
+      "recipient": "+91 7372123456",
+      "templateId": "visit_ticket_confirmation",
+      "content": "Dear Alice Smith, your Campus Visit ticket GPUC-VISIT-2026-524 is confirmed. Visiting hours: Monday to Friday 8:30 AM to 5:00 PM.",
+      "status": "DELIVERED",
+      "timestamp": "2026-10-16T08:58:55.748Z"
+    },
+    {
+      "id": "MSG-8478",
+      "type": "whatsapp",
+      "recipient": "+91 6362123456",
+      "templateId": "visit_ticket_confirmation",
+      "content": "Dear John Doe, your Campus Visit ticket GPUC-VISIT-2026-523 is confirmed. Visiting hours: Monday to Friday 8:30 AM to 5:00 PM.",
+      "status": "DELIVERED",
+      "timestamp": "2026-10-16T08:58:48.478Z"
+    },
+    {
+      "id": "MSG-9030",
+      "type": "whatsapp",
+      "recipient": "91234567890",
+      "templateId": "appointment_confirmation",
+      "content": "Dear qwertyuiop (Parent: wertyuiop[), your online consultation GPUC-2026-APT-522 with Admissions is confirmed for 2026-10-17 at 12:00 PM. Our Admissions team will contact you 1 minute before the allocated time and you will receive a WhatsApp notification confirming your ticket initiation and request.",
+      "status": "DELIVERED",
+      "timestamp": "2026-10-16T06:32:09.030Z"
+    },
     {
       "id": "MSG-2807",
       "type": "whatsapp",
