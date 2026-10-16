@@ -1,1 +1,53 @@
-[]
+[
+  {
+    "analysisId": "ANL-2026-1028",
+    "inquiryId": "GPUC-2026-INQ-1028",
+    "timestamp": "2026-10-16T04:55:40.622Z",
+    "studentName": "Test Student",
+    "mobile": "8989898989",
+    "admissionClass": "11th Class (1st PU)",
+    "totalQueries": 0,
+    "queries": [],
+    "leadSource": "chatbot_inquiry_wizard"
+  },
+  {
+    "analysisId": "ANL-2026-1027",
+    "inquiryId": "GPUC-2026-INQ-1027",
+    "timestamp": "2026-10-16T04:47:31.341Z",
+    "studentName": "qwertyui",
+    "parentName": "qwer",
+    "mobile": "8123456789",
+    "location": "hoodi 560000",
+    "admissionClass": "12th Class (2nd PU) / 11th Class",
+    "totalQueries": 1,
+    "queries": [
+      {
+        "query": "How can I book a campus visit to the North Campus in Yelahanka?",
+        "timestamp": "2026-10-16T04:47:02.042Z"
+      }
+    ],
+    "leadSource": "onboarding_step_2"
+  },
+  {
+    "analysisId": "ANL-2026-1025",
+    "inquiryId": "GPUC-2026-INQ-1025",
+    "timestamp": "2026-10-16T04:38:57.459Z",
+    "studentName": "hari kuamr",
+    "parentName": "polireddy",
+    "mobile": "8989898989",
+    "location": "hoodi 560067",
+    "admissionClass": "12th Class (2nd PU) / 11th Class",
+    "totalQueries": 2,
+    "queries": [
+      {
+        "query": "hi",
+        "timestamp": "2026-10-16T04:38:33.556Z"
+      },
+      {
+        "query": "What is the admission process for academic year 2026-2027 at North Campus?",
+        "timestamp": "2026-10-16T04:38:36.193Z"
+      }
+    ],
+    "leadSource": "onboarding_step_2"
+  }
+]

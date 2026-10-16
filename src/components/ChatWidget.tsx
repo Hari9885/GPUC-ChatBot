@@ -1096,18 +1096,70 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
       timestamp: new Date().toISOString(),
     });
 
-    // If a lead step card was open, any interaction in the chat input dismisses the card
-    if (!userLead && leadStep !== 'idle') {
+    // Handle user inputs during lead onboarding steps if user typed into the chat input:
+    if (leadStep === 'ask_student_name') {
+      const lower = text.toLowerCase().trim();
+      if (lower === 'close' || lower === 'cancel' || lower === 'skip' || lower === 'x' || lower === 'no') {
+        setInput('');
+        handleCloseLead();
+        return;
+      }
+      if (text.includes('?') || isPresetOrResemblingQuery(text) || text.length > 50) {
+        setLeadStep('idle');
+        setHasSkippedLead(true);
+        setStepError('');
+      } else {
+        setInput('');
+        handleStudentNameSubmit(text);
+        return;
+      }
+    }
+
+    if (leadStep === 'ask_contact') {
+      const lower = text.toLowerCase().trim();
+      if (lower === 'close' || lower === 'cancel' || lower === 'skip' || lower === 'x' || lower === 'no') {
+        setInput('');
+        handleCloseLead();
+        return;
+      }
+      const digitsOnly = text.replace(/\D/g, '');
+      if (digitsOnly.length >= 10) {
+        setInput('');
+        handleContactSubmit(undefined, digitsOnly, undefined);
+        return;
+      }
+      if (text.includes('?') || isPresetOrResemblingQuery(text)) {
+        setLeadStep('idle');
+        setHasSkippedLead(true);
+        setStepError('');
+      }
+    }
+
+    if (leadStep === 'ask_admission') {
       const lower = text.toLowerCase().trim();
       if (lower === 'close' || lower === 'cancel' || lower === 'skip' || lower === 'x') {
         setInput('');
         handleCloseLead();
         return;
       }
-      // Any other text is a user query/question: dismiss the lead card and answer the user's question directly
-      setLeadStep('idle');
-      setHasSkippedLead(true);
-      setStepError('');
+      let chosenClass = '11th Class (1st PU)';
+      let chosenType = 'Admissions 2026-27';
+
+      if (lower.includes('12') || lower.includes('2nd')) {
+        chosenClass = '12th Class (2nd PU)';
+      } else if (lower.includes('11') || lower.includes('1st')) {
+        chosenClass = '11th Class (1st PU)';
+      } else if (lower.includes('visit') || lower.includes('campus') || lower.includes('tour')) {
+        chosenClass = '11th/12th PU';
+        chosenType = 'Campus Visit';
+      } else {
+        chosenClass = 'General PU';
+        chosenType = 'Admissions 2026-27';
+      }
+
+      setInput('');
+      handleAdmissionSubmit(chosenClass, chosenType);
+      return;
     }
 
     // Handle user inputs during booking flow steps:
@@ -1118,7 +1170,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
         handleBookOfflineVisit();
         return;
       }
-      if (lower.includes('online') || lower.includes('meeting') || lower.includes('virtual') || lower.includes('call') || lower.includes('meet')) {
+      if (lower.includes('online') || lower.includes('meeting') || lower.includes('virtual') || lower.includes('call') || lower.includes('meet') || lower.includes('slot')) {
         setInput('');
         handleInitiateOnlineMeeting();
         return;
@@ -1172,6 +1224,27 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
       const targetDate = customSlotDate || getTomorrowDateString();
       handleCheckAndBookSlot(targetDate, text);
       return;
+    }
+
+    // Direct visit / meeting request when user specifies booking intent
+    const lowerQuery = text.toLowerCase().trim();
+    if (bookingFlowState !== 'offered_choice') {
+      if (
+        (lowerQuery.includes('campus visit') || lowerQuery.includes('book visit') || lowerQuery.includes('schedule visit') || lowerQuery.includes('offline visit') || lowerQuery.includes('visit campus')) &&
+        !lowerQuery.includes('?')
+      ) {
+        setInput('');
+        handleBookOfflineVisit();
+        return;
+      }
+      if (
+        (lowerQuery.includes('online meeting') || lowerQuery.includes('request meeting') || lowerQuery.includes('schedule meeting') || lowerQuery.includes('video call') || lowerQuery.includes('book slot') || lowerQuery.includes('schedule slot')) &&
+        !lowerQuery.includes('?')
+      ) {
+        setInput('');
+        handleInitiateOnlineMeeting();
+        return;
+      }
     }
 
     // Standard question flow
@@ -1275,12 +1348,46 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
 
       const botContent = enforceMaxThreeLines(data.content || 'I have noted your request.');
 
+      const hasInquiry =
+        data.toolCalls?.some((tc: any) => tc.tool === 'create_inquiry' || tc.name === 'create_inquiry') ||
+        botContent.toLowerCase().includes('inquiry registered') ||
+        botContent.toLowerCase().includes('inquiry has been registered') ||
+        botContent.includes('GPUC-2026-INQ-');
+
+      if (hasInquiry) {
+        setBookingFlowState('offered_choice');
+        setLeadStep('completed');
+        if (data.toolCalls) {
+          const inqCall = data.toolCalls.find(
+            (tc: any) => (tc.tool === 'create_inquiry' || tc.name === 'create_inquiry') && tc.result?.inquiry_id
+          );
+          if (inqCall?.result?.inquiry_id) {
+            activeInquiryIdRef.current = inqCall.result.inquiry_id;
+            setUserLead((prev) => ({
+              ...(prev || {
+                studentName: leadStudentName || 'Prospective Student',
+                mobile: leadMobile || '8989898989',
+                admissionClass: '11th Class (1st PU)',
+                inquiryType: 'Admissions 2026-27',
+              }),
+              inquiryId: inqCall.result.inquiry_id,
+            }));
+          }
+        }
+      }
+
+      const replyContent =
+        hasInquiry && !botContent.toLowerCase().includes('campus visit') && !botContent.toLowerCase().includes('meeting')
+          ? `${botContent}\n\nWould you like to book a campus visit (offline) or request an online meeting?`
+          : botContent;
+
       setMessages((prev) => [
         ...prev,
         {
           role: 'assistant',
-          content: botContent,
+          content: replyContent,
           toolCalls: data.toolCalls,
+          step: hasInquiry ? 'offer_visit_or_online' : undefined,
           isProactiveCallbackCard: shouldTriggerProactiveCard,
         },
       ]);
@@ -1788,11 +1895,17 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
               >
               {messages.map((msg, index) => {
                 const lastAssistantIdx = messages.map((m) => m.role).lastIndexOf('assistant');
+                const isFormInputActive =
+                  leadStep === 'ask_student_name' ||
+                  leadStep === 'ask_contact' ||
+                  leadStep === 'ask_admission' ||
+                  (msg.step === 'ask_custom_slot' && bookingFlowState === 'asking_check_slot') ||
+                  (msg.step === 'show_available_slots' && bookingFlowState === 'showing_available_slots');
+
                 const showPresetsUnderMsg =
-                  !userLead &&
-                  leadStep === 'idle' &&
                   msg.role === 'assistant' &&
-                  index === lastAssistantIdx;
+                  index === lastAssistantIdx &&
+                  !isFormInputActive;
 
                 return (
                   <div
@@ -2407,7 +2520,14 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                       )}
 
                       {/* Step: Offer Offline Campus Visit vs Online Meeting */}
-                      {msg.step === 'offer_visit_or_online' && bookingFlowState === 'offered_choice' && (
+                      {(msg.step === 'offer_visit_or_online' ||
+                        msg.leadInquiryId ||
+                        msg.toolCalls?.some((tc: any) => tc.tool === 'create_inquiry' && tc.result?.success) ||
+                        (msg.content && msg.content.includes('inquiry registered') && !msg.content.includes('ticket has been generated'))) &&
+                        bookingFlowState !== 'completed' &&
+                        bookingFlowState !== 'asking_check_slot' &&
+                        bookingFlowState !== 'showing_available_slots' &&
+                        !msg.ticketData && (
                         <div
                           style={{
                             marginTop: '12px',
@@ -3308,8 +3428,13 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Quick Horizontal Presets Bar (hidden on initial greeting or when card is open to maximize vertical space) */}
-            {messages.length > 1 && leadStep === 'idle' && (
+            {/* Quick Horizontal Presets Bar */}
+            {messages.length > 1 &&
+              leadStep !== 'ask_student_name' &&
+              leadStep !== 'ask_contact' &&
+              leadStep !== 'ask_admission' &&
+              bookingFlowState !== 'asking_check_slot' &&
+              bookingFlowState !== 'showing_available_slots' && (
               <div
                 style={{
                   flexShrink: 0,
