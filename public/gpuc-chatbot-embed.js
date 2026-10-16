@@ -127,10 +127,10 @@
       position: fixed !important;
       bottom: 24px !important;
       right: 24px !important;
-      width: var(--gpuc-custom-width, 420px) !important;
-      height: var(--gpuc-custom-height, 640px) !important;
-      min-width: 340px !important;
-      min-height: 460px !important;
+      width: 420px;
+      height: 640px;
+      min-width: 320px !important;
+      min-height: 440px !important;
       max-width: calc(100vw - 32px) !important;
       max-height: calc(100vh - 36px) !important;
       border-radius: 18px !important;
@@ -182,51 +182,38 @@
       background: transparent !important;
     }
 
-    /* Resize handles for free expanding */
+    /* Invisible native resize handles */
     .gpuc-resize-handle {
       position: absolute !important;
       z-index: 2147483647 !important;
       touch-action: none !important;
       user-select: none !important;
       -webkit-user-select: none !important;
+      background: transparent !important;
     }
 
     .gpuc-resize-top {
       top: -8px !important;
-      left: 18px !important;
-      right: 18px !important;
-      height: 16px !important;
+      left: 36px !important;
+      right: 36px !important;
+      height: 18px !important;
       cursor: ns-resize !important;
     }
 
     .gpuc-resize-left {
       left: -8px !important;
-      top: 18px !important;
-      bottom: 18px !important;
-      width: 16px !important;
+      top: 36px !important;
+      bottom: 36px !important;
+      width: 18px !important;
       cursor: ew-resize !important;
     }
 
     .gpuc-resize-corner {
-      top: -8px !important;
-      left: -8px !important;
-      width: 24px !important;
-      height: 24px !important;
+      top: -12px !important;
+      left: -12px !important;
+      width: 48px !important;
+      height: 48px !important;
       cursor: nwse-resize !important;
-      background: transparent !important;
-    }
-
-    #gpuc-resize-shield {
-      position: fixed !important;
-      top: 0 !important;
-      left: 0 !important;
-      width: 100vw !important;
-      height: 100vh !important;
-      z-index: 2147483647 !important;
-      display: none !important;
-      background: transparent !important;
-      user-select: none !important;
-      -webkit-user-select: none !important;
     }
 
     /* Completely hide Google reCAPTCHA badge / error card behind the launcher */
@@ -341,8 +328,8 @@
       const parsedW = parseInt(savedW, 10);
       const parsedH = parseInt(savedH, 10);
       if (parsedW >= 340 && parsedH >= 460) {
-        containerEl.style.setProperty('--gpuc-custom-width', `${parsedW}px`);
-        containerEl.style.setProperty('--gpuc-custom-height', `${parsedH}px`);
+        containerEl.style.setProperty('width', `${parsedW}px`, 'important');
+        containerEl.style.setProperty('height', `${parsedH}px`, 'important');
       }
     }
   } catch (e) {}
@@ -377,20 +364,20 @@
   containerEl.appendChild(resizeHandleCorner);
   document.body.appendChild(containerEl);
 
-  // Full-screen shield for capturing drag moves over iframe
-  const shieldEl = document.createElement('div');
-  shieldEl.id = 'gpuc-resize-shield';
-  document.body.appendChild(shieldEl);
-
-  // Free Resize Drag Controller
+  // Free Resize Drag Controller with Pointer Capture and RequestAnimationFrame
   let isResizing = false;
   let resizeDir = null;
   let startX = 0;
   let startY = 0;
   let startW = 420;
   let startH = 640;
+  let curTargetW = 420;
+  let curTargetH = 640;
+  let resizeRafId = null;
+  let activeHandle = null;
 
   function initResize(e, direction) {
+    if (e.button !== undefined && e.button !== 0) return; // Only primary mouse button or touch
     if (isMaximized) {
       isMaximized = false;
       containerEl.classList.remove('maximized');
@@ -398,21 +385,35 @@
 
     isResizing = true;
     resizeDir = direction;
-    containerEl.classList.add('is-resizing');
+    activeHandle = e.currentTarget;
 
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    try {
+      if (activeHandle && activeHandle.setPointerCapture) {
+        activeHandle.setPointerCapture(e.pointerId);
+      }
+    } catch (err) {}
+
+    containerEl.classList.add('is-resizing');
+    iframeEl.style.pointerEvents = 'none'; // Prevents iframe from intercepting pointer moves
+
+    const clientX = e.clientX ?? (e.touches ? e.touches[0].clientX : 0);
+    const clientY = e.clientY ?? (e.touches ? e.touches[0].clientY : 0);
     startX = clientX;
     startY = clientY;
 
     const rect = containerEl.getBoundingClientRect();
     startW = rect.width;
     startH = rect.height;
+    curTargetW = startW;
+    curTargetH = startH;
 
-    shieldEl.style.display = 'block';
-    if (direction === 'corner') shieldEl.style.cursor = 'nwse-resize';
-    else if (direction === 'top') shieldEl.style.cursor = 'ns-resize';
-    else if (direction === 'left') shieldEl.style.cursor = 'ew-resize';
+    if (direction === 'corner') document.body.style.cursor = 'nwse-resize';
+    else if (direction === 'top') document.body.style.cursor = 'ns-resize';
+    else if (direction === 'left') document.body.style.cursor = 'ew-resize';
+
+    activeHandle.addEventListener('pointermove', onResizing);
+    activeHandle.addEventListener('pointerup', stopResizing);
+    activeHandle.addEventListener('pointercancel', stopResizing);
 
     window.addEventListener('mousemove', onResizing);
     window.addEventListener('mouseup', stopResizing);
@@ -423,8 +424,8 @@
 
   function onResizing(e) {
     if (!isResizing) return;
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const clientX = e.clientX ?? (e.touches ? e.touches[0].clientX : 0);
+    const clientY = e.clientY ?? (e.touches ? e.touches[0].clientY : 0);
 
     const deltaX = startX - clientX;
     const deltaY = startY - clientY;
@@ -432,27 +433,52 @@
     const maxW = Math.max(340, window.innerWidth - 32);
     const maxH = Math.max(460, window.innerHeight - 36);
 
-    let newW = startW;
-    let newH = startH;
-
     if (resizeDir === 'left' || resizeDir === 'corner') {
-      newW = Math.max(340, Math.min(startW + deltaX, maxW));
-      containerEl.style.setProperty('--gpuc-custom-width', `${Math.round(newW)}px`);
+      curTargetW = Math.max(340, Math.min(startW + deltaX, maxW));
+    }
+    if (resizeDir === 'top' || resizeDir === 'corner') {
+      curTargetH = Math.max(460, Math.min(startH + deltaY, maxH));
     }
 
-    if (resizeDir === 'top' || resizeDir === 'corner') {
-      newH = Math.max(460, Math.min(startH + deltaY, maxH));
-      containerEl.style.setProperty('--gpuc-custom-height', `${Math.round(newH)}px`);
+    if (resizeRafId === null) {
+      resizeRafId = requestAnimationFrame(() => {
+        resizeRafId = null;
+        if (!isResizing) return;
+        if (resizeDir === 'left' || resizeDir === 'corner') {
+          containerEl.style.setProperty('width', `${Math.round(curTargetW)}px`, 'important');
+        }
+        if (resizeDir === 'top' || resizeDir === 'corner') {
+          containerEl.style.setProperty('height', `${Math.round(curTargetH)}px`, 'important');
+        }
+      });
     }
 
     e.preventDefault();
   }
 
-  function stopResizing() {
+  function stopResizing(e) {
     if (!isResizing) return;
     isResizing = false;
+    if (resizeRafId !== null) {
+      cancelAnimationFrame(resizeRafId);
+      resizeRafId = null;
+    }
+
     containerEl.classList.remove('is-resizing');
-    shieldEl.style.display = 'none';
+    iframeEl.style.pointerEvents = 'auto'; // Re-enable iframe pointer events
+    document.body.style.cursor = '';
+
+    if (activeHandle) {
+      try {
+        if (e && e.pointerId && activeHandle.releasePointerCapture) {
+          activeHandle.releasePointerCapture(e.pointerId);
+        }
+      } catch (err) {}
+      activeHandle.removeEventListener('pointermove', onResizing);
+      activeHandle.removeEventListener('pointerup', stopResizing);
+      activeHandle.removeEventListener('pointercancel', stopResizing);
+      activeHandle = null;
+    }
 
     window.removeEventListener('mousemove', onResizing);
     window.removeEventListener('mouseup', stopResizing);
@@ -460,19 +486,19 @@
     window.removeEventListener('touchend', stopResizing);
 
     const rect = containerEl.getBoundingClientRect();
+    const finalW = Math.round(rect.width);
+    const finalH = Math.round(rect.height);
+    containerEl.style.setProperty('width', `${finalW}px`, 'important');
+    containerEl.style.setProperty('height', `${finalH}px`, 'important');
     try {
-      localStorage.setItem('gpuc_chat_custom_width', Math.round(rect.width).toString());
-      localStorage.setItem('gpuc_chat_custom_height', Math.round(rect.height).toString());
-    } catch (e) {}
+      localStorage.setItem('gpuc_chat_custom_width', finalW.toString());
+      localStorage.setItem('gpuc_chat_custom_height', finalH.toString());
+    } catch (err) {}
   }
 
-  resizeHandleTop.addEventListener('mousedown', (e) => initResize(e, 'top'));
-  resizeHandleLeft.addEventListener('mousedown', (e) => initResize(e, 'left'));
-  resizeHandleCorner.addEventListener('mousedown', (e) => initResize(e, 'corner'));
-
-  resizeHandleTop.addEventListener('touchstart', (e) => initResize(e, 'top'), { passive: false });
-  resizeHandleLeft.addEventListener('touchstart', (e) => initResize(e, 'left'), { passive: false });
-  resizeHandleCorner.addEventListener('touchstart', (e) => initResize(e, 'corner'), { passive: false });
+  resizeHandleTop.addEventListener('pointerdown', (e) => initResize(e, 'top'));
+  resizeHandleLeft.addEventListener('pointerdown', (e) => initResize(e, 'left'));
+  resizeHandleCorner.addEventListener('pointerdown', (e) => initResize(e, 'corner'));
 
   // 3. Floating Launcher Button
   const launcherBtn = document.createElement('button');

@@ -574,6 +574,12 @@ body.is-embedded-body .chat-widget-window {
               box-shadow 0.25s ease;
 }
 
+.chat-widget-window.is-resizing {
+  transition: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
 @keyframes gpuc-3-bounces {
   0% {
     transform: translateY(0) scale(1, 1);

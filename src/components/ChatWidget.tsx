@@ -357,6 +357,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
   const [proactiveMobile, setProactiveMobile] = useState<string>('');
   const [proactiveSelectedSlot, setProactiveSelectedSlot] = useState<string>('10:00 AM (Morning)');
   const [proactiveSubmitting, setProactiveSubmitting] = useState<boolean>(false);
+  const [proactiveError, setProactiveError] = useState<string>('');
 
   // Free Resize State (for expanding chat widget smoothly)
   const [customWidth, setCustomWidth] = useState<number | null>(null);
@@ -378,15 +379,19 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
     } catch (e) {}
   }, []);
 
-  const handleStartStandaloneResize = (e: React.MouseEvent | React.TouchEvent, dir: 'top' | 'left' | 'corner') => {
+  const handleStartStandaloneResize = (e: React.PointerEvent<HTMLDivElement>, dir: 'top' | 'left' | 'corner') => {
+    if (e.button !== 0) return; // Only primary mouse button or touch
     if (isMaximized) {
       setIsMaximized(false);
     }
+    const targetHandle = e.currentTarget;
+    try {
+      targetHandle.setPointerCapture(e.pointerId);
+    } catch (err) {}
+
     isResizingRef.current = true;
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-    const startX = clientX;
-    const startY = clientY;
+    const startX = e.clientX;
+    const startY = e.clientY;
 
     const chatEl = document.getElementById('gpuc-chat-window');
     if (!chatEl) return;
@@ -394,46 +399,73 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
     const startW = rect.width;
     const startH = rect.height;
 
-    const onMove = (moveEvt: MouseEvent | TouchEvent) => {
-      if (!isResizingRef.current) return;
-      const curX = 'touches' in moveEvt ? moveEvt.touches[0].clientX : moveEvt.clientX;
-      const curY = 'touches' in moveEvt ? moveEvt.touches[0].clientY : moveEvt.clientY;
+    chatEl.classList.add('is-resizing');
 
-      const deltaX = startX - curX;
-      const deltaY = startY - curY;
+    let curTargetW = startW;
+    let curTargetH = startH;
+    let rafId: number | null = null;
+
+    const onPointerMove = (moveEvt: PointerEvent) => {
+      if (!isResizingRef.current) return;
+      const deltaX = startX - moveEvt.clientX;
+      const deltaY = startY - moveEvt.clientY;
 
       const maxW = Math.max(340, window.innerWidth - 32);
       const maxH = Math.max(460, window.innerHeight - 36);
 
       if (dir === 'left' || dir === 'corner') {
-        const newW = Math.max(340, Math.min(startW + deltaX, maxW));
-        setCustomWidth(Math.round(newW));
+        curTargetW = Math.max(340, Math.min(startW + deltaX, maxW));
       }
       if (dir === 'top' || dir === 'corner') {
-        const newH = Math.max(460, Math.min(startH + deltaY, maxH));
-        setCustomHeight(Math.round(newH));
+        curTargetH = Math.max(460, Math.min(startH + deltaY, maxH));
+      }
+
+      if (rafId === null) {
+        rafId = requestAnimationFrame(() => {
+          rafId = null;
+          if (chatEl && isResizingRef.current) {
+            if (dir === 'left' || dir === 'corner') {
+              chatEl.style.width = `${Math.round(curTargetW)}px`;
+            }
+            if (dir === 'top' || dir === 'corner') {
+              chatEl.style.height = `${Math.round(curTargetH)}px`;
+            }
+          }
+        });
       }
     };
 
-    const onStop = () => {
+    const onPointerUp = (upEvt: PointerEvent) => {
       isResizingRef.current = false;
-      window.removeEventListener('mousemove', onMove);
-      window.removeEventListener('mouseup', onStop);
-      window.removeEventListener('touchmove', onMove);
-      window.removeEventListener('touchend', onStop);
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+      try {
+        targetHandle.releasePointerCapture(upEvt.pointerId);
+      } catch (err) {}
+
+      targetHandle.removeEventListener('pointermove', onPointerMove);
+      targetHandle.removeEventListener('pointerup', onPointerUp);
+      targetHandle.removeEventListener('pointercancel', onPointerUp);
+
       if (chatEl) {
+        chatEl.classList.remove('is-resizing');
         const finalRect = chatEl.getBoundingClientRect();
+        const finalW = Math.round(finalRect.width);
+        const finalH = Math.round(finalRect.height);
+        setCustomWidth(finalW);
+        setCustomHeight(finalH);
         try {
-          localStorage.setItem('gpuc_chat_custom_width', Math.round(finalRect.width).toString());
-          localStorage.setItem('gpuc_chat_custom_height', Math.round(finalRect.height).toString());
+          localStorage.setItem('gpuc_chat_custom_width', finalW.toString());
+          localStorage.setItem('gpuc_chat_custom_height', finalH.toString());
         } catch (e) {}
       }
     };
 
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onStop);
-    window.addEventListener('touchmove', onMove, { passive: false });
-    window.addEventListener('touchend', onStop);
+    targetHandle.addEventListener('pointermove', onPointerMove);
+    targetHandle.addEventListener('pointerup', onPointerUp);
+    targetHandle.addEventListener('pointercancel', onPointerUp);
     e.preventDefault();
   };
 
@@ -1935,22 +1967,52 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
             {!isEmbedded && !isMobile && (
               <>
                 <div
-                  onMouseDown={(e) => handleStartStandaloneResize(e, 'top')}
-                  onTouchStart={(e) => handleStartStandaloneResize(e, 'top')}
+                  onPointerDown={(e) => handleStartStandaloneResize(e, 'top')}
                   title="Drag top edge to resize height"
-                  style={{ position: 'absolute', top: 0, left: 24, right: 24, height: '8px', cursor: 'ns-resize', zIndex: 100 }}
+                  style={{
+                    position: 'absolute',
+                    top: '-6px',
+                    left: '36px',
+                    right: '36px',
+                    height: '16px',
+                    cursor: 'ns-resize',
+                    zIndex: 100,
+                    touchAction: 'none',
+                    userSelect: 'none',
+                    WebkitUserSelect: 'none',
+                  }}
                 />
                 <div
-                  onMouseDown={(e) => handleStartStandaloneResize(e, 'left')}
-                  onTouchStart={(e) => handleStartStandaloneResize(e, 'left')}
+                  onPointerDown={(e) => handleStartStandaloneResize(e, 'left')}
                   title="Drag left edge to resize width"
-                  style={{ position: 'absolute', left: 0, top: 24, bottom: 24, width: '8px', cursor: 'ew-resize', zIndex: 100 }}
+                  style={{
+                    position: 'absolute',
+                    left: '-6px',
+                    top: '36px',
+                    bottom: '36px',
+                    width: '16px',
+                    cursor: 'ew-resize',
+                    zIndex: 100,
+                    touchAction: 'none',
+                    userSelect: 'none',
+                    WebkitUserSelect: 'none',
+                  }}
                 />
                 <div
-                  onMouseDown={(e) => handleStartStandaloneResize(e, 'corner')}
-                  onTouchStart={(e) => handleStartStandaloneResize(e, 'corner')}
+                  onPointerDown={(e) => handleStartStandaloneResize(e, 'corner')}
                   title="Drag corner to freely expand size"
-                  style={{ position: 'absolute', top: 0, left: 0, width: '24px', height: '24px', cursor: 'nwse-resize', zIndex: 101 }}
+                  style={{
+                    position: 'absolute',
+                    top: '-10px',
+                    left: '-10px',
+                    width: '44px',
+                    height: '44px',
+                    cursor: 'nwse-resize',
+                    zIndex: 105,
+                    touchAction: 'none',
+                    userSelect: 'none',
+                    WebkitUserSelect: 'none',
+                  }}
                 />
               </>
             )}
