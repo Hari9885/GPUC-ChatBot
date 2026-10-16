@@ -108,17 +108,52 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { name, mobile, mode, date, timeSlot, purpose, inquiryId } = body;
 
-    const rawName = (name || '').trim();
+    const studentNameInput = (body.studentName || '').trim();
+    const parentNameInput = (body.parentName || '').trim();
+    const rawName = (name || studentNameInput || '').trim();
     const rawMobile = (mobile || '').trim();
 
-    const nameValidation = validatePersonName(rawName);
-    if (!nameValidation.valid) {
-      return NextResponse.json({ error: nameValidation.error || 'Letters only' }, { status: 400 });
+    if (!rawName) {
+      return NextResponse.json({ error: 'Name is required' }, { status: 400 });
     }
+
+    // Handle names formatted with parent information, e.g. "Student Name (Parent: Parent Name)"
+    let studentPart = rawName;
+    let parentPart = parentNameInput;
+
+    const parentMatch = rawName.match(/^(.*?)\s*\((?:Parent:\s*)?([^)]+)\)$/i);
+    if (parentMatch) {
+      studentPart = parentMatch[1].trim();
+      if (!parentPart) {
+        parentPart = parentMatch[2].trim();
+      }
+    }
+
+    const studentValidation = validatePersonName(studentPart);
+    if (!studentValidation.valid) {
+      return NextResponse.json({ error: studentValidation.error || 'Letters only' }, { status: 400 });
+    }
+
+    if (parentPart) {
+      const parentValidation = validatePersonName(parentPart);
+      if (!parentValidation.valid) {
+        return NextResponse.json({ error: parentValidation.error || 'Letters only' }, { status: 400 });
+      }
+    }
+
+    const cleanFullName = parentPart
+      ? `${studentValidation.cleanName} (Parent: ${parentPart})`
+      : studentValidation.cleanName;
 
     const mobileValidation = validateIndianMobile(rawMobile);
     if (!mobileValidation.valid) {
       return NextResponse.json({ error: mobileValidation.error || 'Mobile number must start with 6, 7, 8, or 9.' }, { status: 400 });
+    }
+
+    let finalDate = (date || '').trim();
+    const dateInTime = timeSlot ? timeSlot.match(/\b(20\d\d-[0-1]\d-[0-3]\d)\b/) : null;
+    if (!finalDate && dateInTime) {
+      finalDate = dateInTime[1];
     }
 
     const db = readDB();
@@ -128,7 +163,7 @@ export async function POST(req: NextRequest) {
     // If online meeting, verify availability if date and time provided
     if (finalMode === 'online_meeting') {
       const workingDays = getAvailableWorkingDays();
-      const checkDate = date || workingDays[0]?.dateStr || getTodayDateString();
+      const checkDate = finalDate || workingDays[0]?.dateStr || getTodayDateString();
       const checkTime = timeSlot ? normalizeTime(timeSlot) : '09:00 AM';
       const check = checkSlotAvailability(db, checkDate, checkTime, 'Admissions');
 
@@ -146,11 +181,11 @@ export async function POST(req: NextRequest) {
     }
 
     const result = bookAppointment(db, {
-      name: rawName,
+      name: cleanFullName,
       mobile: mobileValidation.formatted,
       mode: finalMode,
-      date,
-      timeSlot,
+      date: finalDate || undefined,
+      timeSlot: timeSlot ? normalizeTime(timeSlot) : undefined,
       purpose,
       inquiryId,
     });

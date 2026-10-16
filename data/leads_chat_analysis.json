@@ -1,5 +1,72 @@
 [
   {
+    "analysisId": "ANL-2026-1039",
+    "inquiryId": "GPUC-2026-INQ-1039",
+    "timestamp": "2026-10-16T10:04:39.189Z",
+    "studentName": "qwertyu",
+    "parentName": "wertyui",
+    "mobile": "9845012345",
+    "location": "Yelahanka",
+    "admissionClass": "11th Class (1st PU)",
+    "totalQueries": 0,
+    "queries": [],
+    "leadSource": "chatbot_inquiry_wizard"
+  },
+  {
+    "analysisId": "ANL-2026-1038",
+    "inquiryId": "GPUC-2026-INQ-1038",
+    "timestamp": "2026-10-16T09:55:40.457Z",
+    "studentName": "qwertyu",
+    "parentName": "wertyui",
+    "mobile": "+91 8123456789",
+    "location": "ertyu5678",
+    "admissionClass": "12th Class (2nd PU) / 11th Class",
+    "totalQueries": 1,
+    "queries": [
+      {
+        "query": "What is the admission process for academic year 2026-2027 at North Campus?",
+        "timestamp": "2026-10-16T09:55:24.446Z"
+      }
+    ],
+    "leadSource": "onboarding_step_2"
+  },
+  {
+    "analysisId": "ANL-2026-1037",
+    "inquiryId": "GPUC-2026-INQ-1037",
+    "timestamp": "2026-10-16T09:55:06.408Z",
+    "studentName": "asdfghjkl",
+    "parentName": "cvbnm",
+    "mobile": "+91 8123456789",
+    "location": "ytugihoj, 3456789",
+    "admissionClass": "12th Class (2nd PU) / 11th Class",
+    "totalQueries": 1,
+    "queries": [
+      {
+        "query": "What is the admission process for academic year 2026-2027 at North Campus?",
+        "timestamp": "2026-10-16T09:54:34.086Z"
+      }
+    ],
+    "leadSource": "onboarding_step_2"
+  },
+  {
+    "analysisId": "ANL-2026-1036",
+    "inquiryId": "GPUC-2026-INQ-1036",
+    "timestamp": "2026-10-16T09:09:25.883Z",
+    "studentName": "qwertyuiop",
+    "parentName": "qwert",
+    "mobile": "+91 8123456789",
+    "location": "tt palya 560077",
+    "admissionClass": "12th Class (2nd PU) / 11th Class",
+    "totalQueries": 1,
+    "queries": [
+      {
+        "query": "What is the admission process for academic year 2026-2027 at North Campus?",
+        "timestamp": "2026-10-16T09:07:00.310Z"
+      }
+    ],
+    "leadSource": "onboarding_step_2"
+  },
+  {
     "analysisId": "ANL-2026-1035",
     "inquiryId": "GPUC-2026-INQ-1035",
     "timestamp": "2026-10-16T08:45:39.185Z",

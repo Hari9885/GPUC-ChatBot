@@ -285,7 +285,16 @@ export function getTomorrowDateString(): string {
 }
 
 export function normalizeTime(time: string): string {
+  if (!time) return '09:00 AM';
   const t = time.trim().toUpperCase().replace(/\s+/g, ' ');
+  // First check if a time pattern like "12:00 PM" or "9:30 AM" or "9 AM" exists inside the string
+  const embeddedMatch = t.match(/\b(0?[1-9]|1[0-2])(?::([0-5][0-9]))?\s*(AM|PM)\b/i);
+  if (embeddedMatch) {
+    const hh = embeddedMatch[1].padStart(2, '0');
+    const mm = embeddedMatch[2] || '00';
+    const ap = embeddedMatch[3].toUpperCase();
+    return `${hh}:${mm} ${ap}`;
+  }
   const match = t.match(/^(0?[1-9]|1[0-2]):([0-5][0-9])\s*(AM|PM)?$/i);
   if (match) {
     const hh = match[1].padStart(2, '0');

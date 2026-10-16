@@ -89,6 +89,7 @@ interface Message {
     timeSlot: string;
     venue: string;
     studentName: string;
+    parentName?: string;
     mobile: string;
     instructions?: string;
   };
@@ -1008,7 +1009,8 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
             timeSlot: apt.timeSlot || '8:30 AM - 5:00 PM',
             venue: apt.meetingLinkOrVenue,
             studentName: currentLead.studentName,
-            mobile: currentLead.mobile,
+            parentName: currentLead.parentName,
+            mobile: apt.mobile || currentLead.mobile,
             instructions: 'Please present this ticket reference at the Admissions Desk upon arrival.',
           },
         },
@@ -1129,6 +1131,8 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: currentLead.studentName + (currentLead.parentName ? ` (Parent: ${currentLead.parentName})` : ''),
+          studentName: currentLead.studentName,
+          parentName: currentLead.parentName,
           mobile: currentLead.mobile,
           mode: 'online_meeting',
           date: selDate,
@@ -1159,13 +1163,23 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
               timeSlot: apt.timeSlot,
               venue: apt.meetingLinkOrVenue,
               studentName: currentLead.studentName,
-              mobile: currentLead.mobile,
+              parentName: currentLead.parentName,
+              mobile: apt.mobile || currentLead.mobile,
               instructions: 'Our Admissions team will contact you 1 minute before the allocated time and you will receive a WhatsApp notification confirming your ticket initiation and request.',
             },
           },
         ]);
       } else {
-        // Slot unavailable / conflict -> refresh slots for this date
+        const errorMsg = bookData.error || (bookRes.status === 409
+          ? `The slot for ${selDate} at ${selTime} is no longer available. Please select another slot below.`
+          : `Unable to complete booking. Please select another slot or reach out to our Admissions Desk.`);
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            content: enforceMaxThreeLines(errorMsg),
+          },
+        ]);
         await handleSlotDateChange(selDate);
       }
     } catch (err) {
@@ -3217,7 +3231,10 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px', marginBottom: '10px' }}>
                             <div>
                               <div style={{ fontSize: '0.68rem', color: '#64748B' }}>Student Name</div>
-                              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#1E293B' }}>{msg.ticketData.studentName}</div>
+                              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#1E293B' }}>
+                                {msg.ticketData.studentName}
+                                {msg.ticketData.parentName ? ` (Parent: ${msg.ticketData.parentName})` : ''}
+                              </div>
                             </div>
                             <div>
                               <div style={{ fontSize: '0.68rem', color: '#64748B' }}>Registered Mobile</div>
