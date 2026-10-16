@@ -137,7 +137,10 @@
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28), 0 2px 10px rgba(0, 0, 0, 0.08) !important;
       z-index: 2147483645 !important;
       overflow: visible !important;
-      transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                  height 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                  opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
       opacity: 0 !important;
       transform: translateY(16px) scale(0.97) !important;
       pointer-events: none !important;
@@ -381,6 +384,12 @@
     if (isMaximized) {
       isMaximized = false;
       containerEl.classList.remove('maximized');
+      try {
+        iframeEl.contentWindow?.postMessage({
+          type: 'GPUC_WIDGET_SET_MAXIMIZED',
+          isMaximized: false
+        }, '*');
+      } catch (err) {}
     }
 
     isResizing = true;
@@ -552,6 +561,42 @@
     tooltipEl.classList.remove('visible');
   });
 
+  // Preset dimension toggle (Small: 420x640 vs Big: 1040xViewport)
+  const PRESET_SMALL_W = 420;
+  const PRESET_SMALL_H = 640;
+
+  function setPresetMaximize(nextMaximized) {
+    isMaximized = nextMaximized;
+    containerEl.classList.remove('is-resizing');
+
+    if (isMaximized) {
+      containerEl.classList.add('maximized');
+      const maxW = Math.min(1040, window.innerWidth - 32);
+      const maxH = Math.max(500, window.innerHeight - 36);
+      containerEl.style.setProperty('width', `${maxW}px`, 'important');
+      containerEl.style.setProperty('height', `${maxH}px`, 'important');
+      try {
+        localStorage.setItem('gpuc_chat_custom_width', maxW.toString());
+        localStorage.setItem('gpuc_chat_custom_height', maxH.toString());
+      } catch (e) {}
+    } else {
+      containerEl.classList.remove('maximized');
+      containerEl.style.setProperty('width', `${PRESET_SMALL_W}px`, 'important');
+      containerEl.style.setProperty('height', `${PRESET_SMALL_H}px`, 'important');
+      try {
+        localStorage.setItem('gpuc_chat_custom_width', PRESET_SMALL_W.toString());
+        localStorage.setItem('gpuc_chat_custom_height', PRESET_SMALL_H.toString());
+      } catch (e) {}
+    }
+
+    try {
+      iframeEl.contentWindow?.postMessage({
+        type: 'GPUC_WIDGET_SET_MAXIMIZED',
+        isMaximized: isMaximized
+      }, '*');
+    } catch (e) {}
+  }
+
   // Listen to postMessages from chatbot iframe (close, minimize, maximize)
   window.addEventListener('message', (event) => {
     if (!event.data || typeof event.data !== 'object') return;
@@ -559,12 +604,7 @@
     if (event.data.type === 'GPUC_CHAT_CLOSE' || event.data.type === 'GPUC_CHAT_MINIMIZE') {
       closeChat();
     } else if (event.data.type === 'GPUC_CHAT_MAXIMIZE') {
-      isMaximized = !isMaximized;
-      if (isMaximized) {
-        containerEl.classList.add('maximized');
-      } else {
-        containerEl.classList.remove('maximized');
-      }
+      setPresetMaximize(!isMaximized);
     }
   });
 
@@ -613,12 +653,13 @@
     window.addEventListener('load', triggerAutoPopup);
   }
 
-  // Ensure iframe content receives open state as soon as it loads
+  // Ensure iframe content receives open and maximize states as soon as it loads
   iframeEl.addEventListener('load', () => {
-    if (isOpen) {
-      try {
+    try {
+      if (isOpen) {
         iframeEl.contentWindow?.postMessage({ type: 'GPUC_WIDGET_SET_OPEN', isOpen: true }, '*');
-      } catch (e) {}
-    }
+      }
+      iframeEl.contentWindow?.postMessage({ type: 'GPUC_WIDGET_SET_MAXIMIZED', isMaximized: isMaximized }, '*');
+    } catch (e) {}
   });
 })();

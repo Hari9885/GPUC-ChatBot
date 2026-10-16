@@ -583,6 +583,8 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
           if (e.data.type === 'GPUC_WIDGET_SET_OPEN') {
             setIsChatOpen(!!e.data.isOpen);
             setIsEmbedded(true);
+          } else if (e.data.type === 'GPUC_WIDGET_SET_MAXIMIZED') {
+            setIsMaximized(!!e.data.isMaximized);
           }
         }
       };
@@ -1760,11 +1762,42 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
     }
   };
 
+  const PRESET_SMALL_WIDTH = 420;
+  const PRESET_SMALL_HEIGHT = 640;
+
   const handleWidgetMaximize = () => {
+    const nextMaximized = !isMaximized;
+    setIsMaximized(nextMaximized);
+
     if (isEmbedded) {
       window.parent?.postMessage({ type: 'GPUC_CHAT_MAXIMIZE' }, '*');
+    } else {
+      const chatEl = document.getElementById('gpuc-chat-window');
+      if (chatEl) {
+        chatEl.classList.remove('is-resizing');
+        if (nextMaximized) {
+          const bigW = Math.min(1040, window.innerWidth - 36);
+          const bigH = Math.max(500, window.innerHeight - 40);
+          chatEl.style.width = `${bigW}px`;
+          chatEl.style.height = `${bigH}px`;
+          setCustomWidth(bigW);
+          setCustomHeight(bigH);
+          try {
+            localStorage.setItem('gpuc_chat_custom_width', bigW.toString());
+            localStorage.setItem('gpuc_chat_custom_height', bigH.toString());
+          } catch (e) {}
+        } else {
+          chatEl.style.width = `${PRESET_SMALL_WIDTH}px`;
+          chatEl.style.height = `${PRESET_SMALL_HEIGHT}px`;
+          setCustomWidth(PRESET_SMALL_WIDTH);
+          setCustomHeight(PRESET_SMALL_HEIGHT);
+          try {
+            localStorage.setItem('gpuc_chat_custom_width', PRESET_SMALL_WIDTH.toString());
+            localStorage.setItem('gpuc_chat_custom_height', PRESET_SMALL_HEIGHT.toString());
+          } catch (e) {}
+        }
+      }
     }
-    setIsMaximized((prev) => !prev);
   };
 
   return (
@@ -2122,7 +2155,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                 {/* Maximize / Restore Button - Always present */}
                 <button
                   onClick={handleWidgetMaximize}
-                  title={isMaximized ? 'Restore Standard Size' : 'Maximize Assistant'}
+                  title={isMaximized ? 'Restore Standard Size (Preset Small: 420 × 640)' : 'Maximize Assistant (Preset Large)'}
                   aria-label={isMaximized ? 'Restore Standard Size' : 'Maximize Assistant'}
                   style={{
                     background: isMaximized ? 'rgba(245, 158, 11, 0.22)' : 'transparent',
