@@ -208,46 +208,12 @@
     }
 
     .gpuc-resize-corner {
-      top: -10px !important;
-      left: -10px !important;
-      width: 36px !important;
-      height: 36px !important;
+      top: -8px !important;
+      left: -8px !important;
+      width: 24px !important;
+      height: 24px !important;
       cursor: nwse-resize !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-    }
-
-    .gpuc-resize-corner-grip {
-      position: absolute !important;
-      top: 8px !important;
-      left: 8px !important;
-      width: 22px !important;
-      height: 22px !important;
-      border-radius: 6px !important;
-      background: rgba(15, 23, 42, 0.85) !important;
-      backdrop-filter: blur(4px) !important;
-      border: 1.5px solid rgba(255, 255, 255, 0.45) !important;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35) !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      transition: all 0.16s ease !important;
-      cursor: nwse-resize !important;
-      pointer-events: none !important;
-    }
-
-    .gpuc-resize-corner:hover .gpuc-resize-corner-grip {
-      background: #F59E0B !important;
-      border-color: #FFFFFF !important;
-      transform: scale(1.15) !important;
-      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.55) !important;
-    }
-
-    .gpuc-resize-corner-grip svg {
-      width: 12px !important;
-      height: 12px !important;
-      stroke: #FFFFFF !important;
+      background: transparent !important;
     }
 
     #gpuc-resize-shield {
@@ -404,17 +370,7 @@
 
   const resizeHandleCorner = document.createElement('div');
   resizeHandleCorner.className = 'gpuc-resize-handle gpuc-resize-corner';
-  resizeHandleCorner.title = 'Drag corner to freely expand size';
-  resizeHandleCorner.innerHTML = `
-    <div class="gpuc-resize-corner-grip" title="Drag to resize freely">
-      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="15 3 21 3 21 9"></polyline>
-        <polyline points="9 21 3 21 3 15"></polyline>
-        <line x1="21" y1="3" x2="14" y2="10"></line>
-        <line x1="3" y1="21" x2="10" y2="14"></line>
-      </svg>
-    </div>
-  `;
+  resizeHandleCorner.title = 'Drag to freely expand size';
 
   containerEl.appendChild(resizeHandleTop);
   containerEl.appendChild(resizeHandleLeft);
