@@ -3,6 +3,7 @@ import {
   readDB,
   writeDB,
   getTomorrowDateString,
+  getNext3Days,
   checkSlotAvailability,
   getNextAvailableSlot,
   bookAppointment,
@@ -13,9 +14,24 @@ export async function GET(req: NextRequest) {
   try {
     const db = readDB();
     const url = new URL(req.url);
-    const tomorrowDate = getTomorrowDateString();
+    const next3Days = getNext3Days();
+    const defaultDate = next3Days[0]?.dateStr || getTomorrowDateString();
 
-    // Check specific slot availability if queried
+function parseTimeToMinutes(timeStr: string): number {
+  const match = timeStr.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)?$/i);
+  if (!match) return 0;
+  let h = parseInt(match[1], 10);
+  const m = parseInt(match[2], 10);
+  const ampm = (match[3] || 'AM').toUpperCase();
+  if (ampm === 'PM' && h !== 12) h += 12;
+  if (ampm === 'AM' && h === 12) h = 0;
+  return h * 60 + m;
+}
+
+function sortSlotsChronologically<T extends { time: string }>(slots: T[]): T[] {
+  return [...slots].sort((a, b) => parseTimeToMinutes(a.time) - parseTimeToMinutes(b.time));
+}
+
     const queryDate = url.searchParams.get('date');
     const queryTime = url.searchParams.get('time');
 
@@ -25,8 +41,10 @@ export async function GET(req: NextRequest) {
         ? getNextAvailableSlot(db, queryDate, queryTime, 'Admissions')
         : null;
 
-      const dateSlots = db.slots.filter(
-        (s) => s.date === queryDate && !s.isBooked && s.department.toLowerCase().includes('admissions')
+      const dateSlots = sortSlotsChronologically(
+        db.slots.filter(
+          (s) => s.date === queryDate && !s.isBooked && s.department.toLowerCase().includes('admissions')
+        )
       );
 
       return NextResponse.json({
@@ -35,36 +53,42 @@ export async function GET(req: NextRequest) {
         reason: check.reason,
         nextAvailableSlot: nextSlot,
         availableSlotsForDate: dateSlots,
+        next3Days,
       });
     }
 
     if (queryDate && !queryTime) {
-      const dateSlots = db.slots.filter(
-        (s) => s.date === queryDate && !s.isBooked && s.department.toLowerCase().includes('admissions')
+      const dateSlots = sortSlotsChronologically(
+        db.slots.filter(
+          (s) => s.date === queryDate && !s.isBooked && s.department.toLowerCase().includes('admissions')
+        )
       );
       return NextResponse.json({
         availableSlotsForDate: dateSlots,
+        next3Days,
+        selectedDate: queryDate,
       });
     }
 
-    // Check tomorrow 9:00 AM specifically
-    const tomorrow9AmCheck = checkSlotAvailability(db, tomorrowDate, '09:00 AM', 'Admissions');
-    const nextAfterTomorrow9Am = !tomorrow9AmCheck.available
-      ? getNextAvailableSlot(db, tomorrowDate, '09:00 AM', 'Admissions')
-      : null;
-
-    const availableSlots = db.slots
-      .filter((s) => !s.isBooked && s.department.toLowerCase().includes('admissions'))
-      .slice(0, 8);
+    // Default: return next 3 days and available slots for day 1 as well as all 3 days
+    const next3Dates = next3Days.map((d) => d.dateStr);
+    const defaultDateSlots = sortSlotsChronologically(
+      db.slots.filter(
+        (s) => s.date === defaultDate && !s.isBooked && s.department.toLowerCase().includes('admissions')
+      )
+    );
+    const all3DaysSlots = sortSlotsChronologically(
+      db.slots.filter(
+        (s) => next3Dates.includes(s.date) && !s.isBooked && s.department.toLowerCase().includes('admissions')
+      )
+    );
 
     return NextResponse.json({
+      next3Days,
+      defaultDate,
+      availableSlotsForDate: defaultDateSlots,
+      availableSlots: all3DaysSlots,
       appointments: db.appointments,
-      slots: db.slots,
-      tomorrowDate,
-      isTomorrow9AmAvailable: tomorrow9AmCheck.available,
-      tomorrowSlot: tomorrow9AmCheck.slot,
-      nextAvailableSlot: nextAfterTomorrow9Am,
-      availableSlots,
     });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });

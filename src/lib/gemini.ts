@@ -1,7 +1,12 @@
 import { toolDeclarations, executeTool } from './tools';
 import { searchKnowledge, loadFAQs } from './knowledge';
-import { stripStarsAndAsterisks, enforceMaxThreeLines } from './textUtils';
-export { stripStarsAndAsterisks, enforceMaxThreeLines };
+import {
+  stripStarsAndAsterisks,
+  enforceMaxThreeLines,
+  isNonsenseOrIncomprehensible,
+  INCOMPREHENSIBLE_RESPONSE,
+} from './textUtils';
+export { stripStarsAndAsterisks, enforceMaxThreeLines, isNonsenseOrIncomprehensible, INCOMPREHENSIBLE_RESPONSE };
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
 
@@ -18,7 +23,8 @@ export interface ChatMessage {
 }
 
 export const OUT_OF_SCOPE_RESPONSE =
-  "I can help with Gopalan PU College information, courses, admissions, facilities and appointments. What would you like to know about the college?";
+  "I cannot help with that request as I am unable to understand or process requests outside college admissions. I can help with requests about Gopalan PU College courses, admissions, facilities, and campus visits.";
+
 
 export function isOutOfScopeQuery(query: string): boolean {
   if (!query || typeof query !== 'string') return false;
@@ -86,13 +92,16 @@ export function isOutOfScopeQuery(query: string): boolean {
 export const MASTER_SYSTEM_INSTRUCTION = `
 SYSTEM PROMPT — GOPALAN PRE-UNIVERSITY COLLEGE (NORTH CAMPUS, YELAHANKA) AI ASSISTANT
 
-0. STRICT SCOPE BOUNDARY (MANDATORY & ABSOLUTE):
+0. STRICT SCOPE & COMPREHENSIBILITY BOUNDARY (MANDATORY & ABSOLUTE):
 - You are EXCLUSIVELY the Admissions & College Information Assistant for GOPALAN PRE-UNIVERSITY COLLEGE (GPUC) — NORTH CAMPUS, Yelahanka, Bengaluru.
 - You are STRICTLY FORBIDDEN from answering any question unrelated to Gopalan Pre-University College North Campus.
+- IF THE USER MESSAGE DOES NOT MAKE SENSE, IS INCOMPREHENSIBLE, OR IS GIBBERISH (such as keyboard smashes like "wkfjehgisdfvkchdjsbrv", random letters, or nonsensical input):
+  Respond strictly with:
+  "I cannot help with that request as I am unable to understand the message... I can help with requests about Gopalan PU College / school admissions, courses, facilities, and campus visits."
 - NEVER answer questions about general knowledge, national or world politics, presidents, prime ministers, external history, geography, science/homework problems, coding, jokes, weather, movies, sports, or other institutions.
 - IF THE USER ASKS ANY OUT-OF-SCOPE OR UNRELATED QUESTION (such as "president of india", "who is the prime minister", "capital of france", "what is the meaning of life", "tell a joke", "write code", etc.), DO NOT ANSWER THE QUESTION.
-- For ANY out-of-scope question, you must respond ONLY with this exact approved policy answer:
-"I can help with Gopalan PU College information, courses, admissions, facilities and appointments. What would you like to know about the college?"
+- For ANY out-of-scope question, you must respond ONLY with this exact policy answer:
+  "I cannot help with that request as I am unable to understand or process requests outside college admissions. I can help with requests about Gopalan PU College courses, admissions, facilities, and campus visits."
 - Never answer the trivia question and then add a disclaimer. The refusal must be immediate, direct, and adhere to this exact wording.
 
 1. STRICT MAXIMUM 3 LINES RULE (MANDATORY):
@@ -154,6 +163,14 @@ export async function callGemini(
   const userQuery = lastUserMsg?.parts?.[0]?.text || '';
   const cleanQ = userQuery.toLowerCase().trim();
   const cleanQWithoutPunct = cleanQ.replace(/[!.,?]+$/, '').trim();
+
+  // Instant response for nonsense / incomprehensible / keyboard smash queries
+  if (isNonsenseOrIncomprehensible(userQuery)) {
+    return {
+      text: INCOMPREHENSIBLE_RESPONSE,
+      toolCallsExecuted: [],
+    };
+  }
 
   // Instant response for out-of-scope / general knowledge queries
   if (isOutOfScopeQuery(userQuery)) {

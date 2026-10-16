@@ -28,23 +28,37 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import GpucWebsite from '@/components/GpucWebsite';
-import { stripStarsAndAsterisks, enforceMaxThreeLines, formatPhoneNumbers, getTomorrowDateString } from '@/lib/textUtils';
+import {
+  stripStarsAndAsterisks,
+  enforceMaxThreeLines,
+  formatPhoneNumbers,
+  getTomorrowDateString,
+  isNonsenseOrIncomprehensible,
+  INCOMPREHENSIBLE_RESPONSE,
+} from '@/lib/textUtils';
 
 const ADMISSION_TIME_OPTIONS = [
   '09:00 AM',
-  '09:30 AM',
+  '09:20 AM',
+  '09:40 AM',
   '10:00 AM',
-  '10:30 AM',
+  '10:20 AM',
+  '10:40 AM',
   '11:00 AM',
-  '11:30 AM',
+  '11:20 AM',
+  '11:40 AM',
   '12:00 PM',
-  '12:30 PM',
+  '12:20 PM',
+  '12:40 PM',
   '02:00 PM',
-  '02:30 PM',
+  '02:20 PM',
+  '02:40 PM',
   '03:00 PM',
-  '03:30 PM',
+  '03:20 PM',
+  '03:40 PM',
   '04:00 PM',
-  '04:30 PM',
+  '04:20 PM',
+  '04:40 PM',
   '05:00 PM',
 ];
 
@@ -316,7 +330,11 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
   >('idle');
   const [customSlotDate, setCustomSlotDate] = useState('');
   const [customSlotTime, setCustomSlotTime] = useState('10:00 AM');
-  const [availableSlotsList, setAvailableSlotsList] = useState<Array<{ date: string; time: string; department: string }>>([]);
+  const [next3DaysList, setNext3DaysList] = useState<Array<{ dateStr: string; displayLabel: string; shortDate: string }>>([]);
+  const [selectedSlotDate, setSelectedSlotDate] = useState('');
+  const [availableSlotsList, setAvailableSlotsList] = useState<Array<{ id?: string; date: string; time: string; department: string }>>([]);
+  const [allOpenSlots, setAllOpenSlots] = useState<Array<{ id?: string; date: string; time: string; department: string }>>([]);
+  const [loadingSlots, setLoadingSlots] = useState<boolean>(false);
 
   // Session queries tracking for lead analytics (only saved if user provides phone number)
   const sessionQueriesRef = useRef<Array<{ query: string; timestamp: string }>>([]);
@@ -942,21 +960,40 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
     }
   };
 
-  // Online Meeting: Request date & time from user (do not display availability the first time)
+  // Online Meeting: Show available slots for the next 3 days with date dropdown and 20-min slots
   const handleInitiateOnlineMeeting = async () => {
     const userMsg: Message = { role: 'user', content: 'Request an Online Meeting' };
     setMessages((prev) => [...prev, userMsg]);
     setIsTyping(true);
     setLoading(true);
 
-    const targetDate = customSlotDate || getTomorrowDateString();
-    setCustomSlotDate(targetDate);
-    setCustomSlotTime('10:00 AM');
+    let days: Array<{ dateStr: string; displayLabel: string; shortDate: string }> = [];
+    let defDate = '';
+    let openSlots: Array<{ id?: string; date: string; time: string; department: string }> = [];
+    let allSlots: Array<{ id?: string; date: string; time: string; department: string }> = [];
+
+    try {
+      const res = await fetch('/api/appointments');
+      const data = await res.json();
+      days = data.next3Days || [];
+      defDate = data.defaultDate || days[0]?.dateStr || getTomorrowDateString();
+      openSlots = data.availableSlotsForDate || [];
+      allSlots = data.availableSlots || [];
+    } catch (err) {
+      console.error('Failed to load slots:', err);
+      defDate = getTomorrowDateString();
+    }
+
+    setNext3DaysList(days);
+    setSelectedSlotDate(defDate);
+    setCustomSlotDate(defDate);
+    setAvailableSlotsList(openSlots);
+    setAllOpenSlots(allSlots);
     setBookingFlowState('asking_check_slot');
 
-    await new Promise((res) => setTimeout(res, 800));
+    await new Promise((res) => setTimeout(res, 600));
 
-    const replyContent = `Please select your preferred date and time to check slot availability with our Admissions Department:`;
+    const replyContent = `Please select your preferred date (next 3 days) and tap an available 20-minute consultation slot with our Admissions team:`;
 
     setMessages((prev) => [
       ...prev,
@@ -971,49 +1008,63 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
     setLoading(false);
   };
 
-  // Check user requested slot with timetable and book or show open slots
-  const handleCheckAndBookSlot = async (selDate: string, selTime: string) => {
+  const handleSlotDateChange = async (dateStr: string) => {
+    setSelectedSlotDate(dateStr);
+    setCustomSlotDate(dateStr);
+    setLoadingSlots(true);
+    try {
+      const res = await fetch(`/api/appointments?date=${encodeURIComponent(dateStr)}`);
+      const data = await res.json();
+      if (data.availableSlotsForDate) {
+        setAvailableSlotsList(data.availableSlotsForDate);
+      } else {
+        setAvailableSlotsList(allOpenSlots.filter((s) => s.date === dateStr));
+      }
+    } catch (e) {
+      setAvailableSlotsList(allOpenSlots.filter((s) => s.date === dateStr));
+    } finally {
+      setLoadingSlots(false);
+    }
+  };
+
+  const handleDirectBookSlot = async (selDate: string, selTime: string) => {
     const currentLead = userLead || {
       inquiryId: 'GPUC-2026-INQ-1001',
       studentName: leadStudentName || 'Prospective Student',
       parentName: leadParentName,
       mobile: leadMobile || '9845012345',
-      admissionClass: '12th Class (2nd PU)',
+      admissionClass: '11th Class (1st PU)',
       inquiryType: 'Online Meeting',
     };
 
-    const userMsg: Message = { role: 'user', content: `Check ${selDate} at ${selTime}` };
+    const userMsg: Message = { role: 'user', content: `Book ${selDate} at ${selTime}` };
     setMessages((prev) => [...prev, userMsg]);
     setIsTyping(true);
     setLoading(true);
 
     try {
-      const minWait = new Promise((res) => setTimeout(res, 1200));
-      // 1. Check availability with admissions timetable
-      const checkRes = await fetch(`/api/appointments?date=${encodeURIComponent(selDate)}&time=${encodeURIComponent(selTime)}`);
-      const checkData = await checkRes.json();
+      const minWait = new Promise((res) => setTimeout(res, 1000));
+      const bookRes = await fetch('/api/appointments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: currentLead.studentName + (currentLead.parentName ? ` (Parent: ${currentLead.parentName})` : ''),
+          mobile: currentLead.mobile,
+          mode: 'online_meeting',
+          date: selDate,
+          timeSlot: selTime,
+          inquiryId: currentLead.inquiryId,
+          purpose: `Online Admission Consultation (${currentLead.admissionClass})`,
+        }),
+      });
+      const bookData = await bookRes.json();
       await minWait;
 
-      if (checkData.available) {
-        // Slot is available! Book immediately
-        const bookRes = await fetch('/api/appointments', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: currentLead.studentName + (currentLead.parentName ? ` (Parent: ${currentLead.parentName})` : ''),
-            mobile: currentLead.mobile,
-            mode: 'online_meeting',
-            date: selDate,
-            timeSlot: selTime,
-            inquiryId: currentLead.inquiryId,
-            purpose: `Online Admission Consultation (${currentLead.admissionClass})`,
-          }),
-        });
-        const bookData = await bookRes.json();
+      if (bookRes.ok && bookData.success) {
         const apt = bookData.appointment;
         setBookingFlowState('completed');
 
-        const replyContent = `Your online consultation is confirmed for ${apt.date} at ${apt.timeSlot} (Ref: ${apt.id}).\n\nOur Admissions team will contact you 1 minute before the allocated time and you will receive a WhatsApp notification confirming your ticket initiation and request.`;
+        const replyContent = `Your 20-minute online consultation is confirmed for ${apt.date} at ${apt.timeSlot} (Ref: ${apt.id}).\n\nOur Admissions team will contact you 1 minute before the allocated time and you will receive a WhatsApp notification confirming your ticket initiation and request.`;
 
         setMessages((prev) => [
           ...prev,
@@ -1034,34 +1085,21 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
           },
         ]);
       } else {
-        // Requested slot is unavailable! Now show available timetable slots
-        const openSlots: Array<{ date: string; time: string; department: string }> =
-          checkData.availableSlotsForDate && checkData.availableSlotsForDate.length > 0
-            ? checkData.availableSlotsForDate
-            : (checkData.availableSlots || []);
-
-        setAvailableSlotsList(openSlots);
-        setBookingFlowState('showing_available_slots');
-
-        const replyContent = `The slot on ${selDate} at ${selTime} is currently booked.\n\nHere are the available time slots with our Admissions department for ${selDate}. Please select an open slot:`;
-
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: 'assistant',
-            content: enforceMaxThreeLines(replyContent),
-            step: 'show_available_slots',
-            availableSlotsList: openSlots,
-          },
-        ]);
+        // Slot unavailable / conflict -> refresh slots for this date
+        await handleSlotDateChange(selDate);
       }
     } catch (err) {
-      console.error('Check and book slot error:', err);
+      console.error('Direct book slot error:', err);
       handleCannotAgreeDeskFallback();
     } finally {
       setIsTyping(false);
       setLoading(false);
     }
+  };
+
+  // Backwards compatible slot checker & booker
+  const handleCheckAndBookSlot = async (selDate: string, selTime: string) => {
+    return handleDirectBookSlot(selDate, selTime);
   };
 
   // Fallback to Desk Helpline when user cannot find or agree to a slot
@@ -1095,6 +1133,27 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
       query: text,
       timestamp: new Date().toISOString(),
     });
+
+    // Nonsense / Incomprehensible / Gibberish message handling
+    if (isNonsenseOrIncomprehensible(text)) {
+      const userMsg: Message = { role: 'user', content: text };
+      setInput('');
+      setMessages((prev) => [...prev, userMsg]);
+      setIsTyping(true);
+
+      setTimeout(() => {
+        setIsTyping(false);
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            content: INCOMPREHENSIBLE_RESPONSE,
+          },
+        ]);
+      }, 900);
+
+      return;
+    }
 
     // Handle user inputs during lead onboarding steps if user typed into the chat input:
     if (leadStep === 'ask_student_name') {
@@ -1196,8 +1255,8 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
         return;
       }
       setInput('');
-      const targetDate = customSlotDate || getTomorrowDateString();
-      handleCheckAndBookSlot(targetDate, text);
+      const targetDate = selectedSlotDate || customSlotDate || getTomorrowDateString();
+      handleDirectBookSlot(targetDate, text);
       return;
     }
 
@@ -1221,8 +1280,8 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
         return;
       }
       setInput('');
-      const targetDate = customSlotDate || getTomorrowDateString();
-      handleCheckAndBookSlot(targetDate, text);
+      const targetDate = selectedSlotDate || customSlotDate || getTomorrowDateString();
+      handleDirectBookSlot(targetDate, text);
       return;
     }
 
@@ -1428,6 +1487,10 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
     setIsSubmittingLead(false);
     setBookingFlowState('idle');
     setAvailableSlotsList([]);
+    setAllOpenSlots([]);
+    setNext3DaysList([]);
+    setSelectedSlotDate('');
+    setLoadingSlots(false);
     setCustomSlotDate('');
     setCustomSlotTime('10:00 AM');
     sessionQueriesRef.current = [];
@@ -1443,8 +1506,8 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
 
   const getInputPlaceholder = () => {
     if (bookingFlowState === 'offered_choice') return "Type 'offline' for visit or 'online' for meeting...";
-    if (bookingFlowState === 'asking_check_slot') return "Select date & time above or type preferred time...";
-    if (bookingFlowState === 'showing_available_slots') return "Select an available slot or type your time...";
+    if (bookingFlowState === 'asking_check_slot') return "Select date & tap an available 20-min slot above...";
+    if (bookingFlowState === 'showing_available_slots') return "Tap an open 20-minute slot or type your time...";
     return "Ask anything about GPUC...";
   };
 
@@ -2640,7 +2703,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                         </div>
                       )}
 
-                      {/* Step: Ask User to Check Preferred Date & Time (Do not display availability the first time) */}
+                      {/* Step: Select Date (Next 3 Days) & Direct 20-Min Slot Booking */}
                       {msg.step === 'ask_custom_slot' && bookingFlowState === 'asking_check_slot' && (
                         <div
                           style={{
@@ -2654,107 +2717,128 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                             boxSizing: 'border-box',
                           }}
                         >
-                          <div style={{ fontSize: '0.74rem', fontWeight: 700, color: '#1E40AF', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                            <Calendar size={13} color="#2563EB" /> Check Consultation Slot Availability
+                          <div style={{ fontSize: '0.76rem', fontWeight: 700, color: '#1E40AF', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <Calendar size={14} color="#2563EB" /> Available Consultation Slots
                           </div>
 
-                          <div style={{ fontSize: '0.74rem', color: '#475569', marginBottom: '10px' }}>
-                            Select your preferred date and 30-minute consultation window to check availability with our Admissions team:
+                          <div style={{ fontSize: '0.72rem', color: '#475569', marginBottom: '10px' }}>
+                            Select your date from the next 3 days and tap any available 20-minute consultation window to confirm your booking:
                           </div>
 
-                          {/* Date and Time Selectors */}
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '10px' }}>
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 600, color: '#475569', marginBottom: '3px' }}>
-                                Preferred Date:
-                              </label>
-                              <input
-                                type="date"
-                                min={getTomorrowDateString()}
-                                value={customSlotDate || getTomorrowDateString()}
-                                onChange={(e) => setCustomSlotDate(e.target.value)}
-                                style={{
-                                  width: '100%',
-                                  boxSizing: 'border-box',
-                                  padding: '7px 10px',
-                                  borderRadius: '7px',
-                                  border: '1px solid #CBD5E1',
-                                  fontSize: '0.8rem',
-                                  color: '#0F172A',
-                                  background: '#F8FAFC',
-                                  outline: 'none',
-                                }}
-                              />
-                            </div>
-
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 600, color: '#475569', marginBottom: '3px' }}>
-                                Preferred 30-Min Time Slot:
-                              </label>
-                              <select
-                                value={customSlotTime}
-                                onChange={(e) => setCustomSlotTime(e.target.value)}
-                                style={{
-                                  width: '100%',
-                                  boxSizing: 'border-box',
-                                  padding: '7px 10px',
-                                  borderRadius: '7px',
-                                  border: '1px solid #CBD5E1',
-                                  fontSize: '0.8rem',
-                                  color: '#0F172A',
-                                  background: '#F8FAFC',
-                                  outline: 'none',
-                                  cursor: 'pointer',
-                                }}
-                              >
-                                <optgroup label="Morning (9:00 AM – 12:30 PM)">
-                                  <option value="09:00 AM">09:00 AM</option>
-                                  <option value="09:30 AM">09:30 AM</option>
-                                  <option value="10:00 AM">10:00 AM</option>
-                                  <option value="10:30 AM">10:30 AM</option>
-                                  <option value="11:00 AM">11:00 AM</option>
-                                  <option value="11:30 AM">11:30 AM</option>
-                                  <option value="12:00 PM">12:00 PM</option>
-                                  <option value="12:30 PM">12:30 PM</option>
-                                </optgroup>
-                                <optgroup label="Afternoon (2:00 PM – 5:00 PM)">
-                                  <option value="02:00 PM">02:00 PM</option>
-                                  <option value="02:30 PM">02:30 PM</option>
-                                  <option value="03:00 PM">03:00 PM</option>
-                                  <option value="03:30 PM">03:30 PM</option>
-                                  <option value="04:00 PM">04:00 PM</option>
-                                  <option value="04:30 PM">04:30 PM</option>
-                                  <option value="05:00 PM">05:00 PM</option>
-                                </optgroup>
-                              </select>
-                            </div>
-                          </div>
-
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                            <button
-                              type="button"
-                              disabled={loading || isTyping}
-                              onClick={() => handleCheckAndBookSlot(customSlotDate || getTomorrowDateString(), customSlotTime)}
+                          {/* Date Selector Dropdown (Up to 3 Days Ahead) */}
+                          <div style={{ marginBottom: '10px' }}>
+                            <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>
+                              📅 Select Date (Next 3 Days):
+                            </label>
+                            <select
+                              value={selectedSlotDate || customSlotDate || (next3DaysList[0]?.dateStr || getTomorrowDateString())}
+                              onChange={(e) => handleSlotDateChange(e.target.value)}
+                              disabled={loading || isTyping || loadingSlots}
                               style={{
                                 width: '100%',
-                                padding: '9px 12px',
-                                background: 'linear-gradient(135deg, #2563EB, #1D4ED8)',
-                                color: '#FFFFFF',
-                                border: 'none',
+                                boxSizing: 'border-box',
+                                padding: '8px 10px',
                                 borderRadius: '8px',
-                                fontWeight: 700,
+                                border: '1.5px solid #93C5FD',
                                 fontSize: '0.8rem',
+                                fontWeight: 600,
+                                color: '#0F172A',
+                                background: '#F0F9FF',
+                                outline: 'none',
                                 cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '6px',
-                                boxShadow: '0 2px 6px rgba(37, 99, 235, 0.3)',
                               }}
                             >
-                              <Check size={14} /> Check Availability & Book Slot
-                            </button>
+                              {next3DaysList.length > 0 ? (
+                                next3DaysList.map((day) => (
+                                  <option key={day.dateStr} value={day.dateStr}>
+                                    {day.displayLabel}
+                                  </option>
+                                ))
+                              ) : (
+                                <option value={selectedSlotDate || getTomorrowDateString()}>
+                                  {selectedSlotDate || getTomorrowDateString()}
+                                </option>
+                              )}
+                            </select>
+                          </div>
 
+                          {/* Available 20-Min Time Slots Section */}
+                          <div style={{ marginBottom: '6px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <label style={{ fontSize: '0.7rem', fontWeight: 700, color: '#334155', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <Clock size={12} color="#2563EB" /> Available 20-Min Slots:
+                            </label>
+                            <span style={{ fontSize: '0.68rem', color: '#059669', fontWeight: 700, background: '#ECFDF5', padding: '2px 6px', borderRadius: '4px', border: '1px solid #A7F3D0' }}>
+                              {availableSlotsList.length} Open
+                            </span>
+                          </div>
+
+                          {loadingSlots ? (
+                            <div style={{ padding: '16px', textAlign: 'center', color: '#64748B', fontSize: '0.74rem' }}>
+                              Loading available slots...
+                            </div>
+                          ) : availableSlotsList.length > 0 ? (
+                            <div
+                              style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(3, 1fr)',
+                                gap: '6px',
+                                maxHeight: '180px',
+                                overflowY: 'auto',
+                                padding: '2px',
+                                marginBottom: '10px',
+                              }}
+                            >
+                              {availableSlotsList.map((slot, sIdx) => (
+                                <button
+                                  key={sIdx}
+                                  type="button"
+                                  disabled={loading || isTyping}
+                                  onClick={() => handleDirectBookSlot(selectedSlotDate || slot.date, slot.time)}
+                                  style={{
+                                    padding: '7px 4px',
+                                    background: '#F0FDF4',
+                                    border: '1.5px solid #22C55E',
+                                    borderRadius: '7px',
+                                    color: '#15803D',
+                                    fontSize: '0.74rem',
+                                    fontWeight: 700,
+                                    cursor: 'pointer',
+                                    textAlign: 'center',
+                                    transition: 'all 0.15s ease',
+                                    boxShadow: '0 1px 3px rgba(34, 197, 94, 0.15)',
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = '#22C55E';
+                                    e.currentTarget.style.color = '#FFFFFF';
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = '#F0FDF4';
+                                    e.currentTarget.style.color = '#15803D';
+                                  }}
+                                >
+                                  {slot.time}
+                                </button>
+                              ))}
+                            </div>
+                          ) : (
+                            <div
+                              style={{
+                                padding: '10px',
+                                background: '#FEF2F2',
+                                border: '1px solid #FECDD3',
+                                borderRadius: '7px',
+                                color: '#991B1B',
+                                fontSize: '0.72rem',
+                                textAlign: 'center',
+                                marginBottom: '10px',
+                              }}
+                            >
+                              All slots for this date are currently booked. Please choose another date or connect with our Help Desk.
+                            </div>
+                          )}
+
+                          {/* Fallback to Help Desk Button */}
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                             <button
                               type="button"
                               disabled={loading || isTyping}
@@ -2805,7 +2889,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                           </div>
 
                           <div style={{ fontSize: '0.74rem', color: '#475569', marginBottom: '10px' }}>
-                            The slot you requested is taken. Please select any open slot below to confirm your booking:
+                            The slot you requested is taken. Please select any open 20-minute slot below to confirm your booking:
                           </div>
 
                           {/* Available Slots Grid */}

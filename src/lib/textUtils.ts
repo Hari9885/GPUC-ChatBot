@@ -47,3 +47,75 @@ export function getTomorrowDateString(): string {
   }
   return tomorrow.toISOString().split('T')[0];
 }
+
+export const INCOMPREHENSIBLE_RESPONSE =
+  "I cannot help with that request as I am unable to understand the message... I can help with requests about Gopalan PU College / school admissions, courses, facilities, and campus visits.";
+
+const KNOWN_ACRONYMS = new Set([
+  'pcmb',
+  'pcmc',
+  'ceba',
+  'seba',
+  'meba',
+  'kcet',
+  'neet',
+  'jee',
+  'gpuc',
+  'puc',
+  'sslc',
+  'cbse',
+  'icse',
+  'nri',
+  'pu',
+]);
+
+export function isNonsenseOrIncomprehensible(query: string): boolean {
+  if (!query || typeof query !== 'string') return true;
+  const t = query.trim();
+  if (t.length === 0) return true;
+
+  // Single or two-letter random consonants (not 'hi', 'no', 'ok', etc.)
+  if (/^[b-df-hj-np-tv-z]{2,}$/i.test(t)) return true;
+
+  // Repetitive single character (e.g. 'aaaaaa', 'zzzzzz')
+  if (/^(.)\1{4,}$/i.test(t)) return true;
+
+  // Check individual words
+  const words = t.split(/\s+/).filter(Boolean);
+  let nonsenseWordsCount = 0;
+
+  for (const w of words) {
+    const cleanWord = w.toLowerCase().replace(/[^a-z]/g, '');
+    if (KNOWN_ACRONYMS.has(cleanWord)) continue;
+
+    if (cleanWord.length >= 5) {
+      // 5+ consecutive consonants (e.g., 'kchdjsbrv', 'dfghjk')
+      if (/[b-df-hj-np-tv-z]{5,}/i.test(cleanWord)) {
+        nonsenseWordsCount++;
+        continue;
+      }
+      // Vowel ratio check (< 12% vowels in >= 6 chars)
+      const vowels = cleanWord.match(/[aeiou]/g) || [];
+      const vowelRatio = vowels.length / cleanWord.length;
+      if (vowelRatio < 0.12 && cleanWord.length >= 6) {
+        nonsenseWordsCount++;
+        continue;
+      }
+      // Typical keyboard smashes
+      if (/^(asdf|qwer|zxcv|hjkl|dfgh|fghj|jkl|cvbn)/i.test(cleanWord) && cleanWord.length >= 6) {
+        nonsenseWordsCount++;
+        continue;
+      }
+    }
+  }
+
+  if (words.length > 0 && nonsenseWordsCount === words.length) {
+    return true;
+  }
+  if (words.length <= 3 && nonsenseWordsCount >= 1) {
+    return true;
+  }
+
+  return false;
+}
+

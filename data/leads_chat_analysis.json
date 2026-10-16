@@ -1,5 +1,125 @@
 [
   {
+    "analysisId": "ANL-2026-1032",
+    "inquiryId": "GPUC-2026-INQ-1032",
+    "timestamp": "2026-10-16T06:05:25.155Z",
+    "studentName": "qwerty",
+    "parentName": "qwertyui",
+    "mobile": "8123456789",
+    "location": "560066",
+    "admissionClass": "12th Class (2nd PU) / 11th Class",
+    "totalQueries": 1,
+    "queries": [
+      {
+        "query": "What is the admission process for academic year 2026-2027 at North Campus?",
+        "timestamp": "2026-10-16T06:05:06.547Z"
+      }
+    ],
+    "leadSource": "onboarding_step_2"
+  },
+  {
+    "analysisId": "ANL-2026-1031",
+    "inquiryId": "GPUC-2026-INQ-1031",
+    "timestamp": "2026-10-16T06:04:49.540Z",
+    "studentName": "tre",
+    "parentName": "gfre",
+    "mobile": "9876543222",
+    "location": "rhj",
+    "admissionClass": "12th Class (2nd PU) / 11th Class",
+    "totalQueries": 1,
+    "queries": [
+      {
+        "query": "What is the admission process for academic year 2026-2027 at North Campus?",
+        "timestamp": "2026-10-16T06:04:40.265Z"
+      }
+    ],
+    "leadSource": "onboarding_step_2"
+  },
+  {
+    "analysisId": "ANL-2026-1030",
+    "inquiryId": "GPUC-2026-INQ-1030",
+    "timestamp": "2026-10-16T05:59:14.771Z",
+    "studentName": "vasi",
+    "parentName": "vamsi",
+    "mobile": "8908908900",
+    "location": "560066",
+    "admissionClass": "12th Class (2nd PU) / 11th Class",
+    "totalQueries": 13,
+    "queries": [
+      {
+        "query": "hello",
+        "timestamp": "2026-10-16T05:51:42.039Z"
+      },
+      {
+        "query": "can you explain about the collage in short and crisp",
+        "timestamp": "2026-10-16T05:52:14.952Z"
+      },
+      {
+        "query": "why shoud i choose you collage",
+        "timestamp": "2026-10-16T05:52:34.118Z"
+      },
+      {
+        "query": "is that why i should choose your collage?",
+        "timestamp": "2026-10-16T05:52:58.386Z"
+      },
+      {
+        "query": "convince with one point why i should join you collge'",
+        "timestamp": "2026-10-16T05:53:31.389Z"
+      },
+      {
+        "query": "if you solve this problem i will join the collage, what print\"helloe\" in python",
+        "timestamp": "2026-10-16T05:54:10.599Z"
+      },
+      {
+        "query": "this is also an type of help i need know, if you can't solve this how would iknow your collage is good?",
+        "timestamp": "2026-10-16T05:54:58.853Z"
+      },
+      {
+        "query": "in your collage i need your teacher experence, how many and also what is the student to teacher ration ?",
+        "timestamp": "2026-10-16T05:55:44.572Z"
+      },
+      {
+        "query": "can't you be more helpful in this, i have no time to talk to help desk and find pout",
+        "timestamp": "2026-10-16T05:56:33.744Z"
+      },
+      {
+        "query": "you can be honest and tell me if you dont know, so do you know",
+        "timestamp": "2026-10-16T05:57:11.826Z"
+      },
+      {
+        "query": "how many labs do you have?",
+        "timestamp": "2026-10-16T05:57:47.709Z"
+      },
+      {
+        "query": "what year did the collage started?",
+        "timestamp": "2026-10-16T05:58:14.437Z"
+      },
+      {
+        "query": "What is the admission process for academic year 2026-2027 at North Campus?",
+        "timestamp": "2026-10-16T05:58:45.183Z"
+      }
+    ],
+    "leadSource": "onboarding_step_2"
+  },
+  {
+    "analysisId": "ANL-2026-1029",
+    "inquiryId": "GPUC-2026-INQ-1029",
+    "timestamp": "2026-10-16T05:01:32.614Z",
+    "studentName": "jhgfds",
+    "parentName": "iuytrew",
+    "mobile": "9876543212",
+    "location": "tt6666",
+    "admissionClass": "12th Class (2nd PU) / 11th Class",
+    "totalQueries": 1,
+    "queries": [
+      {
+        "query": "What is the admission process for academic year 2026-2027 at North Campus?",
+        "timestamp": "2026-10-16T05:01:20.440Z"
+      }
+    ],
+    "leadSource": "onboarding_step_2"
+  },
+  {
     "analysisId": "ANL-2026-1028",
     "inquiryId": "GPUC-2026-INQ-1028",
     "timestamp": "2026-10-16T04:55:40.622Z",

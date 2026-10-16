@@ -81,21 +81,57 @@ const DB_FILE = path.join(process.cwd(), 'data', 'db.json');
 
 export const ADMISSION_TIMES = [
   '09:00 AM',
-  '09:30 AM',
+  '09:20 AM',
+  '09:40 AM',
   '10:00 AM',
-  '10:30 AM',
+  '10:20 AM',
+  '10:40 AM',
   '11:00 AM',
-  '11:30 AM',
+  '11:20 AM',
+  '11:40 AM',
   '12:00 PM',
-  '12:30 PM',
+  '12:20 PM',
+  '12:40 PM',
   '02:00 PM',
-  '02:30 PM',
+  '02:20 PM',
+  '02:40 PM',
   '03:00 PM',
-  '03:30 PM',
+  '03:20 PM',
+  '03:40 PM',
   '04:00 PM',
-  '04:30 PM',
+  '04:20 PM',
+  '04:40 PM',
   '05:00 PM',
 ];
+
+export function getNext3Days(): Array<{ dateStr: string; displayLabel: string; shortDate: string }> {
+  const days: Array<{ dateStr: string; displayLabel: string; shortDate: string }> = [];
+  const today = new Date();
+  let d = 1;
+
+  while (days.length < 3 && d <= 7) {
+    const nextDate = new Date(today);
+    nextDate.setDate(today.getDate() + d);
+    d++;
+    if (nextDate.getDay() === 0) continue; // Skip Sunday
+
+    const dateStr = nextDate.toISOString().split('T')[0];
+    const dayName = nextDate.toLocaleDateString('en-US', { weekday: 'short' });
+    const monthName = nextDate.toLocaleDateString('en-US', { month: 'short' });
+    const dayNum = nextDate.getDate();
+    const isTomorrow = days.length === 0;
+
+    const displayLabel = isTomorrow
+      ? `Tomorrow (${dayName}, ${dayNum} ${monthName})`
+      : `${dayName}, ${dayNum} ${monthName}`;
+
+    const shortDate = `${dayNum} ${monthName}`;
+
+    days.push({ dateStr, displayLabel, shortDate });
+  }
+
+  return days;
+}
 
 function initializeSlots(): TimeSlot[] {
   const slots: TimeSlot[] = [];
@@ -129,6 +165,15 @@ export function ensureSlots(db: DatabaseSchema): boolean {
     return true;
   }
   let modified = false;
+
+  // Filter out any unbooked legacy slots that do not match the new 20-minute schedule
+  const validTimes = new Set(ADMISSION_TIMES);
+  const filteredSlots = db.slots.filter((s) => s.isBooked || validTimes.has(s.time));
+  if (filteredSlots.length !== db.slots.length) {
+    db.slots = filteredSlots;
+    modified = true;
+  }
+
   const today = new Date();
 
   for (let d = 1; d <= 7; d++) {
@@ -268,21 +313,19 @@ export function getTomorrowDateString(): string {
 
 export function normalizeTime(time: string): string {
   const t = time.trim().toUpperCase().replace(/\s+/g, ' ');
-  if (/^0?9(:00)?(\s*AM)?$/i.test(t)) return '09:00 AM';
-  if (/^0?9:30(\s*AM)?$/i.test(t)) return '09:30 AM';
-  if (/^10(:00)?(\s*AM)?$/i.test(t)) return '10:00 AM';
-  if (/^10:30(\s*AM)?$/i.test(t)) return '10:30 AM';
-  if (/^11(:00)?(\s*AM)?$/i.test(t)) return '11:00 AM';
-  if (/^11:30(\s*AM)?$/i.test(t)) return '11:30 AM';
-  if (/^12(:00)?(\s*PM)?$/i.test(t)) return '12:00 PM';
-  if (/^12:30(\s*PM)?$/i.test(t)) return '12:30 PM';
-  if (/^(0?2|14)(:00)?(\s*PM)?$/i.test(t)) return '02:00 PM';
-  if (/^(0?2|14):30(\s*PM)?$/i.test(t)) return '02:30 PM';
-  if (/^(0?3|15)(:00)?(\s*PM)?$/i.test(t)) return '03:00 PM';
-  if (/^(0?3|15):30(\s*PM)?$/i.test(t)) return '03:30 PM';
-  if (/^(0?4|16)(:00)?(\s*PM)?$/i.test(t)) return '04:00 PM';
-  if (/^(0?4|16):30(\s*PM)?$/i.test(t)) return '04:30 PM';
-  if (/^(0?5|17)(:00)?(\s*PM)?$/i.test(t)) return '05:00 PM';
+  const match = t.match(/^(0?[1-9]|1[0-2]):([0-5][0-9])\s*(AM|PM)?$/i);
+  if (match) {
+    const hh = match[1].padStart(2, '0');
+    const mm = match[2];
+    const ap = match[3] ? match[3].toUpperCase() : parseInt(hh, 10) >= 9 && parseInt(hh, 10) < 12 ? 'AM' : 'PM';
+    return `${hh}:${mm} ${ap}`;
+  }
+  const hourOnly = t.match(/^(0?[1-9]|1[0-2])\s*(AM|PM)?$/i);
+  if (hourOnly) {
+    const hh = hourOnly[1].padStart(2, '0');
+    const ap = hourOnly[2] ? hourOnly[2].toUpperCase() : parseInt(hh, 10) >= 9 && parseInt(hh, 10) < 12 ? 'AM' : 'PM';
+    return `${hh}:00 ${ap}`;
+  }
   return time;
 }
 
