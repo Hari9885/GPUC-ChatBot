@@ -125,22 +125,22 @@
 
     #gpuc-widget-container {
       position: fixed !important;
-      bottom: 94px !important;
+      bottom: 24px !important;
       right: 24px !important;
-      width: 440px !important;
-      height: 680px !important;
+      width: 420px !important;
+      height: 640px !important;
       max-width: calc(100vw - 32px) !important;
-      max-height: calc(100vh - 120px) !important;
-      border-radius: 20px !important;
-      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35), 0 4px 16px rgba(0, 0, 0, 0.15) !important;
+      max-height: calc(100vh - 48px) !important;
+      border-radius: 18px !important;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28), 0 2px 10px rgba(0, 0, 0, 0.08) !important;
       z-index: 2147483645 !important;
       overflow: hidden !important;
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
       opacity: 0 !important;
-      transform: translateY(20px) scale(0.96) !important;
+      transform: translateY(16px) scale(0.97) !important;
       pointer-events: none !important;
-      border: 1px solid rgba(226, 232, 240, 0.8) !important;
-      background: #FFFFFF !important;
+      border: 1px solid rgba(15, 23, 42, 0.14) !important;
+      background: #1E3A8A !important;
     }
 
     #gpuc-widget-container.open {
@@ -212,29 +212,41 @@
       animation: gpuc-3-bounces 0.65s cubic-bezier(0.28, 0.84, 0.42, 1) 3 !important;
     }
 
-    @media (max-width: 640px) {
+    @media (max-width: 768px) {
       #gpuc-widget-launcher {
         bottom: 16px !important;
         right: 16px !important;
-        width: 52px !important;
-        height: 52px !important;
+        width: 48px !important;
+        height: 48px !important;
       }
       #gpuc-widget-launcher img {
-        width: 34px !important;
-        height: 34px !important;
+        width: 30px !important;
+        height: 30px !important;
       }
-      #gpuc-widget-container {
+      #gpuc-widget-container,
+      #gpuc-widget-container.open,
+      #gpuc-widget-container.maximized {
+        position: fixed !important;
+        top: 0 !important;
         bottom: 0 !important;
         right: 0 !important;
         left: 0 !important;
         width: 100vw !important;
-        height: 92vh !important;
+        height: 100% !important;
+        height: 100dvh !important;
         max-width: 100vw !important;
-        max-height: 92vh !important;
-        border-radius: 20px 20px 0 0 !important;
+        max-height: 100dvh !important;
+        border-radius: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        background: #1E3A8A !important;
       }
       #gpuc-widget-tooltip {
         display: none !important;
+      }
+      #gpuc-widget-iframe {
+        border-radius: 0 !important;
+        border: none !important;
       }
     }
   `;

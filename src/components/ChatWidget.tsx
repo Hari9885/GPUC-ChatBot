@@ -433,6 +433,19 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
   }, [leadStep]);
 
   const [isEmbedded, setIsEmbedded] = useState(initialEmbedded);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Responsive check for mobile viewport
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const updateMobile = () => {
+        setIsMobile(window.innerWidth <= 768);
+      };
+      updateMobile();
+      window.addEventListener('resize', updateMobile);
+      return () => window.removeEventListener('resize', updateMobile);
+    }
+  }, []);
 
   // Check if running in embedded iframe mode
   useEffect(() => {
@@ -1599,6 +1612,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
   };
 
   const handleWidgetMaximize = () => {
+    if (isMobile) return;
     if (isEmbedded) {
       window.parent?.postMessage({ type: 'GPUC_CHAT_MAXIMIZE' }, '*');
     }
@@ -1633,6 +1647,23 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                 display: 'flex',
                 flexDirection: 'column',
                 pointerEvents: 'auto',
+              }
+            : isMobile
+            ? {
+                position: 'fixed',
+                top: isChatOpen ? 0 : 'auto',
+                left: isChatOpen ? 0 : 'auto',
+                bottom: isChatOpen ? 0 : '16px',
+                right: isChatOpen ? 0 : '16px',
+                width: isChatOpen ? '100vw' : 'auto',
+                height: isChatOpen ? '100dvh' : 'auto',
+                maxWidth: '100vw',
+                maxHeight: '100dvh',
+                zIndex: 2147483645,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: isChatOpen ? 'stretch' : 'flex-end',
+                pointerEvents: isChatOpen ? 'auto' : 'none',
               }
             : {
                 position: 'fixed',
@@ -1695,8 +1726,8 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
               className={isBouncing ? 'gpuc-bouncing' : ''}
               aria-label="Open Gopalan PU College Assistant"
               style={{
-                width: 'var(--assistant-bubble-size, 53px)',
-                height: 'var(--assistant-bubble-size, 53px)',
+                width: isMobile ? '48px' : 'var(--assistant-bubble-size, 53px)',
+                height: isMobile ? '48px' : 'var(--assistant-bubble-size, 53px)',
                 borderRadius: '50%',
                 background: '#FFFFFF',
                 border: '2.5px solid #F59E0B',
@@ -1716,8 +1747,8 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                 src="/gopalan_crest.svg"
                 alt="Gopalan PU College"
                 style={{
-                  width: 'var(--assistant-crest-size, 37px)',
-                  height: 'var(--assistant-crest-size, 37px)',
+                  width: isMobile ? '32px' : 'var(--assistant-crest-size, 37px)',
+                  height: isMobile ? '32px' : 'var(--assistant-crest-size, 37px)',
                   objectFit: 'contain',
                   display: 'block',
                 }}
@@ -1751,24 +1782,24 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
               e.stopPropagation();
             }}
             style={{
-              width: isEmbedded
+              width: isEmbedded || isMobile
                 ? '100%'
                 : isMaximized
                 ? 'min(1040px, calc(100vw - 36px))'
                 : 'var(--assistant-width)',
-              maxWidth: isEmbedded ? '100%' : 'calc(100vw - 16px)',
-              height: isEmbedded
+              maxWidth: isEmbedded || isMobile ? '100%' : 'calc(100vw - 16px)',
+              height: isEmbedded || isMobile
                 ? '100%'
                 : isMaximized
                 ? 'calc(100vh - 40px)'
                 : 'var(--assistant-height)',
-              maxHeight: isEmbedded ? '100%' : 'calc(100dvh - 16px)',
+              maxHeight: isEmbedded || isMobile ? '100%' : 'calc(100dvh - 16px)',
               display: 'flex',
               flexDirection: 'column',
               background: '#FFFFFF',
-              border: isEmbedded ? 'none' : '1px solid #E2E8F0',
-              borderRadius: isEmbedded ? '0px' : isMaximized ? '20px' : 'var(--assistant-border-radius, 20px)',
-              boxShadow: isEmbedded
+              border: isEmbedded || isMobile ? 'none' : '1px solid rgba(30, 58, 138, 0.16)',
+              borderRadius: isEmbedded || isMobile ? '0px' : isMaximized ? '20px' : 'var(--assistant-border-radius, 20px)',
+              boxShadow: isEmbedded || isMobile
                 ? 'none'
                 : isMaximized
                 ? '0 24px 64px rgba(0, 0, 0, 0.35), 0 4px 16px rgba(0, 0, 0, 0.15)'
@@ -1782,22 +1813,25 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
           >
             {/* Widget Header */}
             <div
+              className="widget-header"
               style={{
                 flexShrink: 0,
-                padding: '9px 12px',
+                padding: isMobile ? '6px 10px' : '9px 12px',
                 background: 'linear-gradient(135deg, #1E3A8A, #0F172A)',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 gap: '6px',
+                borderTopLeftRadius: 'inherit',
+                borderTopRightRadius: 'inherit',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '7px', minWidth: 0, flex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '6px' : '7px', minWidth: 0, flex: 1 }}>
                 <div
                   style={{
-                    width: '28px',
-                    height: '28px',
+                    width: isMobile ? '24px' : '28px',
+                    height: isMobile ? '24px' : '28px',
                     borderRadius: '50%',
                     background: '#FFFFFF',
                     border: '1.5px solid #F59E0B',
@@ -1813,17 +1847,18 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                     src="/gopalan_crest.svg"
                     alt="GPUC Logo"
                     style={{
-                      width: '19px',
-                      height: '19px',
+                      width: isMobile ? '16px' : '19px',
+                      height: isMobile ? '16px' : '19px',
                       objectFit: 'contain',
                     }}
                   />
                 </div>
                 <div style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
                   <div
+                    className="widget-header-title"
                     style={{
                       fontWeight: 700,
-                      fontSize: '0.80rem',
+                      fontSize: isMobile ? '0.78rem' : '0.80rem',
                       color: '#fff',
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
@@ -1835,8 +1870,9 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                     GPUC North Campus
                   </div>
                   <div
+                    className="widget-header-subtitle"
                     style={{
-                      fontSize: '0.64rem',
+                      fontSize: isMobile ? '0.62rem' : '0.64rem',
                       color: '#4ade80',
                       display: 'flex',
                       alignItems: 'center',
@@ -1854,7 +1890,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
               </div>
 
               {/* Window Controls */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1px', flexShrink: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '2px', flexShrink: 0 }}>
                 {/* Reset button */}
                 <button
                   onClick={handleReset}
@@ -1864,7 +1900,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                     border: 'none',
                     color: '#94A3B8',
                     cursor: 'pointer',
-                    padding: '4px',
+                    padding: isMobile ? '3px 4px' : '4px',
                     borderRadius: '6px',
                     display: 'flex',
                     alignItems: 'center',
@@ -1874,31 +1910,33 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                   onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
                   onMouseLeave={(e) => (e.currentTarget.style.color = '#94A3B8')}
                 >
-                  <RotateCcw size={14} />
+                  <RotateCcw size={isMobile ? 13 : 14} />
                 </button>
 
-                {/* Maximize / Restore Button */}
-                <button
-                  onClick={handleWidgetMaximize}
-                  title={isMaximized ? 'Restore Standard Size' : 'Maximize Assistant'}
-                  aria-label={isMaximized ? 'Restore Standard Size' : 'Maximize Assistant'}
-                  style={{
-                    background: isMaximized ? 'rgba(245, 158, 11, 0.22)' : 'transparent',
-                    border: isMaximized ? '1px solid rgba(245, 158, 11, 0.55)' : '1px solid rgba(255, 255, 255, 0.1)',
-                    color: isMaximized ? '#FDE68A' : '#94A3B8',
-                    cursor: 'pointer',
-                    padding: '4px',
-                    borderRadius: '6px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    transition: 'all 0.15s ease',
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = isMaximized ? '#FDE68A' : '#94A3B8')}
-                >
-                  {isMaximized ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
-                </button>
+                {/* Maximize / Restore Button - Only shown on desktop! On mobile screens, assistant is always full screen */}
+                {!isMobile && (
+                  <button
+                    onClick={handleWidgetMaximize}
+                    title={isMaximized ? 'Restore Standard Size' : 'Maximize Assistant'}
+                    aria-label={isMaximized ? 'Restore Standard Size' : 'Maximize Assistant'}
+                    style={{
+                      background: isMaximized ? 'rgba(245, 158, 11, 0.18)' : 'transparent',
+                      border: 'none',
+                      color: isMaximized ? '#FDE68A' : '#94A3B8',
+                      cursor: 'pointer',
+                      padding: '4px',
+                      borderRadius: '6px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'all 0.15s ease',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = isMaximized ? '#FDE68A' : '#94A3B8')}
+                  >
+                    {isMaximized ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+                  </button>
+                )}
 
                 {/* Minimize to circular launcher */}
                 <button
@@ -1909,7 +1947,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                     border: 'none',
                     color: '#94A3B8',
                     cursor: 'pointer',
-                    padding: '4px',
+                    padding: isMobile ? '3px 4px' : '4px',
                     borderRadius: '6px',
                     display: 'flex',
                     alignItems: 'center',
@@ -1919,7 +1957,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                   onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
                   onMouseLeave={(e) => (e.currentTarget.style.color = '#94A3B8')}
                 >
-                  <Minus size={15} />
+                  <Minus size={isMobile ? 14 : 15} />
                 </button>
 
                 {/* Close Chat */}
@@ -1931,7 +1969,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                     border: 'none',
                     color: '#94A3B8',
                     cursor: 'pointer',
-                    padding: '4px',
+                    padding: isMobile ? '3px 4px' : '4px',
                     borderRadius: '6px',
                     display: 'flex',
                     alignItems: 'center',
@@ -1941,7 +1979,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                   onMouseEnter={(e) => (e.currentTarget.style.color = '#EF4444')}
                   onMouseLeave={(e) => (e.currentTarget.style.color = '#94A3B8')}
                 >
-                  <X size={15} />
+                  <X size={isMobile ? 14 : 15} />
                 </button>
               </div>
             </div>
@@ -1951,13 +1989,13 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
               <div
                 style={{
                   flexShrink: 0,
-                  padding: '8px 16px',
+                  padding: isMobile ? '5px 10px' : '8px 16px',
                   background: '#F0FDF4',
                   borderBottom: '1px solid #BBF7D0',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  fontSize: '0.74rem',
+                  fontSize: isMobile ? '0.68rem' : '0.74rem',
                   color: '#166534',
                 }}
               >
@@ -1974,17 +2012,17 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
             {/* Messages Feed */}
             <div
               id="gpuc-chat-messages"
-              className="chat-messages-container"
+              className="chat-messages-container messages-scroll-area"
               style={{
                 flex: '1 1 0%',
                 minHeight: 0,
                 overflowY: 'auto',
                 overscrollBehavior: 'contain',
                 WebkitOverflowScrolling: 'touch',
-                padding: '12px 10px',
+                padding: isMobile ? '8px 8px 6px' : '12px 10px',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '12px',
+                gap: isMobile ? '8px' : '12px',
                 background: '#F8FAFC',
               }}
             >
@@ -1995,7 +2033,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                   margin: '0 auto',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '12px',
+                  gap: isMobile ? '8px' : '12px',
                 }}
               >
               {messages.map((msg, index) => {
@@ -2027,9 +2065,9 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                   >
                     <div
                       style={{
-                        fontSize: '0.7rem',
+                        fontSize: isMobile ? '0.64rem' : '0.7rem',
                         color: msg.role === 'user' ? '#1E3A8A' : '#64748B',
-                        marginBottom: '3px',
+                        marginBottom: isMobile ? '2px' : '3px',
                         marginLeft: msg.role === 'user' ? 'auto' : '4px',
                         marginRight: msg.role === 'user' ? '4px' : 'auto',
                         fontWeight: 700,
@@ -2043,12 +2081,12 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                         background: msg.role === 'user' ? 'linear-gradient(135deg, #1E3A8A, #2563EB)' : '#FFFFFF',
                         borderRadius:
                           msg.role === 'user'
-                            ? '16px 16px 4px 16px'
-                            : '16px 16px 16px 4px',
-                        padding: '10px 12px',
+                            ? (isMobile ? '12px 12px 3px 12px' : '16px 16px 4px 16px')
+                            : (isMobile ? '12px 12px 12px 3px' : '16px 16px 16px 4px'),
+                        padding: isMobile ? '7px 9px' : '10px 12px',
                         color: msg.role === 'user' ? '#FFFFFF' : '#0F172A',
-                        fontSize: '0.82rem',
-                        lineHeight: 1.5,
+                        fontSize: isMobile ? '0.78rem' : '0.82rem',
+                        lineHeight: isMobile ? 1.38 : 1.5,
                         border: msg.role === 'user' ? 'none' : '1px solid #E2E8F0',
                         boxShadow: msg.role === 'user' ? '0 2px 8px rgba(30, 58, 138, 0.25)' : '0 2px 10px rgba(0, 0, 0, 0.05)',
                         whiteSpace: 'pre-line',
@@ -2056,16 +2094,17 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                         width: (msg.step || showPresetsUnderMsg) ? '100%' : 'auto',
                         boxSizing: 'border-box',
                       }}
-                      className={msg.role === 'user' ? 'prose-chat prose-chat-user' : 'prose-chat prose-chat-bot'}
+                      className={msg.role === 'user' ? 'chat-msg-bubble prose-chat prose-chat-user' : 'chat-msg-bubble prose-chat prose-chat-bot'}
                     >
                       {renderHighlightedContent(msg.content, msg.role === 'user')}
 
                       {/* Clickable Preset Quick Actions Grid (Uses full width in 2-column layout) */}
                       {showPresetsUnderMsg && (
                         <div
+                          className="popular-inquiries-card"
                           style={{
-                            marginTop: '10px',
-                            paddingTop: '10px',
+                            marginTop: isMobile ? '6px' : '10px',
+                            paddingTop: isMobile ? '6px' : '10px',
                             borderTop: '1px solid #E2E8F0',
                             width: '100%',
                             boxSizing: 'border-box',
@@ -2073,10 +2112,10 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                         >
                           <div
                             style={{
-                              fontSize: '0.70rem',
+                              fontSize: isMobile ? '0.66rem' : '0.70rem',
                               fontWeight: 700,
                               color: '#92400E',
-                              marginBottom: '6px',
+                              marginBottom: isMobile ? '4px' : '6px',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'space-between',
@@ -2085,7 +2124,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                             <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                               <Sparkles size={12} color="#D97706" /> Popular Inquiries &amp; Services
                             </span>
-                            <span style={{ fontSize: '0.64rem', color: '#64748B', fontWeight: 500 }}>
+                            <span style={{ fontSize: isMobile ? '0.60rem' : '0.64rem', color: '#64748B', fontWeight: 500 }}>
                               Tap to explore
                             </span>
                           </div>
@@ -2094,7 +2133,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                             style={{
                               display: 'grid',
                               gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-                              gap: '6px',
+                              gap: isMobile ? '4px' : '6px',
                               width: '100%',
                               boxSizing: 'border-box',
                             }}
@@ -2103,13 +2142,14 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                               <button
                                 key={pIdx}
                                 type="button"
+                                className="popular-inquiries-btn"
                                 onClick={() => handleSend(preset.query)}
                                 disabled={loading || isTyping}
                                 style={{
                                   width: '100%',
                                   boxSizing: 'border-box',
-                                  padding: '7px 8px',
-                                  borderRadius: '8px',
+                                  padding: isMobile ? '5px 6px' : '7px 8px',
+                                  borderRadius: isMobile ? '7px' : '8px',
                                   background: 'linear-gradient(135deg, #FFFFFF, #FFFBEB)',
                                   border: '1.5px solid #FDE68A',
                                   color: '#78350F',
@@ -2117,7 +2157,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                   cursor: 'pointer',
                                   display: 'flex',
                                   alignItems: 'center',
-                                  gap: '6px',
+                                  gap: isMobile ? '5px' : '6px',
                                   transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
                                   boxShadow: '0 1px 3px rgba(245, 158, 11, 0.08)',
                                   gridColumn: pIdx === 4 && FAQ_PRESETS.length === 5 ? 'span 2' : 'auto',
@@ -2138,15 +2178,15 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                               >
                                 <div
                                   style={{
-                                    width: '24px',
-                                    height: '24px',
-                                    borderRadius: '6px',
+                                    width: isMobile ? '20px' : '24px',
+                                    height: isMobile ? '20px' : '24px',
+                                    borderRadius: isMobile ? '5px' : '6px',
                                     background: '#FEF3C7',
                                     border: '1px solid #FCD34D',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    fontSize: '0.88rem',
+                                    fontSize: isMobile ? '0.76rem' : '0.88rem',
                                     flexShrink: 0,
                                   }}
                                 >
@@ -2155,7 +2195,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                 <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
                                   <div
                                     style={{
-                                      fontSize: '0.76rem',
+                                      fontSize: isMobile ? '0.71rem' : '0.76rem',
                                       fontWeight: 650,
                                       color: '#92400E',
                                       lineHeight: 1.2,
@@ -2176,20 +2216,21 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                       {/* Step 1: Student Name Card */}
                       {msg.step === 'ask_student_name' && leadStep === 'ask_student_name' && (
                         <div
+                          className="form-step-card"
                           style={{
-                            marginTop: '10px',
+                            marginTop: isMobile ? '6px' : '10px',
                             background: '#FFFFFF',
                             border: '1.5px solid #F59E0B',
-                            borderRadius: '12px',
-                            padding: '12px',
+                            borderRadius: isMobile ? '9px' : '12px',
+                            padding: isMobile ? '8px 10px' : '12px',
                             boxShadow: '0 4px 14px rgba(0, 0, 0, 0.06)',
                             width: '100%',
                             boxSizing: 'border-box',
                           }}
                         >
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                            <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#92400E', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                              <Sparkles size={13} color="#D97706" /> Student Details (Step 1/3)
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: isMobile ? '6px' : '8px' }}>
+                            <span style={{ fontSize: isMobile ? '0.72rem' : '0.78rem', fontWeight: 700, color: '#92400E', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                              <Sparkles size={12} color="#D97706" /> Student Details (Step 1/3)
                             </span>
                             <button
                               type="button"
@@ -2209,21 +2250,22 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                 lineHeight: 1,
                               }}
                             >
-                              <X size={15} />
+                              <X size={14} />
                             </button>
                           </div>
 
                           {stepError && (
-                            <div style={{ marginBottom: '8px', padding: '6px 10px', borderRadius: '6px', background: '#FEF2F2', border: '1px solid #FCA5A5', color: '#B91C1C', fontSize: '0.76rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                              <AlertCircle size={13} />
+                            <div style={{ marginBottom: '6px', padding: isMobile ? '4px 8px' : '6px 10px', borderRadius: '6px', background: '#FEF2F2', border: '1px solid #FCA5A5', color: '#B91C1C', fontSize: isMobile ? '0.70rem' : '0.76rem', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                              <AlertCircle size={12} />
                               <span>{stepError}</span>
                             </div>
                           )}
 
-                          <div style={{ display: 'flex', gap: '8px', width: '100%', boxSizing: 'border-box' }}>
+                          <div style={{ display: 'flex', gap: isMobile ? '6px' : '8px', width: '100%', boxSizing: 'border-box' }}>
                             <div style={{ position: 'relative', flex: 1, minWidth: 0 }}>
                               <input
                                 type="text"
+                                className="form-step-input"
                                 value={stepStudentName}
                                 onChange={(e) => {
                                   const filtered = e.target.value.replace(/[^a-zA-Z\s.'-]/g, '');
@@ -2236,16 +2278,16 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                 style={{
                                   width: '100%',
                                   boxSizing: 'border-box',
-                                  padding: '8px 12px 8px 34px',
+                                  padding: isMobile ? '6px 8px 6px 28px' : '8px 12px 8px 34px',
                                   background: '#F8FAFC',
                                   border: '1px solid #CBD5E1',
-                                  borderRadius: '8px',
+                                  borderRadius: isMobile ? '7px' : '8px',
                                   color: '#0F172A',
-                                  fontSize: '0.84rem',
+                                  fontSize: isMobile ? '0.78rem' : '0.84rem',
                                   outline: 'none',
                                 }}
                               />
-                              <User size={15} color="#64748B" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }} />
+                              <User size={isMobile ? 13 : 15} color="#64748B" style={{ position: 'absolute', left: isMobile ? '8px' : '10px', top: '50%', transform: 'translateY(-50%)' }} />
                             </div>
                             <button
                               type="button"
@@ -2253,11 +2295,11 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                               className="btn-primary"
                               style={{
                                 flexShrink: 0,
-                                padding: '8px 14px',
-                                fontSize: '0.82rem',
+                                padding: isMobile ? '6px 11px' : '8px 14px',
+                                fontSize: isMobile ? '0.76rem' : '0.82rem',
                                 background: 'linear-gradient(135deg, #F59E0B, #D97706)',
                                 color: '#FFFFFF',
-                                borderRadius: '8px',
+                                borderRadius: isMobile ? '7px' : '8px',
                                 fontWeight: 600,
                                 cursor: 'pointer',
                                 display: 'flex',
@@ -2266,10 +2308,10 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                 whiteSpace: 'nowrap',
                               }}
                             >
-                              Next <ArrowRight size={14} />
+                              Next <ArrowRight size={13} />
                             </button>
                           </div>
-                          <div style={{ fontSize: '0.67rem', color: '#64748B', marginTop: '4px' }}>
+                          <div style={{ fontSize: isMobile ? '0.62rem' : '0.67rem', color: '#64748B', marginTop: '3px' }}>
                             Only letters accepted (no numbers)
                           </div>
                         </div>
@@ -2278,20 +2320,21 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                       {/* Step 2: Parent Name, Mobile & Location Card */}
                       {msg.step === 'ask_contact' && leadStep === 'ask_contact' && (
                         <div
+                          className="form-step-card"
                           style={{
-                            marginTop: '10px',
+                            marginTop: isMobile ? '6px' : '10px',
                             background: '#FFFFFF',
                             border: '1.5px solid #F59E0B',
-                            borderRadius: '12px',
-                            padding: '12px',
+                            borderRadius: isMobile ? '9px' : '12px',
+                            padding: isMobile ? '8px 10px' : '12px',
                             boxShadow: '0 4px 14px rgba(0, 0, 0, 0.06)',
                             width: '100%',
                             boxSizing: 'border-box',
                           }}
                         >
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                            <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#92400E', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                              <Sparkles size={13} color="#D97706" /> Contact & Location (Step 2/3)
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: isMobile ? '6px' : '8px' }}>
+                            <span style={{ fontSize: isMobile ? '0.72rem' : '0.78rem', fontWeight: 700, color: '#92400E', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                              <Sparkles size={12} color="#D97706" /> Contact &amp; Location (Step 2/3)
                             </span>
                             <button
                               type="button"
@@ -2311,27 +2354,28 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                 lineHeight: 1,
                               }}
                             >
-                              <X size={15} />
+                              <X size={14} />
                             </button>
                           </div>
 
                           {stepError && (
-                            <div style={{ marginBottom: '8px', padding: '6px 10px', borderRadius: '6px', background: '#FEF2F2', border: '1px solid #FCA5A5', color: '#B91C1C', fontSize: '0.76rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                              <AlertCircle size={13} />
+                            <div style={{ marginBottom: '6px', padding: isMobile ? '4px 8px' : '6px 10px', borderRadius: '6px', background: '#FEF2F2', border: '1px solid #FCA5A5', color: '#B91C1C', fontSize: isMobile ? '0.70rem' : '0.76rem', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                              <AlertCircle size={12} />
                               <span>{stepError}</span>
                             </div>
                           )}
 
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '7px', width: '100%', boxSizing: 'border-box' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '5px' : '7px', width: '100%', boxSizing: 'border-box' }}>
                             {/* 1. Parent / Guardian Name (with autoFocus) */}
                             <div>
-                              <div style={{ fontSize: '0.72rem', fontWeight: 600, color: '#334155', marginBottom: '2px' }}>
+                              <div style={{ fontSize: isMobile ? '0.67rem' : '0.72rem', fontWeight: 600, color: '#334155', marginBottom: '2px' }}>
                                 Parent / Guardian Name <span style={{ color: '#94A3B8', fontWeight: 400 }}>(Optional - letters only)</span>
                               </div>
                               <div style={{ position: 'relative' }}>
                                 <input
                                   ref={parentInputRef}
                                   type="text"
+                                  className="form-step-input"
                                   value={stepParentName}
                                   autoFocus
                                   onChange={(e) => {
@@ -2349,33 +2393,33 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                   style={{
                                     width: '100%',
                                     boxSizing: 'border-box',
-                                    padding: '7px 10px 7px 32px',
+                                    padding: isMobile ? '5px 8px 5px 28px' : '7px 10px 7px 32px',
                                     background: '#F8FAFC',
                                     border: '1px solid #CBD5E1',
-                                    borderRadius: '8px',
+                                    borderRadius: isMobile ? '7px' : '8px',
                                     color: '#0F172A',
-                                    fontSize: '0.82rem',
+                                    fontSize: isMobile ? '0.77rem' : '0.82rem',
                                     outline: 'none',
                                   }}
                                 />
-                                <Users size={14} color="#64748B" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }} />
+                                <Users size={13} color="#64748B" style={{ position: 'absolute', left: isMobile ? '8px' : '10px', top: '50%', transform: 'translateY(-50%)' }} />
                               </div>
                             </div>
 
                             {/* 2. Mobile / WhatsApp Phone Number */}
                             <div>
-                              <div style={{ fontSize: '0.72rem', fontWeight: 600, color: '#334155', marginBottom: '2px' }}>
-                                Mobile Number <span style={{ color: '#D97706', fontSize: '0.68rem', fontWeight: 600 }}>(Required)</span>
+                              <div style={{ fontSize: isMobile ? '0.67rem' : '0.72rem', fontWeight: 600, color: '#334155', marginBottom: '2px' }}>
+                                Mobile Number <span style={{ color: '#D97706', fontSize: '0.66rem', fontWeight: 600 }}>(Required)</span>
                               </div>
                               <div style={{ display: 'flex', alignItems: 'center' }}>
                                 <span
                                   style={{
-                                    padding: '7px 9px',
+                                    padding: isMobile ? '5px 7px' : '7px 9px',
                                     background: '#F1F5F9',
                                     border: '1px solid #CBD5E1',
                                     borderRight: 'none',
-                                    borderRadius: '8px 0 0 8px',
-                                    fontSize: '0.82rem',
+                                    borderRadius: isMobile ? '7px 0 0 7px' : '8px 0 0 8px',
+                                    fontSize: isMobile ? '0.77rem' : '0.82rem',
                                     fontWeight: 700,
                                     color: '#334155',
                                     userSelect: 'none',
@@ -2387,6 +2431,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                 <input
                                   ref={mobileInputRef}
                                   type="tel"
+                                  className="form-step-input"
                                   value={stepMobile}
                                   maxLength={10}
                                   onChange={(e) => {
@@ -2408,30 +2453,31 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                     flex: 1,
                                     minWidth: 0,
                                     boxSizing: 'border-box',
-                                    padding: '7px 10px',
+                                    padding: isMobile ? '5px 8px' : '7px 10px',
                                     background: '#F8FAFC',
                                     border: '1px solid #CBD5E1',
-                                    borderRadius: '0 8px 8px 0',
+                                    borderRadius: isMobile ? '0 7px 7px 0' : '0 8px 8px 0',
                                     color: '#0F172A',
-                                    fontSize: '0.82rem',
+                                    fontSize: isMobile ? '0.77rem' : '0.82rem',
                                     outline: 'none',
                                   }}
                                 />
                               </div>
-                              <div style={{ fontSize: '0.66rem', color: '#64748B', marginTop: '2px' }}>
+                              <div style={{ fontSize: isMobile ? '0.62rem' : '0.66rem', color: '#64748B', marginTop: '2px' }}>
                                 Default +91 • Must start with 6, 7, 8, or 9
                               </div>
                             </div>
 
                             {/* 3. Location: Area & Pincode */}
                             <div>
-                              <div style={{ fontSize: '0.72rem', fontWeight: 600, color: '#334155', marginBottom: '2px' }}>
-                                Location / Area & Pincode <span style={{ color: '#94A3B8', fontWeight: 400 }}>(e.g. Whitefield 560066)</span>
+                              <div style={{ fontSize: isMobile ? '0.67rem' : '0.72rem', fontWeight: 600, color: '#334155', marginBottom: '2px' }}>
+                                Location / Area &amp; Pincode <span style={{ color: '#94A3B8', fontWeight: 400 }}>(e.g. Yelahanka 560064)</span>
                               </div>
                               <div style={{ position: 'relative' }}>
                                 <input
                                   ref={locationInputRef}
                                   type="text"
+                                  className="form-step-input"
                                   value={stepLocation}
                                   onChange={(e) => setStepLocation(e.target.value)}
                                   onKeyDown={(e) => {
@@ -2440,20 +2486,20 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                       handleContactSubmit();
                                     }
                                   }}
-                                  placeholder="Enter your area & pincode (e.g. Whitefield 560066)"
+                                  placeholder="Enter your area & pincode"
                                   style={{
                                     width: '100%',
                                     boxSizing: 'border-box',
-                                    padding: '7px 10px 7px 32px',
+                                    padding: isMobile ? '5px 8px 5px 28px' : '7px 10px 7px 32px',
                                     background: '#F8FAFC',
                                     border: '1px solid #CBD5E1',
-                                    borderRadius: '8px',
+                                    borderRadius: isMobile ? '7px' : '8px',
                                     color: '#0F172A',
-                                    fontSize: '0.82rem',
+                                    fontSize: isMobile ? '0.77rem' : '0.82rem',
                                     outline: 'none',
                                   }}
                                 />
-                                <MapPin size={14} color="#64748B" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }} />
+                                <MapPin size={13} color="#64748B" style={{ position: 'absolute', left: isMobile ? '8px' : '10px', top: '50%', transform: 'translateY(-50%)' }} />
                               </div>
                             </div>
 
@@ -2462,23 +2508,23 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                               onClick={() => handleContactSubmit()}
                               className="btn-primary"
                               style={{
-                                marginTop: '4px',
+                                marginTop: '3px',
                                 width: '100%',
                                 boxSizing: 'border-box',
-                                padding: '8px 14px',
-                                fontSize: '0.82rem',
+                                padding: isMobile ? '6px 12px' : '8px 14px',
+                                fontSize: isMobile ? '0.76rem' : '0.82rem',
                                 background: 'linear-gradient(135deg, #F59E0B, #D97706)',
                                 color: '#FFFFFF',
-                                borderRadius: '8px',
+                                borderRadius: isMobile ? '7px' : '8px',
                                 fontWeight: 600,
                                 cursor: 'pointer',
                                 justifyContent: 'center',
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '6px',
+                                gap: '5px',
                               }}
                             >
-                              Next: Select Class / Inquiry <ArrowRight size={14} />
+                              Next: Select Class / Inquiry <ArrowRight size={13} />
                             </button>
                           </div>
                         </div>
@@ -2487,20 +2533,21 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                       {/* Step 3: Class / Inquiry Selection Card */}
                       {(msg.step === 'ask_admission' || msg.content?.includes('12th Class (2nd PU) or 11th Class (1st PU)')) && leadStep === 'ask_admission' && (
                         <div
+                          className="form-step-card"
                           style={{
-                            marginTop: '10px',
+                            marginTop: isMobile ? '6px' : '10px',
                             background: '#FFFFFF',
                             border: '1.5px solid #F59E0B',
-                            borderRadius: '12px',
-                            padding: '12px',
+                            borderRadius: isMobile ? '9px' : '12px',
+                            padding: isMobile ? '8px 10px' : '12px',
                             boxShadow: '0 4px 14px rgba(0, 0, 0, 0.06)',
                             width: '100%',
                             boxSizing: 'border-box',
                           }}
                         >
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                            <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#92400E', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                              <Sparkles size={13} color="#D97706" /> Choose Option (Step 3/3)
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: isMobile ? '6px' : '8px' }}>
+                            <span style={{ fontSize: isMobile ? '0.72rem' : '0.78rem', fontWeight: 700, color: '#92400E', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                              <Sparkles size={12} color="#D97706" /> Choose Option (Step 3/3)
                             </span>
                             <button
                               type="button"
@@ -2520,11 +2567,11 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                 lineHeight: 1,
                               }}
                             >
-                              <X size={15} />
+                              <X size={14} />
                             </button>
                           </div>
 
-                          <div style={{ fontSize: '0.74rem', color: '#475569', marginBottom: '8px' }}>
+                          <div style={{ fontSize: isMobile ? '0.68rem' : '0.74rem', color: '#475569', marginBottom: isMobile ? '6px' : '8px' }}>
                             Tap an option below to register:
                           </div>
 
@@ -2532,7 +2579,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                             style={{
                               display: 'grid',
                               gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-                              gap: '6px',
+                              gap: isMobile ? '5px' : '6px',
                               width: '100%',
                               boxSizing: 'border-box',
                             }}
@@ -2542,22 +2589,22 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                               disabled={isSubmittingLead}
                               onClick={() => handleAdmissionSubmit('11th Class (1st PU)', 'Admissions 2026-27')}
                               style={{
-                                padding: '10px 8px',
+                                padding: isMobile ? '7px 6px' : '10px 8px',
                                 textAlign: 'center',
                                 background: '#EFF6FF',
                                 border: '1.5px solid #3B82F6',
                                 color: '#1E40AF',
                                 fontWeight: 700,
-                                fontSize: '0.78rem',
-                                borderRadius: '8px',
+                                fontSize: isMobile ? '0.74rem' : '0.78rem',
+                                borderRadius: isMobile ? '7px' : '8px',
                                 cursor: isSubmittingLead ? 'not-allowed' : 'pointer',
                                 whiteSpace: 'normal',
                                 wordBreak: 'break-word',
-                                lineHeight: 1.25,
+                                lineHeight: 1.2,
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                gap: '5px',
+                                gap: '4px',
                                 width: '100%',
                                 boxSizing: 'border-box',
                                 boxShadow: '0 2px 4px rgba(59, 130, 246, 0.1)',
@@ -2570,22 +2617,22 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                               disabled={isSubmittingLead}
                               onClick={() => handleAdmissionSubmit('12th Class (2nd PU)', 'Admissions 2026-27')}
                               style={{
-                                padding: '10px 8px',
+                                padding: isMobile ? '7px 6px' : '10px 8px',
                                 textAlign: 'center',
                                 background: '#FEF3C7',
                                 border: '1.5px solid #F59E0B',
                                 color: '#92400E',
                                 fontWeight: 700,
-                                fontSize: '0.78rem',
-                                borderRadius: '8px',
+                                fontSize: isMobile ? '0.74rem' : '0.78rem',
+                                borderRadius: isMobile ? '7px' : '8px',
                                 cursor: isSubmittingLead ? 'not-allowed' : 'pointer',
                                 whiteSpace: 'normal',
                                 wordBreak: 'break-word',
-                                lineHeight: 1.25,
+                                lineHeight: 1.2,
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                gap: '5px',
+                                gap: '4px',
                                 width: '100%',
                                 boxSizing: 'border-box',
                                 boxShadow: '0 2px 4px rgba(245, 158, 11, 0.1)',
@@ -2598,18 +2645,18 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                               disabled={isSubmittingLead}
                               onClick={() => handleAdmissionSubmit('11th/12th PU', 'Campus Visit')}
                               style={{
-                                padding: '8px 6px',
+                                padding: isMobile ? '6px 5px' : '8px 6px',
                                 textAlign: 'center',
                                 background: '#F0FDF4',
                                 border: '1px solid #22C55E',
                                 color: '#166534',
                                 fontWeight: 700,
-                                fontSize: '0.76rem',
-                                borderRadius: '8px',
+                                fontSize: isMobile ? '0.72rem' : '0.76rem',
+                                borderRadius: isMobile ? '7px' : '8px',
                                 cursor: isSubmittingLead ? 'not-allowed' : 'pointer',
                                 whiteSpace: 'normal',
                                 wordBreak: 'break-word',
-                                lineHeight: 1.25,
+                                lineHeight: 1.2,
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -2625,18 +2672,18 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                               disabled={isSubmittingLead}
                               onClick={() => handleAdmissionSubmit('General PU', 'Admissions 2026-27')}
                               style={{
-                                padding: '8px 6px',
+                                padding: isMobile ? '6px 5px' : '8px 6px',
                                 textAlign: 'center',
                                 background: '#F1F5F9',
                                 border: '1px solid #94A3B8',
                                 color: '#334155',
                                 fontWeight: 700,
-                                fontSize: '0.76rem',
-                                borderRadius: '8px',
+                                fontSize: isMobile ? '0.72rem' : '0.76rem',
+                                borderRadius: isMobile ? '7px' : '8px',
                                 cursor: isSubmittingLead ? 'not-allowed' : 'pointer',
                                 whiteSpace: 'normal',
                                 wordBreak: 'break-word',
-                                lineHeight: 1.25,
+                                lineHeight: 1.2,
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -2650,7 +2697,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                           </div>
 
                           {isSubmittingLead && (
-                            <div style={{ marginTop: '8px', fontSize: '0.74rem', color: '#D97706', textAlign: 'center', fontWeight: 600 }}>
+                            <div style={{ marginTop: '6px', fontSize: isMobile ? '0.68rem' : '0.74rem', color: '#D97706', textAlign: 'center', fontWeight: 600 }}>
                               Registering inquiry with Gopalan admissions server...
                             </div>
                           )}
@@ -2667,32 +2714,33 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                         bookingFlowState !== 'showing_available_slots' &&
                         !msg.ticketData && (
                         <div
+                          className="form-step-card"
                           style={{
-                            marginTop: '12px',
+                            marginTop: isMobile ? '6px' : '12px',
                             background: '#FFFFFF',
                             border: '1.5px solid #F59E0B',
-                            borderRadius: '12px',
-                            padding: '12px',
+                            borderRadius: isMobile ? '9px' : '12px',
+                            padding: isMobile ? '8px 10px' : '12px',
                             boxShadow: '0 4px 14px rgba(0, 0, 0, 0.06)',
                             width: '100%',
                             boxSizing: 'border-box',
                           }}
                         >
-                          <div style={{ fontSize: '0.74rem', fontWeight: 700, color: '#92400E', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                            <Sparkles size={13} color="#D97706" /> Consultation & Visit Options
+                          <div style={{ fontSize: isMobile ? '0.70rem' : '0.74rem', fontWeight: 700, color: '#92400E', marginBottom: isMobile ? '6px' : '8px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <Sparkles size={12} color="#D97706" /> Consultation &amp; Visit Options
                           </div>
 
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '6px' : '8px', width: '100%' }}>
                             <button
                               type="button"
                               disabled={loading || isTyping}
                               onClick={() => handleBookOfflineVisit()}
                               style={{
                                 width: '100%',
-                                padding: '10px 12px',
+                                padding: isMobile ? '7px 8px' : '10px 12px',
                                 background: 'linear-gradient(135deg, #FFFBEB, #FEF3C7)',
                                 border: '1.5px solid #F59E0B',
-                                borderRadius: '10px',
+                                borderRadius: isMobile ? '8px' : '10px',
                                 textAlign: 'left',
                                 cursor: 'pointer',
                                 display: 'flex',
@@ -2701,20 +2749,20 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                 transition: 'all 0.15s ease',
                               }}
                             >
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#F59E0B', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '1rem' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '7px' : '10px' }}>
+                                <div style={{ width: isMobile ? '26px' : '32px', height: isMobile ? '26px' : '32px', borderRadius: isMobile ? '6px' : '8px', background: '#F59E0B', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: isMobile ? '0.85rem' : '1rem' }}>
                                   🏫
                                 </div>
                                 <div>
-                                  <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#92400E' }}>
+                                  <div style={{ fontSize: isMobile ? '0.76rem' : '0.82rem', fontWeight: 700, color: '#92400E' }}>
                                     Book a Campus Visit (Offline)
                                   </div>
-                                  <div style={{ fontSize: '0.72rem', color: '#78350F' }}>
-                                    Tour North Campus (Yelahanka) &bull; Instant visit ticket
+                                  <div style={{ fontSize: isMobile ? '0.66rem' : '0.72rem', color: '#78350F' }}>
+                                    Tour North Campus (Yelahanka) &bull; Instant ticket
                                   </div>
                                 </div>
                               </div>
-                              <ArrowRight size={15} color="#D97706" />
+                              <ArrowRight size={isMobile ? 13 : 15} color="#D97706" />
                             </button>
 
                             <button
@@ -2723,10 +2771,10 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                               onClick={() => handleInitiateOnlineMeeting()}
                               style={{
                                 width: '100%',
-                                padding: '10px 12px',
+                                padding: isMobile ? '7px 8px' : '10px 12px',
                                 background: 'linear-gradient(135deg, #EFF6FF, #DBEAFE)',
                                 border: '1.5px solid #3B82F6',
-                                borderRadius: '10px',
+                                borderRadius: isMobile ? '8px' : '10px',
                                 textAlign: 'left',
                                 cursor: 'pointer',
                                 display: 'flex',
@@ -2735,20 +2783,20 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                 transition: 'all 0.15s ease',
                               }}
                             >
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#3B82F6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '1rem' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '7px' : '10px' }}>
+                                <div style={{ width: isMobile ? '26px' : '32px', height: isMobile ? '26px' : '32px', borderRadius: isMobile ? '6px' : '8px', background: '#3B82F6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: isMobile ? '0.85rem' : '1rem' }}>
                                   💻
                                 </div>
                                 <div>
-                                  <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#1E40AF' }}>
+                                  <div style={{ fontSize: isMobile ? '0.76rem' : '0.82rem', fontWeight: 700, color: '#1E40AF' }}>
                                     Request an Online Meeting
                                   </div>
-                                  <div style={{ fontSize: '0.72rem', color: '#1E3A8A' }}>
+                                  <div style={{ fontSize: isMobile ? '0.66rem' : '0.72rem', color: '#1E3A8A' }}>
                                     Admissions video consultation &bull; Check timetable
                                   </div>
                                 </div>
                               </div>
-                              <ArrowRight size={15} color="#2563EB" />
+                              <ArrowRight size={isMobile ? 13 : 15} color="#2563EB" />
                             </button>
 
                             <button
@@ -2764,8 +2812,8 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                 background: 'transparent',
                                 border: 'none',
                                 color: '#64748B',
-                                fontSize: '0.74rem',
-                                padding: '4px',
+                                fontSize: isMobile ? '0.68rem' : '0.74rem',
+                                padding: '3px',
                                 cursor: 'pointer',
                                 textAlign: 'center',
                               }}
@@ -2779,32 +2827,33 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                       {/* Step: Select Date (Next 3 Days) & Direct 20-Min Slot Booking */}
                       {msg.step === 'ask_custom_slot' && bookingFlowState === 'asking_check_slot' && (
                         <div
+                          className="form-step-card"
                           style={{
-                            marginTop: '10px',
+                            marginTop: isMobile ? '6px' : '10px',
                             background: '#FFFFFF',
                             border: '1.5px solid #3B82F6',
-                            borderRadius: '12px',
-                            padding: '12px',
+                            borderRadius: isMobile ? '9px' : '12px',
+                            padding: isMobile ? '8px 10px' : '12px',
                             boxShadow: '0 4px 14px rgba(0, 0, 0, 0.06)',
                             width: '100%',
                             boxSizing: 'border-box',
                           }}
                         >
-                          <div style={{ fontSize: '0.76rem', fontWeight: 700, color: '#1E40AF', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                            <Calendar size={14} color="#2563EB" /> Available Consultation Slots
+                          <div style={{ fontSize: isMobile ? '0.72rem' : '0.76rem', fontWeight: 700, color: '#1E40AF', marginBottom: '3px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <Calendar size={13} color="#2563EB" /> Available Consultation Slots
                           </div>
 
-                          <div style={{ fontSize: '0.72rem', color: '#475569', marginBottom: '10px' }}>
+                          <div style={{ fontSize: isMobile ? '0.67rem' : '0.72rem', color: '#475569', marginBottom: isMobile ? '6px' : '10px' }}>
                             Select your date and tap an available 20-minute consultation window to confirm your booking:
                           </div>
 
                           {/* Date Selector: Horizontal Day Cards (Up to 7 Working Days, Today on Leftmost, Sat & Sun Off) */}
-                          <div style={{ marginBottom: '12px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-                              <label style={{ fontSize: '0.72rem', fontWeight: 700, color: '#1E3A8A', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                <Calendar size={13} color="#2563EB" /> Select Date (Working Days):
+                          <div style={{ marginBottom: isMobile ? '8px' : '12px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: isMobile ? '4px' : '6px' }}>
+                              <label style={{ fontSize: isMobile ? '0.68rem' : '0.72rem', fontWeight: 700, color: '#1E3A8A', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <Calendar size={12} color="#2563EB" /> Select Date (Working Days):
                               </label>
-                              <span style={{ fontSize: '0.66rem', color: '#64748B', fontWeight: 500 }}>
+                              <span style={{ fontSize: isMobile ? '0.62rem' : '0.66rem', color: '#64748B', fontWeight: 500 }}>
                                 Sat &amp; Sun Off
                               </span>
                             </div>
@@ -2812,9 +2861,9 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                             <div
                               style={{
                                 display: 'flex',
-                                gap: '6px',
+                                gap: isMobile ? '5px' : '6px',
                                 overflowX: 'auto',
-                                paddingBottom: '6px',
+                                paddingBottom: '4px',
                                 scrollbarWidth: 'thin',
                                 WebkitOverflowScrolling: 'touch',
                               }}
@@ -2825,13 +2874,14 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                   <button
                                     key={day.dateStr}
                                     type="button"
+                                    className="working-day-card"
                                     disabled={loading || isTyping || loadingSlots}
                                     onClick={() => handleSlotDateChange(day.dateStr)}
                                     style={{
                                       flex: '0 0 auto',
-                                      minWidth: '58px',
-                                      padding: '7px 8px',
-                                      borderRadius: '10px',
+                                      minWidth: isMobile ? '46px' : '58px',
+                                      padding: isMobile ? '5px 4px' : '7px 8px',
+                                      borderRadius: isMobile ? '7px' : '10px',
                                       border: isSelected ? '1.5px solid #2563EB' : '1px solid #CBD5E1',
                                       background: isSelected
                                         ? 'linear-gradient(135deg, #2563EB, #1D4ED8)'
@@ -2851,15 +2901,15 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                     {day.isToday && (
                                       <span
                                         style={{
-                                          fontSize: '0.58rem',
+                                          fontSize: isMobile ? '0.50rem' : '0.58rem',
                                           fontWeight: 800,
                                           textTransform: 'uppercase',
-                                          padding: '1px 5px',
+                                          padding: isMobile ? '1px 3px' : '1px 5px',
                                           borderRadius: '999px',
-                                          marginBottom: '3px',
+                                          marginBottom: '2px',
                                           background: isSelected ? 'rgba(255, 255, 255, 0.25)' : '#DBEAFE',
                                           color: isSelected ? '#FFFFFF' : '#1E40AF',
-                                          letterSpacing: '0.3px',
+                                          letterSpacing: '0.2px',
                                         }}
                                       >
                                         Today
@@ -2867,7 +2917,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                     )}
                                     <span
                                       style={{
-                                        fontSize: '0.78rem',
+                                        fontSize: isMobile ? '0.70rem' : '0.78rem',
                                         fontWeight: 800,
                                         lineHeight: 1.1,
                                         color: isSelected ? '#FFFFFF' : '#0F172A',
@@ -2877,9 +2927,9 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                     </span>
                                     <span
                                       style={{
-                                        fontSize: '0.72rem',
+                                        fontSize: isMobile ? '0.64rem' : '0.72rem',
                                         fontWeight: 600,
-                                        marginTop: '3px',
+                                        marginTop: '2px',
                                         color: isSelected ? '#DBEAFE' : '#64748B',
                                       }}
                                     >
@@ -2892,17 +2942,17 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                           </div>
 
                           {/* Available 20-Min Time Slots Section */}
-                          <div style={{ marginBottom: '6px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <label style={{ fontSize: '0.7rem', fontWeight: 700, color: '#334155', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                              <Clock size={12} color="#2563EB" /> Available 20-Min Slots:
+                          <div style={{ marginBottom: '5px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <label style={{ fontSize: isMobile ? '0.66rem' : '0.7rem', fontWeight: 700, color: '#334155', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <Clock size={11} color="#2563EB" /> Available 20-Min Slots:
                             </label>
-                            <span style={{ fontSize: '0.68rem', color: '#059669', fontWeight: 700, background: '#ECFDF5', padding: '2px 6px', borderRadius: '4px', border: '1px solid #A7F3D0' }}>
+                            <span style={{ fontSize: isMobile ? '0.62rem' : '0.68rem', color: '#059669', fontWeight: 700, background: '#ECFDF5', padding: '1px 5px', borderRadius: '4px', border: '1px solid #A7F3D0' }}>
                               {availableSlotsList.length} Open
                             </span>
                           </div>
 
                           {loadingSlots ? (
-                            <div style={{ padding: '16px', textAlign: 'center', color: '#64748B', fontSize: '0.74rem' }}>
+                            <div style={{ padding: '12px', textAlign: 'center', color: '#64748B', fontSize: isMobile ? '0.68rem' : '0.74rem' }}>
                               Loading available slots...
                             </div>
                           ) : availableSlotsList.length > 0 ? (
@@ -2910,26 +2960,27 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                               style={{
                                 display: 'grid',
                                 gridTemplateColumns: 'repeat(3, 1fr)',
-                                gap: '6px',
-                                maxHeight: '180px',
+                                gap: isMobile ? '4px' : '6px',
+                                maxHeight: isMobile ? '140px' : '180px',
                                 overflowY: 'auto',
                                 padding: '2px',
-                                marginBottom: '10px',
+                                marginBottom: isMobile ? '6px' : '10px',
                               }}
                             >
                               {availableSlotsList.map((slot, sIdx) => (
                                 <button
                                   key={sIdx}
                                   type="button"
+                                  className="time-slot-btn"
                                   disabled={loading || isTyping}
                                   onClick={() => handleDirectBookSlot(selectedSlotDate || slot.date, slot.time)}
                                   style={{
-                                    padding: '7px 4px',
+                                    padding: isMobile ? '5px 2px' : '7px 4px',
                                     background: '#F0FDF4',
                                     border: '1.5px solid #22C55E',
-                                    borderRadius: '7px',
+                                    borderRadius: isMobile ? '5px' : '7px',
                                     color: '#15803D',
-                                    fontSize: '0.74rem',
+                                    fontSize: isMobile ? '0.68rem' : '0.74rem',
                                     fontWeight: 700,
                                     cursor: 'pointer',
                                     textAlign: 'center',
@@ -3697,6 +3748,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
               bookingFlowState !== 'asking_check_slot' &&
               bookingFlowState !== 'showing_available_slots' && (
               <div
+                className="preset-chips-wrap"
                 style={{
                   flexShrink: 0,
                   display: 'flex',
@@ -3705,7 +3757,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                   gap: '5px',
                   overflowX: 'auto',
                   overscrollBehavior: 'contain',
-                  padding: '5px 10px 3px',
+                  padding: isMobile ? '3px 8px 2px' : '5px 10px 3px',
                   background: '#FFFFFF',
                   borderTop: '1px solid #F1F5F9',
                   scrollbarWidth: 'none',
@@ -3715,7 +3767,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '5px',
+                    gap: isMobile ? '4px' : '5px',
                     maxWidth: isMaximized ? '860px' : 'none',
                     width: isMaximized ? '100%' : 'auto',
                     overflowX: 'auto',
@@ -3731,8 +3783,8 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                       className="chip-btn"
                       style={{
                         flexShrink: 0,
-                        fontSize: '0.70rem',
-                        padding: '4px 8px',
+                        fontSize: isMobile ? '0.66rem' : '0.70rem',
+                        padding: isMobile ? '3px 6px' : '4px 8px',
                         whiteSpace: 'nowrap',
                         background: '#FFFDF5',
                         border: '1px solid #FDE68A',
@@ -3758,9 +3810,10 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                 e.preventDefault();
                 handleSend();
               }}
+              className="bottom-input-form"
               style={{
                 flexShrink: 0,
-                padding: '8px 10px',
+                padding: isMobile ? '5px 8px 6px' : '8px 10px',
                 background: '#FFFFFF',
                 borderTop: '1px solid #E2E8F0',
                 display: 'flex',
@@ -3776,11 +3829,12 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                   maxWidth: isMaximized ? '860px' : '100%',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px',
+                  gap: isMobile ? '6px' : '8px',
                 }}
               >
                 <input
                   type="text"
+                  className="chat-input-text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder={getInputPlaceholder()}
@@ -3789,11 +3843,11 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                     minWidth: 0,
                     background: '#F8FAFC',
                     border: '1px solid #CBD5E1',
-                    borderRadius: '8px',
+                    borderRadius: isMobile ? '7px' : '8px',
                     color: '#0F172A',
                     outline: 'none',
-                    fontSize: '0.86rem',
-                    padding: '9px 12px',
+                    fontSize: isMobile ? '0.80rem' : '0.86rem',
+                    padding: isMobile ? '6px 10px' : '9px 12px',
                     fontFamily: 'var(--font-body)',
                     boxSizing: 'border-box',
                   }}
@@ -3802,25 +3856,25 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
 
                 <button
                   type="submit"
-                  className="btn-primary"
+                  className="btn-primary chat-send-icon-btn"
                   disabled={loading || isTyping || !input.trim()}
                   style={{
                     flexShrink: 0,
-                    width: '38px',
-                    height: '38px',
+                    width: isMobile ? '32px' : '38px',
+                    height: isMobile ? '32px' : '38px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     padding: 0,
                     opacity: loading || isTyping || !input.trim() ? 0.5 : 1,
                     cursor: loading || isTyping || !input.trim() ? 'not-allowed' : 'pointer',
-                    borderRadius: '8px',
+                    borderRadius: isMobile ? '7px' : '8px',
                     background: 'linear-gradient(135deg, #F59E0B, #D97706)',
                     color: '#FFFFFF',
                     border: 'none',
                   }}
                 >
-                  <Send size={16} />
+                  <Send size={isMobile ? 14 : 16} />
                 </button>
               </div>
             </form>
