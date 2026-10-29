@@ -1,43 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readDB, writeDB, Inquiry, writeAnalysisDB, UserQueryLog } from '@/lib/db';
 import { validatePersonName, validateIndianMobile } from '@/lib/textUtils';
-
-export async function GET(req: NextRequest) {
-  try {
-    const db = readDB();
-    const url = new URL(req.url);
-    const department = url.searchParams.get('department');
-    const status = url.searchParams.get('status');
-
-    let list = db.inquiries;
-    if (department && department !== 'All') {
-      list = list.filter((i) => {
-        const team = (i.assignedTeam || '').toLowerCase();
-        const dept = department.toLowerCase();
-        if (dept === 'accounts' || dept === 'accountant') {
-          return team.includes('account') || team.includes('fee');
-        }
-        if (dept === 'admissions') {
-          return team.includes('admission');
-        }
-        if (dept === 'administration') {
-          return team.includes('admin') && !team.includes('admission');
-        }
-        if (dept === 'academics') {
-          return team.includes('academic');
-        }
-        return team === dept;
-      });
-    }
-    if (status && status !== 'All') {
-      list = list.filter((i) => i.status === status);
-    }
-
-    return NextResponse.json({ inquiries: list });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
-  }
-}
+import { pushInquiry } from '@/lib/hub';
 
 export async function POST(req: NextRequest) {
   try {
@@ -91,7 +55,7 @@ export async function POST(req: NextRequest) {
     const combinedContent = `${finalTopic} ${finalType} ${finalLocation} ${chatNotes || ''}`.toLowerCase();
 
     let assignedTeam = department || 'Admissions';
-    let assignedStaff = staff || 'Mr. Aravind J (Admissions Officer)';
+    let assignedStaff = staff || 'Mrs. Johnsemey Anthony (Admission Counsellor)';
     let category = finalType.toUpperCase().replace(/\s+/g, '_');
 
     if (!department) {
@@ -141,7 +105,7 @@ export async function POST(req: NextRequest) {
         category = 'ACADEMICS_AND_COACHING';
       } else {
         assignedTeam = 'Admissions';
-        assignedStaff = 'Mr. Aravind J (Admissions Officer)';
+        assignedStaff = 'Mrs. Johnsemey Anthony (Admission Counsellor)';
         category = 'ADMISSIONS_2026-27';
       }
     }
@@ -154,7 +118,7 @@ export async function POST(req: NextRequest) {
       location: finalLocation || undefined,
       userType: finalParent ? 'parent' : 'prospective_student',
       courseInterest: finalClass,
-      intendedYear: '2026-2027',
+      intendedYear: '2027-2028',
       category,
       preferredContact: 'phone',
       summary: `Topic: ${finalTopic} | Class: ${finalClass} | Inquiry: ${finalType} | Student: ${studentVal.cleanName}${finalParent ? ` | Parent: ${finalParent}` : ''}${finalLocation ? ` | Location: ${finalLocation}` : ''}${chatNotes ? ` | Note: ${chatNotes}` : ''}`,
@@ -170,6 +134,9 @@ export async function POST(req: NextRequest) {
 
     db.inquiries.unshift(newInquiry);
     writeDB(db);
+
+    // Mirror this enquiry to the Central Admission Hub (no-op unless HUB_* env vars are set).
+    void pushInquiry(newInquiry);
 
     // Save session queries to dedicated analytics JSON for algorithm improvement ONLY when phone number is provided
     if (rawMobile) {
@@ -195,10 +162,11 @@ export async function POST(req: NextRequest) {
   }
 }
 
+// Public: the widget only appends notes to its own lead, so never return the lead.
+// ponytail: ids are sequential, so anyone can append notes to any lead; switch to random ids if abused.
 export async function PATCH(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { id, status, assignedTeam, assignedStaff, notes, chatInfo } = body;
+    const { id, notes, chatInfo } = await req.json();
 
     const db = readDB();
     const inq = db.inquiries.find((i) => i.id === id);
@@ -206,24 +174,13 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: 'Inquiry not found' }, { status: 404 });
     }
 
-    if (status) inq.status = status;
-    if (assignedTeam) {
-      inq.assignedTeam = assignedTeam;
-      // Automatically assign default staff if not explicitly provided
-      if (!assignedStaff) {
-        if (assignedTeam === 'Accounts') inq.assignedStaff = 'Mrs. Kavitha N (Accountant)';
-        else if (assignedTeam === 'Admissions') inq.assignedStaff = 'Mr. Aravind J (Admissions Officer)';
-        else if (assignedTeam === 'Administration') inq.assignedStaff = 'Mr. Suresh Kumar (Administration Officer)';
-        else if (assignedTeam === 'Academics') inq.assignedStaff = 'Mrs. Deepa R (Academic Coordinator)';
-      }
-    }
-    if (assignedStaff) inq.assignedStaff = assignedStaff;
     if (notes) inq.summary += ` | Note: ${notes}`;
     if (chatInfo) inq.summary += ` | Chat update: ${chatInfo}`;
     inq.updatedAt = new Date().toISOString();
 
     writeDB(db);
-    return NextResponse.json({ success: true, inquiry: inq });
+    void pushInquiry(inq); // status/notes change -> the hub updates the same lead
+    return NextResponse.json({ success: true });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
