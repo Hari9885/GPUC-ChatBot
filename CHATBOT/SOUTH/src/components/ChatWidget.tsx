@@ -801,6 +801,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
             body: JSON.stringify({
               id: activeInquiryIdRef.current,
               notes: `Admission choice: ${chosenClass} • ${chosenType}`,
+              admissionClass: chosenClass, // the class picked here replaces the placeholder saved at step 2
             }),
           }).then((r) => r.json())
         : fetch('/api/inquiries', {
