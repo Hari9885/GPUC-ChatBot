@@ -1,17 +1,25 @@
 import fs from 'fs';
 import path from 'path';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
-  const filePath = path.join(process.cwd(), 'public', 'gpuc-south.html');
-  const html = fs.readFileSync(filePath, 'utf-8');
-  return new NextResponse(html, {
-    status: 200,
-    headers: {
-      'Content-Type': 'text/html; charset=utf-8',
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-    },
-  });
+export async function GET(req: NextRequest) {
+  try {
+    const filePath = path.join(process.cwd(), 'public', 'gpuc-south.html');
+    if (fs.existsSync(filePath)) {
+      const html = fs.readFileSync(filePath, 'utf-8');
+      return new NextResponse(html, {
+        status: 200,
+        headers: {
+          'Content-Type': 'text/html; charset=utf-8',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+        },
+      });
+    }
+  } catch (err) {
+    console.error('Error reading gpuc-south.html:', err);
+  }
+
+  return NextResponse.redirect(new URL('/embed', req.url));
 }
