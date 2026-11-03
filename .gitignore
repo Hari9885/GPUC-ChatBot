@@ -55,3 +55,4 @@ gpuc-south-bot.zip
 CHATBOT/*/public/assets
 CHATBOT/*/data/hub_outbox.json
 CHATBOT/*/data/*.bak-*
+delopusmax.sh
