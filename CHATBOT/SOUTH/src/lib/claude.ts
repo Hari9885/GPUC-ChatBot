@@ -1,3 +1,4 @@
+import Anthropic from '@anthropic-ai/sdk';
 import { toolDeclarations, executeTool } from './tools';
 import { searchKnowledge, loadFAQs } from './knowledge';
 import {
@@ -8,23 +9,15 @@ import {
 } from './textUtils';
 export { stripStarsAndAsterisks, enforceMaxThreeLines, isNonsenseOrIncomprehensible, INCOMPREHENSIBLE_RESPONSE };
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
+// Reads ANTHROPIC_API_KEY from the environment
+const client = new Anthropic({ timeout: 15_000, maxRetries: 1 });
+const MODEL = 'claude-haiku-5-5';
 
-// Priority order with resilient fallbacks
-const CANDIDATE_MODELS = [
-  'gemini-flash-lite-latest',
-  'gemini-3.5-flash-lite',
-  'gemini-3.8-flash',
-];
-
-export interface ChatMessage {
-  role: 'user' | 'model' | 'system';
-  parts: any[];
-}
+const FALLBACK_RESPONSE =
+  "For questions about Gopalan PU College Whitefield Campus, please call our Admissions Help Desk at +91 96069 41908 / +91 96069 41907 / (080) 41280227 or visit our campus behind SAP Labs, Hoodi.";
 
 export const OUT_OF_SCOPE_RESPONSE =
   "I cannot help with that request as I am unable to understand or process requests outside college admissions. I can help with requests about Gopalan PU College courses, admissions, facilities, and campus visits.";
-
 
 export function isOutOfScopeQuery(query: string): boolean {
   if (!query || typeof query !== 'string') return false;
@@ -36,9 +29,14 @@ export function isOutOfScopeQuery(query: string): boolean {
     return false;
   }
 
+  // GoFly / template artifact rejection (Anti-hallucination guardrail)
+  if (/\b(gofly|go\s*fly|robert\s*harringson|flight\s*ticket|flight\s*booking|airline|holiday\s*package|hotel\s*booking)\b/i.test(clean)) {
+    return true;
+  }
+
   // Strong college context keywords
   const hasStrongCollegeContext =
-    /\b(gpuc|gopalan|pu\s*college|puc|pre-university|pcmb|pcmc|ceba|seba|meba|neet|kcet|kanchana|mahesh|sunita|yelahanka|hesaragatta|mavallipura|gpuc\s*north|north\s*campus|principal|director)\b/i.test(clean);
+    /\b(gpuc|gopalan|pu\s*college|puc|pre-university|pcmb|pcmc|ceba|seba|meba|ca\s*foundation|neet|kcet|jee|nata|tally|coursera|kanchana|mahesh|krishna\s*murthy|sunita|aravind|whitefield|hoodi|seetharam\s*palya|basavanagar|yelahanka|gpuc\s*south|south\s*campus|principal|director)\b/i.test(clean);
 
   // 1. National/World leaders, politics, elections, presidents, prime ministers
   const politicalOrLeaderPattern =
@@ -90,11 +88,11 @@ export function isOutOfScopeQuery(query: string): boolean {
 }
 
 export const MASTER_SYSTEM_INSTRUCTION = `
-SYSTEM PROMPT — GOPALAN PRE-UNIVERSITY COLLEGE (NORTH CAMPUS, YELAHANKA) AI ASSISTANT
+SYSTEM PROMPT — GOPALAN PRE-UNIVERSITY COLLEGE (WHITEFIELD / SOUTH CAMPUS) AI ASSISTANT
 
 0. STRICT SCOPE & COMPREHENSIBILITY BOUNDARY (MANDATORY & ABSOLUTE):
-- You are EXCLUSIVELY the Admissions & College Information Assistant for GOPALAN PRE-UNIVERSITY COLLEGE (GPUC) — NORTH CAMPUS, Yelahanka, Bengaluru.
-- You are STRICTLY FORBIDDEN from answering any question unrelated to Gopalan Pre-University College North Campus.
+- You are EXCLUSIVELY the Admissions & College Information Assistant for GOPALAN PRE-UNIVERSITY COLLEGE (GPUC) — WHITEFIELD (SOUTH) CAMPUS, Bengaluru.
+- You are STRICTLY FORBIDDEN from answering any question unrelated to Gopalan Pre-University College.
 - IF THE USER MESSAGE DOES NOT MAKE SENSE, IS INCOMPREHENSIBLE, OR IS GIBBERISH (such as keyboard smashes like "wkfjehgisdfvkchdjsbrv", random letters, or nonsensical input):
   Respond strictly with:
   "I cannot help with that request as I am unable to understand the message... I can help with requests about Gopalan PU College / school admissions, courses, facilities, and campus visits."
@@ -103,6 +101,7 @@ SYSTEM PROMPT — GOPALAN PRE-UNIVERSITY COLLEGE (NORTH CAMPUS, YELAHANKA) AI AS
 - For ANY out-of-scope question, you must respond ONLY with this exact policy answer:
   "I cannot help with that request as I am unable to understand or process requests outside college admissions. I can help with requests about Gopalan PU College courses, admissions, facilities, and campus visits."
 - Never answer the trivia question and then add a disclaimer. The refusal must be immediate, direct, and adhere to this exact wording.
+- TEMPLATE ARTIFACT REFUSAL: The college website historically had a third-party template referencing "GoFly Travel Agency" or "Robert Harringson". If asked, strictly refuse and clarify that Gopalan PU College is exclusively an educational pre-university institution.
 
 1. STRICT MAXIMUM 3 LINES RULE (MANDATORY):
 - FOR ANY QUESTION, YOUR ENTIRE ANSWER MUST BE MAXIMUM 3 LINES. NEVER EXCEED 3 LINES.
@@ -114,44 +113,58 @@ SYSTEM PROMPT — GOPALAN PRE-UNIVERSITY COLLEGE (NORTH CAMPUS, YELAHANKA) AI AS
 - When asked about admissions, requirements, or documents, reply strictly in 2 lines:
 "Admission requires passing 10th standard (Karnataka SSLC, CBSE, or ICSE).
 
-For the document checklist and enrollment procedures, please contact our Admissions & Enquiry Help Desk at +91 81053 88193 / +91 81230 40418 / +91 96320 70209."
+For the document checklist and enrollment procedures, please contact our Admissions & Enquiry Help Desk at +91 96069 41908 / +91 96069 41907 / (080) 41280227."
 
 3. COURSES & COMBINATIONS (OFFICIAL & VERIFIED — MAX 3 LINES):
-- Science: PCMB (Physics, Chemistry, Mathematics, Biology) and PCMC (Physics, Chemistry, Mathematics, Computer Science) with integrated NEET, JEE, and KCET coaching.
-- Commerce: CEBA (Computer Science, Economics, Business Studies, Accountancy).
-- Languages: English (Mandatory I Language) and Kannada or Hindi (Part II).
-- When asked about courses, answer directly in 2-3 lines with these exact North Campus combinations.
+- Science: PCMB (Physics, Chemistry, Mathematics, Biology) and PCMC (Physics, Chemistry, Mathematics, Computer Science) with integrated NEET (PCMB), JEE and KCET coaching.
+- Commerce: CEBA (Computer Science), SEBA (Statistics), and MEBA (Mathematics) with Economics, Business Studies, Accountancy, and integrated CA Foundation coaching.
+- Languages: English (Mandatory Part I) + Kannada, Hindi, Sanskrit, or French (Part II).
+- Value-Added Courses: NATA Coaching, Data Analytics with Advanced Excel, Tally, Introduction to Data Science, Coursera Global Certifications.
 
-4. LEADERSHIP (MAX 2 LINES):
-- Principal of Gopalan PU College North Campus (Yelahanka): Mr. M. Mahesh.
-- Director of Gopalan Foundations: Mrs. Sunita Prabhakar.
+4. LEADERSHIP & FACULTY (MAX 2 LINES):
+- Principal of Gopalan PU College Whitefield: Dr. Kanchana A S.
+- Academic Head: Mr. Mahesh (Chemistry, MSc, MPhil, BEd - 21 Years). Science Coordinator: Mr. Krishna Murthy Goud (Chemistry, MSc, SET - 14 Years).
+- Director of Gopalan Foundation: Mrs. Sunita Prabhakar.
 
 5. FEES (MAX 2 LINES):
-- When asked about fees, tuition, installment options, or scholarships, do not quote amounts or estimates. Immediately direct the user to the North Campus Help Desk:
-"For official fee structures, installment options, and scholarship details, please contact our North Campus Help Desk directly:
-Admissions & Enquiry Help Desk: +91 81053 88193 / +91 81230 40418 / +91 96320 70209 (Mon–Sat, 8:30 AM–5:00 PM) | Email: gpuc.north@gopalanpucollege.com"
+- When asked about fees, tuition, installment options, or scholarships, do not quote amounts or estimates. Immediately direct the user to the Whitefield Admissions Help Desk:
+"For official fee structures, installment options, and scholarship details, please contact our Admissions Help Desk directly:
+Admissions & Enquiry Help Desk: +91 96069 41908 / +91 96069 41907 / (080) 41280227 | Email: admission_gpuc@gopalanpucollege.com"
 
-6. HOSTEL & FACILITIES (MAX 3 LINES):
-- "North Campus features modern science labs, computer lab, library, sports grounds (cricket, football), cafeteria, secure girls' hostel, and college bus transport across North Bengaluru."
+6. RULES & REGULATIONS (MAX 3 LINES):
+- Mobile Phones: Strictly prohibited on campus. Unauthorized use entails phone confiscation until course completion OR a fine of Rs. 1,000.
+- Vehicles: Two-wheelers and four-wheelers are strictly prohibited for PUC students.
+- Attendance: Late reporting is marked as ABSENT for the entire day.
 
-7. CAMPUS VISITS & APPOINTMENTS (MAX 2 LINES):
-- "Campus visits to North Campus (Yelahanka) are available Monday to Saturday between 8:30 AM and 5:00 PM. Would you like to schedule a visit or admission consultation?"
+7. CAMPUS FACILITIES & SPORTS (MAX 3 LINES):
+- Modern science laboratories, digital classrooms, a well-stocked library, a cafeteria, an amphitheatre, and 24/7 CCTV surveillance.
+- Sports: football ground, cricket ground, lawn tennis, badminton, table tennis, and gymnastics. GPS-enabled transport across key city routes (route list from the help desk).
+- Hostel: residential facility exclusively for girls; fees and capacity are not published.
 
-8. NO ASTERISKS / STARS:
+8. CAMPUS VISITS & APPOINTMENTS (MAX 2 LINES):
+- Office and visiting hours are not published. Never state any hours.
+- "Campus visits to Whitefield Campus (Behind SAP Labs, Hoodi) can be arranged by calling +91 96069 41908 or (080) 41280227. Would you like to schedule a visit or admission consultation?"
+
+9. OTHER CAMPUSES — STRICT BOUNDARY (MAX 2 LINES):
+- You only have information about the Whitefield (South) Campus. Never share or guess any detail (courses, contacts, address, staff, fees, events) of any other Gopalan campus, and never compare campuses.
+- If the user asks about any other campus (for example North Campus or Yelahanka), respond only with:
+"I can only help with Gopalan PU College, Whitefield (South) Campus. For any other campus, please contact that campus directly."
+
+10. NO ASTERISKS / STARS:
 - Never use asterisks (*) or double asterisks (**) anywhere.
 
-9. GREETINGS (MAX 2 LINES):
-- If the user says "hi", "hello", "hey", or a general greeting, respond with a warm hello and welcome them to Gopalan Pre-University College, North Campus (Yelahanka). Never assume an inquiry topic or ask for student details on a simple greeting.
+11. GREETINGS (MAX 2 LINES):
+- If the user says "hi", "hello", "hey", or a general greeting, respond with a warm hello and welcome them to Gopalan Pre-University College, South Campus (Whitefield). Never assume an inquiry topic or ask for student details on a simple greeting.
 
-10. LOCATION & CONTACT (MAX 3 LINES):
-- Gopalan Pre-University College, North Campus: No. 79, Mavallipura Kondashettihalli Road, Hesaragatta Hobli, Yelahanka, Bengaluru 560089.
-- Admissions & Enquiry Help Desk: +91 81053 88193 / +91 81230 40418 / +91 96320 70209 (gpuc.north@gopalanpucollege.com).
+12. LOCATION & CONTACT (MAX 3 LINES):
+- Address: 181/1, 182/1, Behind SAP Labs, Seetharam Palya, Basavanagar, Hoodi Village, Whitefield, Bengaluru - 560048.
+- Admissions Helpline: +91 96069 41908 / +91 96069 41907 / (080) 41280227 | WhatsApp: +91 8105131098.
+- Email: admission_gpuc@gopalanpucollege.com / admin@gopalanpucollege.com.
 `;
 
-export async function callGemini(
-  messages: ChatMessage[],
-  userContext?: any,
-  temperature = 0.3
+export async function callClaude(
+  messages: Anthropic.MessageParam[],
+  userContext: any
 ): Promise<{
   text: string;
   toolCallsExecuted: Array<{ tool: string; args: any; result: any }>;
@@ -160,7 +173,7 @@ export async function callGemini(
 
   // Extract latest user query for context enrichment
   const lastUserMsg = [...messages].reverse().find((m) => m.role === 'user');
-  const userQuery = lastUserMsg?.parts?.[0]?.text || '';
+  const userQuery = typeof lastUserMsg?.content === 'string' ? lastUserMsg.content : '';
   const cleanQ = userQuery.toLowerCase().trim();
   const cleanQWithoutPunct = cleanQ.replace(/[!.,?]+$/, '').trim();
 
@@ -188,8 +201,12 @@ export async function callGemini(
   if (isGreeting) {
     const studentName = userContext?.studentName || userContext?.name;
     const greetingText = studentName
-      ? `Hello ${studentName}! Welcome back to Gopalan Pre-University College, North Campus.\n\nHow can I help you today? Feel free to ask about our courses, 2026-27 admissions, or campus visits.`
-      : `Hello! Welcome to Gopalan Pre-University College, North Campus (Yelahanka).\n\nHow can I help you today? Please feel free to ask about admissions, courses, or campus visits.`;
+      ? `Hello ${studentName}! Welcome back to Gopalan Pre-University College, South Campus (Whitefield).
+
+How can I help you today? Feel free to ask about our courses, 2027-28 admissions, or campus visits.`
+      : `Hello! Welcome to Gopalan Pre-University College, South Campus (Whitefield).
+
+How can I help you today? Please feel free to ask about admissions, courses, or campus visits.`;
     return {
       text: greetingText,
       toolCallsExecuted: [],
@@ -197,10 +214,10 @@ export async function callGemini(
   }
 
   // Instant response for Principal / Leadership queries
-  const isPrincipalQuery = /\b(who is the principal|principal name|who is principal|principal of|college principal|director)\b/i.test(cleanQ);
+  const isPrincipalQuery = /\b(who is the principal|principal name|who is principal|principal of|college principal|director|academic head|science coordinator)\b/i.test(cleanQ);
   if (isPrincipalQuery) {
     return {
-      text: "The Principal of Gopalan Pre-University College, North Campus (Yelahanka) is Mr. M. Mahesh.\n\nAdmissions & Enquiry Help Desk: +91 81053 88193 / +91 81230 40418 / +91 96320 70209.",
+      text: "The Principal of Gopalan Pre-University College, Whitefield Campus is Dr. Kanchana A S. The Academic Head is Mr. Mahesh (Chemistry, MSc, MPhil, BEd).\n\nAdmissions Helpline: +91 96069 41908 / +91 96069 41907 | WhatsApp: +91 8105131098.",
       toolCallsExecuted: [],
     };
   }
@@ -210,16 +227,16 @@ export async function callGemini(
     ((cleanQ.includes('fee') || cleanQ.includes('cost') || cleanQ.includes('tuition') || cleanQ.includes('installment') || cleanQ.includes('scholarship') || cleanQ.includes('concession') || cleanQ.includes('payment') || cleanQ.includes('how much')) && !cleanQ.includes('calculate') && !cleanQ.includes('solve'));
   if (isFeeQuery) {
     return {
-      text: "For official fee structures, installment options, and scholarship details, please contact our North Campus Help Desk directly:\n\nAdmissions & Enquiry Help Desk: +91 81053 88193 / +91 81230 40418 / +91 96320 70209 (Mon–Sat, 8:30 AM–5:00 PM)\nEmail: gpuc.north@gopalanpucollege.com",
+      text: "For official fee structures, installment options, and scholarship details, please contact our Admissions Help Desk directly:\n\nAdmissions Helpline: +91 96069 41908 / +91 96069 41907 / (080) 41280227\nEmail: admission_gpuc@gopalanpucollege.com",
       toolCallsExecuted: [],
     };
   }
 
   // Instant response for Commerce courses queries
-  const isCommerceQuery = /commerce (combination|course|stream)|what commerce|commerce subject/i.test(cleanQ);
+  const isCommerceQuery = /commerce (combination|course|stream)|what commerce|commerce subject|ceba|seba|meba|ca foundation/i.test(cleanQ);
   if (isCommerceQuery) {
     return {
-      text: "Commerce Stream Available:\n• CEBA: Computer Science, Economics, Business Studies, Accountancy\n• Focus: CA Foundation, CS & B.Com pathways\n• Languages: English + Kannada / Hindi",
+      text: "Commerce Streams Available (Whitefield Campus):\n• CEBA (Computer Science), SEBA (Statistics), and MEBA (Mathematics)\n• Integrated CA Foundation coaching available\n• Languages: English + Kannada / Hindi / Sanskrit / French",
       toolCallsExecuted: [],
     };
   }
@@ -228,7 +245,7 @@ export async function callGemini(
   const isScienceQuery = /science (combination|course|stream)|what science|pcmb|pcmc|integrated neet|integrated jee|integrated kcet/i.test(cleanQ);
   if (isScienceQuery && !cleanQ.includes('calculate') && !cleanQ.includes('solve')) {
     return {
-      text: "Science Streams Available:\n• PCMB: Physics, Chemistry, Maths, Biology\n• PCMC: Physics, Chemistry, Maths, Computer Science\n• Integrated Coaching: NEET, JEE & KCET\n• Languages: English + Kannada / Hindi",
+      text: "Science Streams Available (Whitefield Campus):\n• PCMB: Physics, Chemistry, Maths, Biology\n• PCMC: Physics, Chemistry, Maths, Computer Science\n• Integrated Coaching: NEET, JEE & KCET\n• Languages: English + Kannada / Hindi / Sanskrit / French",
       toolCallsExecuted: [],
     };
   }
@@ -237,7 +254,16 @@ export async function callGemini(
   const isAllCoursesQuery = /what courses|which courses|available courses|list of courses|courses offered|all courses|streams offered|combinations offered/i.test(cleanQ);
   if (isAllCoursesQuery) {
     return {
-      text: "Courses Offered at North Campus:\n• Science: PCMB & PCMC (with integrated NEET/JEE/KCET)\n• Commerce: CEBA (CS, Economics, Business, Accountancy)\n• Languages: English + Kannada / Hindi",
+      text: "Courses Offered at Whitefield (South) Campus:\n• Science: PCMB & PCMC (with integrated NEET/JEE/KCET)\n• Commerce: CEBA, SEBA & MEBA (with CA Foundation coaching)\n• Languages: English + Kannada / Hindi / Sanskrit / French",
+      toolCallsExecuted: [],
+    };
+  }
+
+  // Instant response for Rules, Cell phone & Vehicle queries
+  const isRulesQuery = /\b(rule|rules|cell phone|mobile phone|phone policy|vehicle|bike|car|two wheeler|punctuality|attendance|dress code|uniform)\b/i.test(cleanQ);
+  if (isRulesQuery) {
+    return {
+      text: "Whitefield Campus Rules: Cell phones are strictly prohibited (unauthorized use entails phone confiscation or Rs. 1,000 fine). Student two-wheelers and four-wheelers are not permitted. Late reporting is recorded as absent.",
       toolCallsExecuted: [],
     };
   }
@@ -246,7 +272,7 @@ export async function callGemini(
   const isLocationQuery = /where|location|address|how to reach|campus location|map/i.test(cleanQ);
   if (isLocationQuery) {
     return {
-      text: "Gopalan PU College North Campus is located at No. 79 Mavallipura Kondashettihalli Road, Hesaragatta Hobli, Yelahanka, Bengaluru 560089.\n\nAdmissions & Enquiry Help Desk: +91 81053 88193 / +91 81230 40418 / +91 96320 70209 (gpuc.north@gopalanpucollege.com).",
+      text: "Gopalan PU College Whitefield is located at 181/1, 182/1, Behind SAP Labs, Seetharam Palya, Basavanagar, Hoodi, Whitefield, Bengaluru 560048.\n\nAdmissions Helpline: +91 96069 41908 / +91 96069 41907 | WhatsApp: +91 8105131098.",
       toolCallsExecuted: [],
     };
   }
@@ -255,16 +281,16 @@ export async function callGemini(
   const isContactDirect = /^(how to )?(contact|phone|call|number|spoc|reach|email)/i.test(cleanQ) || /contact (us|the college|admissions|desk)/i.test(cleanQ);
   if (isContactDirect && !cleanQ.includes('calculate') && !cleanQ.includes('solve')) {
     return {
-      text: "North Campus Admissions & Enquiry Help Desk: +91 81053 88193 / +91 81230 40418 / +91 96320 70209.\nEmail: gpuc.north@gopalanpucollege.com.\nAddress: No. 79 Mavallipura, Hesaragatta Hobli, Yelahanka.",
+      text: "Whitefield Admissions Helpline: +91 96069 41908 / +91 96069 41907 / (080) 41280227.\nWhatsApp: +91 8105131098 | Email: admission_gpuc@gopalanpucollege.com\nAddress: Behind SAP Labs, Hoodi, Whitefield, Bengaluru.",
       toolCallsExecuted: [],
     };
   }
 
-  // Instant response for Facilities, Hostel & Transport queries
-  const isFacilityDirect = /hostel|bus|transport|cafeteria|canteen|lab|labs|library|sports|ground/i.test(cleanQ);
+  // Instant response for Facilities, Sports & Transport queries
+  const isFacilityDirect = /football|cricket|tennis|badminton|table tennis|hostel|bus|transport|cafeteria|canteen|lab|labs|library|sports|ground/i.test(cleanQ);
   if (isFacilityDirect && (cleanQ.includes('do you have') || cleanQ.includes('available') || cleanQ.includes('facility') || cleanQ.includes('facilities') || cleanQ.includes('is there') || cleanQ.includes('what are'))) {
     return {
-      text: "North Campus provides smart classrooms, advanced Science & CS labs, a central library, sports grounds, a dedicated girls' hostel with 24/7 security, and GPS-tracked college buses across North Bengaluru.",
+      text: "Whitefield Campus has modern science labs, digital classrooms, a library, cafeteria, amphitheatre, a girls' hostel, sports facilities (football, cricket, lawn tennis, badminton, table tennis, gymnastics), and GPS-enabled transport across key city routes.",
       toolCallsExecuted: [],
     };
   }
@@ -273,7 +299,7 @@ export async function callGemini(
   const isDocumentsDirect = /(what|which) documents? (are )?(needed|required)|admission documents|document checklist/i.test(cleanQ);
   if (isDocumentsDirect) {
     return {
-      text: "Required admission documents: 10th/SSLC Marks Card, Transfer Certificate (TC), Conduct Certificate, Migration Certificate (for CBSE/ICSE), Aadhaar copies (student & parent), and passport-size photographs.",
+      text: "Required admission documents (two sets of photocopies): 10th original TC, attested 10th marks card, 10th hall ticket, study certificate, caste & income certificate, student & parent Aadhaar, and 5 passport-size photos. Migration or eligibility certificates are needed for other boards or NRI students.",
       toolCallsExecuted: [],
     };
   }
@@ -282,31 +308,29 @@ export async function callGemini(
   const isTimingsDirect = /timings|timing|visiting hour|visiting time|office hour|when can i visit/i.test(cleanQ);
   if (isTimingsDirect) {
     return {
-      text: "North Campus visiting and office hours are Monday to Saturday, 8:30 AM to 5:00 PM.\n\nYou can tour laboratories, smart classrooms, and library, or speak with an admissions counselor.",
+      text: "Whitefield Campus office and visiting hours are not published. Please call +91 96069 41908 / (080) 41280227 before visiting, or ask me to book a campus visit.",
       toolCallsExecuted: [],
     };
   }
 
-
-
   // Hybrid RAG: Retrieve grounded context from knowledge base & FAQs
   const isCourseQuery = /course|cource|stream|combin|subject|puc|pcmb|pcmc|ceba|seba|meba|offer/i.test(cleanQ);
   const isDocQuery = /document|admission|eligib|caste|tc|certif|require|process|apply/i.test(cleanQ);
-  const isFacQuery = /facilit|hostel|sport|ground|transport|bus|lab|library|canteen|cafeteria/i.test(cleanQ);
+  const isFacQuery = /facilit|sport|ground|tennis|badminton|cricket|football|transport|bus|lab|library|canteen|cafeteria/i.test(cleanQ);
   const isBookQuery = /book|visit|tour|appointment|consult|meet|schedule|slot/i.test(cleanQ);
-  const isContactQuery = /contact|phone|call|number|spoc|reach|email/i.test(cleanQ);
-  const isPrincipalFilter = /principal|director|leadership|mahesh|sunita/i.test(cleanQ);
+  const isContactQuery = /contact|phone|call|number|spoc|reach|email|whatsapp/i.test(cleanQ);
+  const isPrincipalFilter = /principal|director|leadership|kanchana|mahesh|sunita/i.test(cleanQ);
 
   const kbMatches = searchKnowledge(userQuery, 4);
   const allFAQs = loadFAQs();
   const faqMatches = allFAQs.filter((f) => {
     if (isGreeting) return true;
-    if (isPrincipalFilter && (f.id === 'north_campus_principal' || f.id === 'institution_overview')) return true;
-    if (isCourseQuery && (f.id === 'north_campus_courses' || f.id === 'science_combinations' || f.id === 'commerce_combinations' || f.id === 'languages')) return true;
-    if (isDocQuery && (f.id === 'admission_documents' || f.id === 'admission_eligibility')) return true;
-    if (isFacQuery && (f.id === 'north_campus_facilities' || f.id === 'facilities')) return true;
-    if (isBookQuery && f.id === 'book_appointment') return true;
-    if (isContactQuery && f.id === 'contact') return true;
+    if (isPrincipalFilter && (f.id === 'college_principal' || f.id === 'institution_overview')) return true;
+    if (isCourseQuery && (f.id === 'science_courses_combinations' || f.id === 'commerce_courses_combinations' || f.id === 'languages_offered' || f.id === 'value_added_courses')) return true;
+    if (isDocQuery && (f.id === 'admission_documents_required' || f.id === 'admission_eligibility')) return true;
+    if (isFacQuery && (f.id === 'sports_and_facilities' || f.id === 'transportation_routes')) return true;
+    if (isBookQuery && f.id === 'campus_visit_schedule') return true;
+    if (isContactQuery && f.id === 'contact_help_desk') return true;
     return cleanQ.includes(f.intent.toLowerCase()) || f.question.toLowerCase().includes(cleanQ);
   });
 
@@ -315,7 +339,7 @@ export async function callGemini(
     faqMatches.push(unrelatedFAQ);
   }
 
-  let groundedContext = `\n\n=== VERIFIED GOPALAN PU COLLEGE RECORDS ===\n`;
+  let groundedContext = `\n\n=== VERIFIED GOPALAN PU COLLEGE RECORDS (WHITEFIELD / SOUTH CAMPUS) ===\n`;
   if (kbMatches.length > 0) {
     groundedContext += `\n[KNOWLEDGE BASE EXCERPTS]:\n` + kbMatches.map((k) => `### ${k.title}\n${k.content}`).join('\n\n');
   }
@@ -329,85 +353,54 @@ export async function callGemini(
       `- Parent/Guardian: ${userContext.parentName || 'N/A'}\n` +
       `- Contact Mobile: ${userContext.mobile || 'N/A'}\n` +
       `- Location/Area: ${userContext.location || 'N/A'}\n` +
-      `- Target Class/Stream: ${userContext.admissionClass || '12th Class (2nd PU)'}\n` +
-      `- Inquiry Nature: ${userContext.inquiryType || 'Admissions 2026-27'}\n` +
+      `- Target Class/Stream: ${userContext.admissionClass || '1st PU (11th Standard)'}\n` +
+      `- Inquiry Nature: ${userContext.inquiryType || 'Admissions 2027-28'}\n` +
       `- Reference ID: ${userContext.inquiryId || 'GPUC-2026-INQ'}\n` +
       `Answer directly, concisely, and helpfully without robotic preamble or repeating their reference ID.\n`;
   }
 
-  // Convert declarations to Gemini API format
-  const geminiTools = [
-    {
-      functionDeclarations: toolDeclarations.map((t) => ({
-        name: t.name,
-        description: t.description,
-        parameters: t.parameters,
-      })),
-    },
-  ];
+  const tools: Anthropic.Tool[] = toolDeclarations.map((t) => ({
+    name: t.name,
+    description: t.description,
+    input_schema: t.parameters,
+  }));
 
-  let currentMessages = [...messages];
+  const currentMessages = [...messages];
   let maxTurns = 4;
 
   while (maxTurns > 0) {
     maxTurns--;
-    let lastError: any = null;
-    let data: any = null;
 
-    // Try candidate models in order until one responds
-    for (const model of CANDIDATE_MODELS) {
-      try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          signal: AbortSignal.timeout(12000),
-          body: JSON.stringify({
-            systemInstruction: {
-              parts: [{ text: MASTER_SYSTEM_INSTRUCTION + groundedContext }],
-            },
-            contents: currentMessages,
-            tools: geminiTools,
-            generationConfig: {
-              temperature,
-              maxOutputTokens: 140,
-            },
-          }),
-        });
-
-        if (!res.ok) {
-          const errData = await res.json();
-          lastError = errData;
-          continue; // try next model
-        }
-
-        data = await res.json();
-        if (data?.candidates?.[0]?.content) {
-          break; // success!
-        }
-      } catch (err: any) {
-        lastError = err;
-      }
+    let response: Anthropic.Message;
+    try {
+      response = await client.messages.create({
+        model: MODEL,
+        max_tokens: 1024, // thinking counts toward this; answer length is capped by enforceMaxThreeLines
+        output_config: { effort: 'low' },
+        // Static prompt first so it is cached; per-query grounded context after the breakpoint
+        system: [
+          { type: 'text', text: MASTER_SYSTEM_INSTRUCTION, cache_control: { type: 'ephemeral' } },
+          { type: 'text', text: groundedContext },
+        ],
+        tools,
+        messages: currentMessages,
+      });
+    } catch (err) {
+      console.error('Claude API call failed:', err);
+      return { text: FALLBACK_RESPONSE, toolCallsExecuted };
     }
 
-    if (!data?.candidates?.[0]?.content) {
-      console.error('All Gemini candidate models failed:', lastError);
-      return {
-        text: "For questions about Gopalan PU College North Campus, please call our Admissions & Enquiry Help Desk at +91 81053 88193 / +91 81230 40418 / +91 96320 70209 or visit our campus in Yelahanka.",
-        toolCallsExecuted,
-      };
+    // Safety classifier declined (Haiku 5.5 has no server-side fallback)
+    if (response.stop_reason === 'refusal') {
+      return { text: OUT_OF_SCOPE_RESPONSE, toolCallsExecuted };
     }
 
-    const candidate = data.candidates[0];
-    const parts = candidate.content.parts || [];
-
-    // Check for function calls
-    const functionCalls = parts.filter((p: any) => p.functionCall);
-
-    if (functionCalls.length === 0) {
+    if (response.stop_reason !== 'tool_use') {
       // Model produced text response
-      const textParts = parts.filter((p: any) => p.text).map((p: any) => p.text);
-      const rawText = textParts.join('\n') || '';
+      const rawText = response.content
+        .filter((b): b is Anthropic.TextBlock => b.type === 'text')
+        .map((b) => b.text)
+        .join('\n');
 
       // Post-generation guard: If model answered out-of-scope topic or leaked political/general knowledge
       const mentionsPoliticalOrGK =
@@ -419,10 +412,8 @@ export async function callGemini(
         };
       }
 
-      if (
-        isOutOfScopeQuery(rawText) ||
-        (cleanQ.includes('president') && !cleanQ.includes('principal') && !cleanQ.includes('gopalan'))
-      ) {
+      // Note: isOutOfScopeQuery is for user input only; on answers its math regex flags phone numbers ("41907 / (080)") and years ("2026-27")
+      if (cleanQ.includes('president') && !cleanQ.includes('principal') && !cleanQ.includes('gopalan')) {
         return {
           text: OUT_OF_SCOPE_RESPONSE,
           toolCallsExecuted,
@@ -430,45 +421,32 @@ export async function callGemini(
       }
 
       return {
-        text: enforceMaxThreeLines(rawText),
+        text: enforceMaxThreeLines(rawText) || FALLBACK_RESPONSE,
         toolCallsExecuted,
       };
     }
 
-    // Process function calls: IMPORTANT - Preserve candidate.content intact so thoughtSignature is not lost!
-    currentMessages.push(candidate.content);
+    // Append the full assistant content (incl. thinking blocks) unchanged before tool results
+    currentMessages.push({ role: 'assistant', content: response.content });
 
-    const functionResponseParts = [];
-    for (const fcPart of functionCalls) {
-      const { name, args } = fcPart.functionCall;
-      console.log(`Executing tool: ${name} with args:`, args);
+    const toolResults: Anthropic.ToolResultBlockParam[] = [];
+    for (const block of response.content) {
+      if (block.type !== 'tool_use') continue;
+      const args = block.input as Record<string, any>;
+      console.log(`Executing tool: ${block.name} with args:`, args);
 
       try {
-        const result = await executeTool(name, args);
-        toolCallsExecuted.push({ tool: name, args, result });
-
-        functionResponseParts.push({
-          functionResponse: {
-            name,
-            response: { content: result },
-          },
-        });
+        const result = await executeTool(block.name, args);
+        toolCallsExecuted.push({ tool: block.name, args, result });
+        toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: JSON.stringify(result) });
       } catch (toolErr: any) {
-        console.error(`Tool execution error for ${name}:`, toolErr);
-        functionResponseParts.push({
-          functionResponse: {
-            name,
-            response: { content: { error: toolErr.message } },
-          },
-        });
+        console.error(`Tool execution error for ${block.name}:`, toolErr);
+        toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: toolErr.message, is_error: true });
       }
     }
 
-    // Append function responses in user turn as expected by Gemini API
-    currentMessages.push({
-      role: 'user',
-      parts: functionResponseParts,
-    });
+    // All tool results go back in a single user turn
+    currentMessages.push({ role: 'user', content: toolResults });
   }
 
   return {

@@ -1,21 +1,44 @@
-Page_File,Live_URL,Content_Category,File_Size_Bytes,HTTP_Status,Campus
-about-us.html,https://www.gopalancolleges.com/gpuc/about-us.html,General Information,102272,200,Gopalan PU College - Whitefield
-admission.html,https://www.gopalancolleges.com/gpuc/admission.html,Admissions & Documents,28616,200,Gopalan PU College - Whitefield
-campus-life.html,https://www.gopalancolleges.com/gpuc/campus-life.html,General Information,15157,200,Gopalan PU College - Whitefield
-commerce-courses.html,https://www.gopalancolleges.com/gpuc/commerce-courses.html,Curriculum & Courses,28670,200,Gopalan PU College - Whitefield
-contact-us.html,https://www.gopalancolleges.com/gpuc/contact-us.html,Contact & Location,39239,200,Gopalan PU College - Whitefield
-contact.html,https://www.gopalancolleges.com/gpuc/contact.html,Contact & Location,15157,200,Gopalan PU College - Whitefield
-director-message.html,https://www.gopalancolleges.com/gpuc/director-message.html,Institutional Leadership,28812,200,Gopalan PU College - Whitefield
-events.html,https://www.gopalancolleges.com/gpuc/events.html,Campus Life & Events,38972,200,Gopalan PU College - Whitefield
-facilities.html,https://www.gopalancolleges.com/gpuc/facilities.html,Infrastructure & Facilities,35357,200,Gopalan PU College - Whitefield
-faculty.html,https://www.gopalancolleges.com/gpuc/faculty.html,Faculty & Staff Directory,58642,200,Gopalan PU College - Whitefield
-gallery.html,https://www.gopalancolleges.com/gpuc/gallery.html,General Information,28967,200,Gopalan PU College - Whitefield
-index.html,https://www.gopalancolleges.com/gpuc/,General Information,58442,200,Gopalan PU College - Whitefield
-placement.html,https://www.gopalancolleges.com/gpuc/placement.html,Redirect / Archived,771,302,Gopalan PU College - Whitefield
-principal-message.html,https://www.gopalancolleges.com/gpuc/principal-message.html,Institutional Leadership,28900,200,Gopalan PU College - Whitefield
-rules-regulations.html,https://www.gopalancolleges.com/gpuc/rules-regulations.html,Institutional Policies & Rules,31509,200,Gopalan PU College - Whitefield
-science-courses.html,https://www.gopalancolleges.com/gpuc/science-courses.html,Curriculum & Courses,28969,200,Gopalan PU College - Whitefield
-testimonial.html,https://www.gopalancolleges.com/gpuc/testimonial.html,Redirect / Archived,771,302,Gopalan PU College - Whitefield
-value-added-courses.html,https://www.gopalancolleges.com/gpuc/value-added-courses.html,Curriculum & Courses,31054,200,Gopalan PU College - Whitefield
-vision-mission.html,https://www.gopalancolleges.com/gpuc/vision-mission.html,Vision & Mission,27026,200,Gopalan PU College - Whitefield
-why-choose-us.html,https://www.gopalancolleges.com/gpuc/why-choose-us.html,Institutional Highlights,30413,200,Gopalan PU College - Whitefield
+url,page_title,fetched_ok,notes
+https://www.gopalancolleges.com/gpuc/,Gopalan Pre-University College,yes,Home page; admissions open 2027-28; 20+ years; header phone +91 96069 41907
+https://www.gopalancolleges.com/gpuc/about-us.html,About Us | Gopalan Pre-University College,yes,Overview; template travel-agency text present only in HTML comments (ignored)
+https://www.gopalancolleges.com/gpuc/vision-mission.html,Vision & Mission | Gopalan PU College,yes,Vision and mission statements
+https://www.gopalancolleges.com/gpuc/why-choose-us.html,Why Choose Us | Gopalan PU College,yes,Academic strengths and campus highlights
+https://www.gopalancolleges.com/gpuc/director-message.html,Gopalan PU College,yes,Director's message - Mrs. Sunita Prabhakar
+https://www.gopalancolleges.com/gpuc/principal-message.html,Gopalan PU College,yes,Principal's message - Dr. Kanchana A S
+https://www.gopalancolleges.com/gpuc/leadership-message.html,Gopalan PU College,yes,Not linked from site navigation; older combined page naming a different principal (Mrs. Sangeeta Upadhyaya) - not used
+https://www.gopalancolleges.com/gpuc/faculty.html,Faculty | Gopalan Pre-University College,yes,38 staff listed; principal qualification only in an HTML comment (not used)
+https://www.gopalancolleges.com/gpuc/facilities.html,Facilities | Gopalan Pre-University College,yes,12 facilities incl. girls-only hostel; Football Ground caption is template text (ignored)
+https://www.gopalancolleges.com/gpuc/rules-regulations.html,Rules & Regulations | Gopalan Pre-University College,yes,Full code of conduct
+https://www.gopalancolleges.com/gpuc/science-courses.html,Gopalan Pre-University College,yes,"PCMB, PCMC, NEET/JEE/KCET coaching, languages"
+https://www.gopalancolleges.com/gpuc/commerce-courses.html,Gopalan Pre-University College,yes,"CEBA, SEBA, MEBA, CA Foundation, languages"
+https://www.gopalancolleges.com/gpuc/value-added-courses.html,Gopalan Pre-University College,yes,"NATA, Advanced Excel, Tally, Data Science, Coursera"
+https://www.gopalancolleges.com/gpuc/admission.html,Gopalan Pre-University College,yes,Eligibility and document list (linked as How to Apply)
+https://www.gopalancolleges.com/gpuc/how-to-apply.html,Gopalan Pre-University College,yes,Not linked from site navigation; content belongs to Gopalan College of Commerce (degree admissions) - not used for PU
+https://www.gopalancolleges.com/gpuc/contact-us.html,Contact Us | Gopalan Pre-University College,yes,"Address, phones, SPOC, admissions contact"
+https://www.gopalancolleges.com/gpuc/career.html,Careers | Gopalan Pre-University College,yes,Careers page; careers@gopalancolleges.com
+https://www.gopalancolleges.com/gpuc/gallery.html,Gallery | Gopalan PU College,yes,Photo gallery only
+https://www.gopalancolleges.com/gpuc/events.html,Events | Gopalan PU College,yes,18 published events
+https://www.gopalancolleges.com/gpuc/event-anti-drug-day.html,Event | Gopalan PU College,yes,Event photo gallery; no date or description text
+https://www.gopalancolleges.com/gpuc/event-drawing-competition-2025.html,Event | Gopalan PU College,yes,Event photo gallery; no date or description text
+https://www.gopalancolleges.com/gpuc/event-drug-awareness-program-2026.html,Event | Gopalan PU College,yes,Event photo gallery; no date or description text
+https://www.gopalancolleges.com/gpuc/event-environment-day-2025.html,Gallery | Gopalan PU College,yes,Event photo gallery; no date or description text
+https://www.gopalancolleges.com/gpuc/event-environment-day-2026.html,Event | Gopalan PU College,yes,Event photo gallery; no date or description text
+https://www.gopalancolleges.com/gpuc/event-felicitation-ceremony-2025.html,Event | Gopalan PU College,yes,Event photo gallery; no date or description text
+https://www.gopalancolleges.com/gpuc/event-felicitation-orientation-ceremony-2026.html,Event | Gopalan PU College,yes,Event photo gallery; no date or description text
+https://www.gopalancolleges.com/gpuc/event-field-trips-2025.html,Event | Gopalan PU College,yes,Event photo gallery; no date or description text
+https://www.gopalancolleges.com/gpuc/event-freshers-day-2026.html,Event | Gopalan PU College,yes,Event photo gallery; no date or description text
+https://www.gopalancolleges.com/gpuc/event-ice-breaking-session-2026.html,Event | Gopalan PU College,yes,Event photo gallery; no date or description text
+https://www.gopalancolleges.com/gpuc/event-investiture-ceremony-2026.html,Event | Gopalan PU College,yes,Event photo gallery; no date or description text
+https://www.gopalancolleges.com/gpuc/event-mothers-day-2025.html,Event | Gopalan PU College,yes,Event photo gallery; no date or description text
+https://www.gopalancolleges.com/gpuc/event-orientation-day-2025.html,Event | Gopalan PU College,yes,Event photo gallery; no date or description text
+https://www.gopalancolleges.com/gpuc/event-saraswathi-puja-2025.html,Event | Gopalan PU College,yes,Event photo gallery; no date or description text
+https://www.gopalancolleges.com/gpuc/event-statistics-day-2025.html,Event | Gopalan PU College,yes,Event photo gallery; no date or description text
+https://www.gopalancolleges.com/gpuc/event-talents-day-2025.html,Event | Gopalan PU College,yes,Event photo gallery; no date or description text
+https://www.gopalancolleges.com/gpuc/event-yoga-day-2025.html,Yoga Day | Gopalan PU College,yes,Event photo gallery; no date or description text
+https://www.gopalancolleges.com/gpuc/event-yoga-day-2026.html,Event | Gopalan PU College,yes,Event photo gallery; no date or description text
+https://www.gopalancolleges.com/gpuc/campus-life.html,Gopalan Group of Institutions,no,HTTP 302 redirect to https://www.gopalancolleges.com/ (group home page); no GPUC content
+https://www.gopalancolleges.com/gpuc/contact.html,Gopalan Group of Institutions,no,HTTP 302 redirect to https://www.gopalancolleges.com/ (group home page); no GPUC content
+https://www.gopalancolleges.com/gpuc/placement.html,Gopalan Group of Institutions,no,HTTP 302 redirect to https://www.gopalancolleges.com/ (group home page); no GPUC content
+https://www.gopalancolleges.com/gpuc/testimonial.html,Gopalan Group of Institutions,no,HTTP 302 redirect to https://www.gopalancolleges.com/ (group home page); no GPUC content
+https://www.gopalancolleges.com/gpuc/travel-package-01.html,Gopalan Group of Institutions,no,HTTP 302 redirect to https://www.gopalancolleges.com/ (group home page); no GPUC content
+https://www.gopalancolleges.com/gpuc/travel-package-details.html,Gopalan Group of Institutions,no,HTTP 302 redirect to https://www.gopalancolleges.com/ (group home page); no GPUC content

@@ -44,7 +44,7 @@ export const toolDeclarations: ToolDefinition[] = [
         mobile: { type: 'string', description: 'Validated mobile phone number' },
         user_type: { type: 'string', enum: ['parent', 'prospective_student', 'current_student', 'other'], description: 'Role of the enquirer' },
         course_interest: { type: 'string', description: 'Interested stream/combination (e.g. Science PCMB, Commerce CEBA)' },
-        intended_year: { type: 'string', description: 'Intended academic year (e.g. 2026-2027)' },
+        intended_year: { type: 'string', description: 'Intended academic year (e.g. 2027-2028)' },
         category: { type: 'string', description: 'Inquiry category (ADMISSIONS, COURSES, FACILITIES, GENERAL)' },
         preferred_contact: { type: 'string', enum: ['phone', 'whatsapp', 'email'], description: 'Preferred communication method' },
         summary: { type: 'string', description: 'Brief description of the query or request' },
@@ -55,14 +55,14 @@ export const toolDeclarations: ToolDefinition[] = [
   },
   {
     name: 'find_existing_inquiry',
-    description: 'Look up an existing inquiry status by reference ID and/or mobile number.',
+    description: 'Look up an existing inquiry status. Needs both the reference ID and the mobile number it was registered with.',
     parameters: {
       type: 'object',
       properties: {
         inquiry_id: { type: 'string', description: 'Official reference ID (e.g. GPUC-2026-INQ-1001)' },
         mobile: { type: 'string', description: 'Mobile number for identity verification' },
       },
-      required: ['inquiry_id'],
+      required: ['inquiry_id', 'mobile'],
     },
   },
   {
@@ -232,7 +232,7 @@ export async function executeTool(name: string, args: Record<string, any>): Prom
         mobile: args.mobile,
         userType: args.user_type || 'prospective_student',
         courseInterest: args.course_interest || 'General PUC',
-        intendedYear: args.intended_year || '2026-2027',
+        intendedYear: args.intended_year || '2027-2028',
         category: args.category || 'ADMISSION_PROCESS',
         preferredContact: args.preferred_contact || 'phone',
         summary: args.summary,
@@ -271,10 +271,12 @@ export async function executeTool(name: string, args: Record<string, any>): Prom
     }
 
     case 'find_existing_inquiry': {
+      const last10 = (m: string) => (m || '').replace(/\D/g, '').slice(-10);
       const found = db.inquiries.find(
         (inq) =>
-          inq.id.toLowerCase() === (args.inquiry_id || '').toLowerCase() ||
-          (args.mobile && inq.mobile.includes(args.mobile))
+          inq.id.toLowerCase() === (args.inquiry_id || '').toLowerCase() &&
+          last10(args.mobile).length === 10 &&
+          last10(inq.mobile) === last10(args.mobile)
       );
 
       if (!found) {
@@ -328,7 +330,7 @@ export async function executeTool(name: string, args: Record<string, any>): Prom
       const aptId = `GPUC-2026-APT-${Math.floor(100 + Math.random() * 900)}`;
       const venue =
         args.mode === 'campus_visit'
-          ? 'Gopalan Pre-University College, North Campus, No. 79 Mavallipura, Hesaragatta Hobli, Yelahanka, Bengaluru - 560089'
+          ? 'Gopalan Pre-University College, South Campus, 181/1, 182/1, Behind SAP Labs, Seetharam Palya, Hoodi, Whitefield, Bengaluru - 560048'
           : args.mode === 'online_meeting'
           ? 'Google Meet (Link will be dispatched 30 mins prior)'
           : 'Telephonic Callback from College Office';
@@ -500,8 +502,9 @@ export async function executeTool(name: string, args: Record<string, any>): Prom
         spoc_contact: 'Mr. Aravind J (Admin Executive): +91 63621 66945',
         official_email: 'admin@gopalanpucollege.com',
         website: 'https://www.gopalancolleges.com/gpuc/',
-        office_hours: 'Monday to Friday: 8:30 AM – 5:00 PM (Closed on Weekends & Public Holidays)',
-        notes: 'Help desk is available Monday to Friday from 8:30 AM to 5:00 PM.',
+        admissions_email: 'admission_gpuc@gopalanpucollege.com',
+        whatsapp: '+91 81051 31098',
+        notes: 'Office and visiting hours are not published. Ask users to call before visiting.',
       };
     }
 

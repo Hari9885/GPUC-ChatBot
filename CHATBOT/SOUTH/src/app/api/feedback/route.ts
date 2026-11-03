@@ -1,22 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readDB, writeDB } from '@/lib/db';
 
-export async function GET() {
-  try {
-    const db = readDB();
-    const count = db.feedback.length;
-    const avg = count > 0 ? (db.feedback.reduce((sum, f) => sum + f.rating, 0) / count).toFixed(1) : '5.0';
-
-    return NextResponse.json({
-      feedback: db.feedback,
-      averageRating: avg,
-      totalCount: count,
-    });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
-  }
-}
-
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();

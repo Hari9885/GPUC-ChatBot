@@ -23,7 +23,7 @@ export function enforceMaxThreeLines(text: string): string {
   if (
     /transfer certificate|marks card|study certificate|aadhaar|hall ticket|migration certificate/i.test(cleaned)
   ) {
-    cleaned = "Admission requires passing 10th standard (Karnataka SSLC, CBSE, or ICSE).\n\nFor the document checklist and enrollment procedures, please contact our Admissions & Enquiry Help Desk at +91 81053 88193 / +91 81230 40418 / +91 96320 70209 (Monday to Saturday, 8:30 AM to 5:00 PM).";
+    cleaned = "Admission requires passing 10th standard (Karnataka SSLC, CBSE, or ICSE).\n\nFor the document checklist and enrollment procedures, please contact our Admissions & Enquiry Help Desk at +91 96069 41908 / +91 96069 41907 / (080) 41280227.";
     return formatPhoneNumbers(cleaned);
   }
 

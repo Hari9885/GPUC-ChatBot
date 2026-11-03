@@ -166,7 +166,7 @@ export async function POST(req: NextRequest) {
 // ponytail: ids are sequential, so anyone can append notes to any lead; switch to random ids if abused.
 export async function PATCH(req: NextRequest) {
   try {
-    const { id, notes, chatInfo } = await req.json();
+    const { id, notes, chatInfo, admissionClass } = await req.json();
 
     const db = readDB();
     const inq = db.inquiries.find((i) => i.id === id);
@@ -175,6 +175,8 @@ export async function PATCH(req: NextRequest) {
     }
 
     if (notes) inq.summary += ` | Note: ${notes}`;
+    // The class chosen after the contact step (1st or 2nd PU) replaces the placeholder saved with the contact details.
+    if (typeof admissionClass === 'string' && admissionClass.trim()) inq.courseInterest = admissionClass.trim().slice(0, 60);
     if (chatInfo) inq.summary += ` | Chat update: ${chatInfo}`;
     inq.updatedAt = new Date().toISOString();
 

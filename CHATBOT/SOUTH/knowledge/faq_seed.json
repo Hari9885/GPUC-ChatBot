@@ -3,7 +3,7 @@
     "id": "institution_overview",
     "intent": "college_overview",
     "question": "Tell me about Gopalan PU College Whitefield.",
-    "answer": "Gopalan Pre-University College (GPUC) Whitefield offers comprehensive Science (PCMB/PCMC) and Commerce (CEBA/SEBA/MEBA) education with integrated coaching for NEET, JEE, KCET, and CA Foundation, alongside world-class sports and laboratory infrastructure.",
+    "answer": "Gopalan Pre-University College, Whitefield (Hoodi, behind SAP Labs) is part of the Gopalan Group of Institutions, with 20+ years of academic excellence.\nIt offers Science (PCMB, PCMC) with NEET/JEE/KCET coaching and Commerce (CEBA, SEBA, MEBA) with CA Foundation coaching.",
     "source_url": "https://www.gopalancolleges.com/gpuc/about-us.html",
     "campus": "Whitefield",
     "release_status": "approved"
@@ -12,17 +12,8 @@
     "id": "campus_location_address",
     "intent": "college_location",
     "question": "Where is Gopalan PU College Whitefield located?",
-    "answer": "The campus is located at 181/1, 182/1, Behind SAP Labs, Seetharam Palya, Basavanagar, Hoodi Village, Sonnenahalli, K.R. Puram, Whitefield, Bengaluru - 560048 (Near Hoodi Junction).",
+    "answer": "181/1, 182/1, Behind SAP Labs, Seetharam Palya, Basavanagar, Hoodi, Bangalore - 560 048 (Hoodi Village, Sonnenahalli, K.R. Puram).",
     "source_url": "https://www.gopalancolleges.com/gpuc/contact-us.html",
-    "campus": "Whitefield",
-    "release_status": "approved"
-  },
-  {
-    "id": "whitefield_vs_north_campus",
-    "intent": "campus_difference",
-    "question": "What is the difference between Gopalan PU College Whitefield and North Campus?",
-    "answer": "Whitefield (South) is located behind SAP Labs in Hoodi and offers Science (PCMB/PCMC) and Commerce (CEBA/SEBA/MEBA with CA Foundation). North Campus is in Yelahanka and offers PCMB, PCMC, and CEBA.",
-    "source_url": "https://www.gopalancolleges.com/gpuc/",
     "campus": "Whitefield",
     "release_status": "approved"
   },
@@ -30,8 +21,17 @@
     "id": "college_principal",
     "intent": "leadership_principal",
     "question": "Who is the Principal of Gopalan PU College Whitefield?",
-    "answer": "The Principal of Gopalan Pre-University College, Whitefield Campus is Dr. Kanchana A S. The Academic Head is Mr. Mahesh (Chemistry, MSc, MPhil, BEd).",
+    "answer": "The Principal is Dr. Kanchana A S. The Academic Head is Mr. Mahesh (Chemistry; MSc, MPhil, BEd).",
     "source_url": "https://www.gopalancolleges.com/gpuc/principal-message.html",
+    "campus": "Whitefield",
+    "release_status": "approved"
+  },
+  {
+    "id": "college_director",
+    "intent": "leadership_director",
+    "question": "Who is the Director of Gopalan PU College?",
+    "answer": "Mrs. Sunita Prabhakar, Director, Gopalan Foundation.",
+    "source_url": "https://www.gopalancolleges.com/gpuc/director-message.html",
     "campus": "Whitefield",
     "release_status": "approved"
   },
@@ -39,7 +39,16 @@
     "id": "science_courses_combinations",
     "intent": "courses_science",
     "question": "What Science combinations are offered at Whitefield?",
-    "answer": "We offer PCMB (Physics, Chemistry, Maths, Biology) and PCMC (Physics, Chemistry, Maths, Computer Science), integrated with NEET, JEE (Main & Advanced), and KCET entrance coaching.",
+    "answer": "PCMB (Physics, Chemistry, Mathematics, Biology) and PCMC (Physics, Chemistry, Mathematics, Computer Science).\nIntegrated coaching: NEET (PCMB), JEE and KCET (PCMB & PCMC).",
+    "source_url": "https://www.gopalancolleges.com/gpuc/science-courses.html",
+    "campus": "Whitefield",
+    "release_status": "approved"
+  },
+  {
+    "id": "integrated_coaching",
+    "intent": "courses_coaching",
+    "question": "Do you offer NEET, JEE or KCET coaching?",
+    "answer": "Yes. NEET coaching for PCMB students, and JEE and KCET coaching for PCMB & PCMC students, integrated with the PU curriculum.\nIt includes structured study material, crash courses and weekly mock tests.",
     "source_url": "https://www.gopalancolleges.com/gpuc/science-courses.html",
     "campus": "Whitefield",
     "release_status": "approved"
@@ -48,7 +57,16 @@
     "id": "commerce_courses_combinations",
     "intent": "courses_commerce",
     "question": "What Commerce combinations are offered at Whitefield?",
-    "answer": "Whitefield offers three combinations: CEBA (Computer Science), SEBA (Statistics), and MEBA (Mathematics), alongside structured CA Foundation preparatory coaching.",
+    "answer": "CEBA (Computer Science, Economics, Business Studies, Accountancy), SEBA (Statistics, Economics, Business Studies, Accountancy) and MEBA (Mathematics, Economics, Business Studies, Accountancy), plus CA Foundation coaching.",
+    "source_url": "https://www.gopalancolleges.com/gpuc/commerce-courses.html",
+    "campus": "Whitefield",
+    "release_status": "approved"
+  },
+  {
+    "id": "ca_foundation_coaching",
+    "intent": "courses_ca_foundation",
+    "question": "Is CA Foundation coaching available?",
+    "answer": "Yes. CA Foundation coaching gives structured preparation in accounting, economics and business laws for aspiring Chartered Accountants.",
     "source_url": "https://www.gopalancolleges.com/gpuc/commerce-courses.html",
     "campus": "Whitefield",
     "release_status": "approved"
@@ -57,7 +75,7 @@
     "id": "languages_offered",
     "intent": "course_languages",
     "question": "What languages can I choose at Gopalan PU College Whitefield?",
-    "answer": "Part I (Mandatory): English.\nPart II (Choice): Kannada, Hindi, Sanskrit, or French.",
+    "answer": "I Language: English (mandatory).\nII Language: Kannada, Hindi, Sanskrit or French.",
     "source_url": "https://www.gopalancolleges.com/gpuc/science-courses.html",
     "campus": "Whitefield",
     "release_status": "approved"
@@ -66,7 +84,7 @@
     "id": "value_added_courses",
     "intent": "courses_value_added",
     "question": "What value-added courses are available?",
-    "answer": "We offer NATA Architecture Coaching, Data Analytics with Advanced Excel, Tally Accounting Software, Introduction to Data Science, and Coursera Global University Certifications.",
+    "answer": "NATA Coaching, Data Analytics with Advanced Excel, Tally, Introduction to Data Science, and Coursera online certification courses.",
     "source_url": "https://www.gopalancolleges.com/gpuc/value-added-courses.html",
     "campus": "Whitefield",
     "release_status": "approved"
@@ -75,7 +93,7 @@
     "id": "admission_eligibility",
     "intent": "admission_eligibility",
     "question": "What is the eligibility criteria for admission?",
-    "answer": "Admission requires passing 10th standard (Karnataka SSLC, CBSE, ICSE, or any recognized equivalent state/national/international board).",
+    "answer": "You must have passed the Karnataka SSLC Examination or an equivalent examination recognised by the Department of Pre-University Education, Karnataka, and meet all prescribed eligibility criteria.",
     "source_url": "https://www.gopalancolleges.com/gpuc/admission.html",
     "campus": "Whitefield",
     "release_status": "approved"
@@ -84,7 +102,16 @@
     "id": "admission_documents_required",
     "intent": "admission_documents",
     "question": "What documents are required for admission?",
-    "answer": "Required documents (2 photocopy sets + originals): 10th Marks Card, Transfer Certificate (TC), 10th Hall Ticket, Study Certificate, Aadhaar Card (Student & Parents), Migration/Eligibility Certificate (if applicable), and 5 passport-size photos.",
+    "answer": "Two sets of photocopies: original 10th TC, attested 10th marks card, 10th hall ticket, caste & income certificate, study certificate, Aadhaar (student & parents), 5 photos (white background), PU Board application and enrollment forms.\nIf applicable: eligibility/migration certificate (outside Karnataka, CBSE/ICSE, NRI), transport application, medical certificate.",
+    "source_url": "https://www.gopalancolleges.com/gpuc/admission.html",
+    "campus": "Whitefield",
+    "release_status": "approved"
+  },
+  {
+    "id": "admission_process",
+    "intent": "admission_process",
+    "question": "How do I apply for admission?",
+    "answer": "Admissions are open for 2027-28. Fill the enquiry form on the website or call +91 96069 41908 / (080) 41280227.\nSubmit the required documents (two sets of photocopies) at the time of admission.",
     "source_url": "https://www.gopalancolleges.com/gpuc/admission.html",
     "campus": "Whitefield",
     "release_status": "approved"
@@ -92,36 +119,18 @@
   {
     "id": "fee_structure_inquiry",
     "intent": "college_fees",
-    "question": "What is the fee structure for 11th / 1st PU?",
-    "answer": "Fee structures vary depending on the stream (Science/Commerce), integrated coaching (NEET/JEE/KCET/CA), and chosen second language.\n\nPlease contact our Admissions Desk at +91 96069 41908 / +91 96069 41907 or email admission_gpuc@gopalanpucollege.com for the official fee schedule and installment options.",
-    "source_url": "https://www.gopalancolleges.com/gpuc/admission.html",
+    "question": "What is the fee structure for 1st PU?",
+    "answer": "Fee amounts are not published on the website.\nPlease contact the admissions desk at +91 96069 41908 / (080) 41280227 or admission_gpuc@gopalanpucollege.com for current fees.",
+    "source_url": "https://www.gopalancolleges.com/gpuc/contact-us.html",
     "campus": "Whitefield",
     "release_status": "approved"
   },
   {
-    "id": "cell_phone_rules",
-    "intent": "rules_mobile_phones",
-    "question": "Are mobile phones allowed on campus?",
-    "answer": "Cell phones are strictly prohibited in all academic areas. Unauthorized usage results in confiscation until course completion or return upon payment of a Rs. 1,000 fine.",
-    "source_url": "https://www.gopalancolleges.com/gpuc/rules-regulations.html",
-    "campus": "Whitefield",
-    "release_status": "approved"
-  },
-  {
-    "id": "vehicle_parking_rules",
-    "intent": "rules_vehicles",
-    "question": "Can PU students bring two-wheelers or bikes to college?",
-    "answer": "No. Two-wheelers and four-wheelers are strictly NOT permitted for PUC students on or around the college campus.",
-    "source_url": "https://www.gopalancolleges.com/gpuc/rules-regulations.html",
-    "campus": "Whitefield",
-    "release_status": "approved"
-  },
-  {
-    "id": "attendance_punctuality_rules",
-    "intent": "rules_attendance",
-    "question": "What happens if a student arrives late or takes leave?",
-    "answer": "Students reporting late are marked ABSENT for the day. Minimum attendance is mandatory per PU Board rules. Leaving campus during college hours requires written permission from the Mentor/HOD and Principal.",
-    "source_url": "https://www.gopalancolleges.com/gpuc/rules-regulations.html",
+    "id": "scholarships",
+    "intent": "college_scholarships",
+    "question": "Are scholarships available?",
+    "answer": "The college mentions merit-based scholarships. Criteria are not published online; please contact the admissions desk at +91 96069 41908.",
+    "source_url": "https://www.gopalancolleges.com/gpuc/why-choose-us.html",
     "campus": "Whitefield",
     "release_status": "approved"
   },
@@ -129,7 +138,16 @@
     "id": "sports_and_facilities",
     "intent": "campus_facilities",
     "question": "What sports and campus facilities are available?",
-    "answer": "The campus features a dedicated Football ground, Cricket ground, Lawn Tennis courts, Badminton courts, indoor Table Tennis, modern Science & Computer labs, a digital library, and a hygienic cafeteria.",
+    "answer": "Football and cricket grounds, lawn tennis, badminton, table tennis, gymnastics, science labs, library, cafeteria, amphitheatre, girls' hostel and GPS-enabled transport.\nAlso digital classrooms and 24/7 CCTV surveillance.",
+    "source_url": "https://www.gopalancolleges.com/gpuc/facilities.html",
+    "campus": "Whitefield",
+    "release_status": "approved"
+  },
+  {
+    "id": "hostel_facility",
+    "intent": "campus_hostel",
+    "question": "Is hostel facility available?",
+    "answer": "Yes, a safe and well-supervised residential facility exclusively for girls.\nFor hostel fees and availability, contact +91 96069 41908.",
     "source_url": "https://www.gopalancolleges.com/gpuc/facilities.html",
     "campus": "Whitefield",
     "release_status": "approved"
@@ -138,8 +156,26 @@
     "id": "transportation_routes",
     "intent": "campus_transport",
     "question": "Is bus transportation facility available?",
-    "answer": "Yes, GPS-enabled college buses operate across major routes in Bengaluru East, including Whitefield, Hoodi, K.R. Puram, Mahadevapura, Marathahalli, CV Raman Nagar, and Kadugodi.",
-    "source_url": "https://www.gopalancolleges.com/gpuc/why-choose-us.html",
+    "answer": "Yes, GPS-enabled transport serves students across key city routes; submit a Transportation Application at admission.\nFor routes, stops and fees, call +91 96069 41908.",
+    "source_url": "https://www.gopalancolleges.com/gpuc/facilities.html",
+    "campus": "Whitefield",
+    "release_status": "approved"
+  },
+  {
+    "id": "campus_visit_schedule",
+    "intent": "visit_schedule",
+    "question": "Can I visit the campus for admission counselling?",
+    "answer": "Yes, you are welcome to visit. Visiting hours are not published, so please call +91 96069 41908 / (080) 41280227 to fix a time.\nCampus: Behind SAP Labs, Seetharam Palya, Basavanagar, Hoodi, Bangalore - 560 048.",
+    "source_url": "https://www.gopalancolleges.com/gpuc/contact-us.html",
+    "campus": "Whitefield",
+    "release_status": "approved"
+  },
+  {
+    "id": "office_hours",
+    "intent": "office_timings",
+    "question": "What are the office timings?",
+    "answer": "Office hours are not published on the website. Please call +91 96069 41908 or (080) 41280227 before visiting.",
+    "source_url": "https://www.gopalancolleges.com/gpuc/contact-us.html",
     "campus": "Whitefield",
     "release_status": "approved"
   },
@@ -147,17 +183,80 @@
     "id": "contact_help_desk",
     "intent": "contact_details",
     "question": "How can I contact the Whitefield Admissions Office?",
-    "answer": "Admissions Helpline: +91 96069 41908 / +91 96069 41907 / (080) 41280227.\nWhatsApp: +91 8105131098.\nEmail: admission_gpuc@gopalanpucollege.com / admin@gopalanpucollege.com.\nHours: Monday to Saturday, 8:30 AM to 5:00 PM.",
+    "answer": "Admissions: +91 96069 41908 / (080) 41280227 / +91 96069 41907. WhatsApp: +91 81051 31098.\nEmail: admission_gpuc@gopalanpucollege.com. SPOC: Mr. Aravind, +91 63621 66945, admin@gopalanpucollege.com.",
     "source_url": "https://www.gopalancolleges.com/gpuc/contact-us.html",
     "campus": "Whitefield",
     "release_status": "approved"
   },
   {
-    "id": "campus_visit_schedule",
-    "intent": "visit_schedule",
-    "question": "Can I visit the campus for admission counseling?",
-    "answer": "Yes, personalized campus visits and laboratory tours are welcomed Monday through Saturday between 8:30 AM and 5:00 PM at our Hoodi/Whitefield campus.",
-    "source_url": "https://www.gopalancolleges.com/gpuc/contact-us.html",
+    "id": "cell_phone_rules",
+    "intent": "rules_mobile_phones",
+    "question": "Are mobile phones allowed on campus?",
+    "answer": "Cell phones are strictly prohibited in all academic areas. A confiscated phone is returned only at the end of the course or after a Rs. 1,000 fine.",
+    "source_url": "https://www.gopalancolleges.com/gpuc/rules-regulations.html",
+    "campus": "Whitefield",
+    "release_status": "approved"
+  },
+  {
+    "id": "vehicle_parking_rules",
+    "intent": "rules_vehicles",
+    "question": "Can PU students bring two-wheelers or bikes to college?",
+    "answer": "No. Two-wheelers and four-wheelers are not permitted to PUC students.",
+    "source_url": "https://www.gopalancolleges.com/gpuc/rules-regulations.html",
+    "campus": "Whitefield",
+    "release_status": "approved"
+  },
+  {
+    "id": "attendance_punctuality_rules",
+    "intent": "rules_attendance",
+    "question": "What happens if a student arrives late or takes leave?",
+    "answer": "Late arrivals are marked ABSENT for the day. Leaving during working hours needs written permission of the mentor/HOD and Principal.\nLeave must be approved in advance by the class in-charge, and minimum attendance norms apply.",
+    "source_url": "https://www.gopalancolleges.com/gpuc/rules-regulations.html",
+    "campus": "Whitefield",
+    "release_status": "approved"
+  },
+  {
+    "id": "faculty_overview",
+    "intent": "faculty_info",
+    "question": "Tell me about the faculty.",
+    "answer": "The faculty includes the Principal, Academic Head, and teams in Science, Commerce and Languages, described as highly experienced and KTET/CTET-qualified.\nScience Coordinator: Mr. Krishna Murthy Goud; Commerce Co-ordinator: Ms. Lekha K S.",
+    "source_url": "https://www.gopalancolleges.com/gpuc/faculty.html",
+    "campus": "Whitefield",
+    "release_status": "approved"
+  },
+  {
+    "id": "events_and_activities",
+    "intent": "campus_events",
+    "question": "What events happen at the college?",
+    "answer": "Recent events include the Investiture Ceremony, Freshers Day, Yoga Day, Environment Day, Drug Awareness Program, Talents Day, Statistics Day, Drawing Competition, Saraswathi Puja and field trips.",
+    "source_url": "https://www.gopalancolleges.com/gpuc/events.html",
+    "campus": "Whitefield",
+    "release_status": "approved"
+  },
+  {
+    "id": "vision_mission",
+    "intent": "vision_mission",
+    "question": "What is the vision of Gopalan PU College?",
+    "answer": "To emerge as a centre of academic excellence that nurtures confident, competent and value-driven individuals, preparing students for higher education and future professional challenges.",
+    "source_url": "https://www.gopalancolleges.com/gpuc/vision-mission.html",
+    "campus": "Whitefield",
+    "release_status": "approved"
+  },
+  {
+    "id": "careers",
+    "intent": "jobs_careers",
+    "question": "How can I apply for a job at Gopalan PU College?",
+    "answer": "Please mail your resume to careers@gopalancolleges.com.",
+    "source_url": "https://www.gopalancolleges.com/gpuc/career.html",
+    "campus": "Whitefield",
+    "release_status": "approved"
+  },
+  {
+    "id": "unrelated_question",
+    "intent": "out_of_scope",
+    "question": "Can you help with something not related to the college?",
+    "answer": "Sorry, I can only help with Gopalan PU College, Whitefield: courses, admissions, facilities, rules and campus visits.\nFor anything else, please use another resource.",
+    "source_url": "https://www.gopalancolleges.com/gpuc/",
     "campus": "Whitefield",
     "release_status": "approved"
   }

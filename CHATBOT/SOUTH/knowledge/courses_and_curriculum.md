@@ -1,73 +1,47 @@
-# Gopalan Pre-University College — Courses & Curriculum (Whitefield Campus)
+# Gopalan Pre-University College, Whitefield — Courses & Curriculum
 
-**Institution:** Gopalan Pre-University College, Whitefield, Bengaluru  
-**Affiliation:** Department of Pre-University Education, Government of Karnataka  
-**Curriculum Standard:** NCERT (Science) & State PU Curriculum (Commerce & Languages)
+Source pages: https://www.gopalancolleges.com/gpuc/science-courses.html, commerce-courses.html, value-added-courses.html (crawled 28 October 2026).
 
----
+## Science Stream
+The Science stream at Gopalan Pre-University College builds strong conceptual foundations, analytical reasoning, and academic discipline. It is designed for students aspiring to pursue engineering, medicine, and pure sciences. The programme integrates structured teaching with practical laboratory learning to support board examinations and competitive entrance preparation.
 
-## 1. Science Stream
+Course combinations:
+- PCMB – Physics, Chemistry, Mathematics, Biology
+- PCMC – Physics, Chemistry, Mathematics, Computer Science
 
-The Science stream at Gopalan PU College is designed for students seeking strong academic and analytical foundations for careers in Medicine, Engineering, Computer Science, Research, and Pure Sciences.
+## Integrated Coaching Programmes
+Designed to complement the PU curriculum and strengthen competitive exam readiness:
+- NEET Coaching (for PCMB students)
+- JEE Coaching (for PCMB & PCMC students)
+- KCET Coaching (for PCMB & PCMC students)
 
-### Combinations Offered:
-1. **PCMB (Physics, Chemistry, Mathematics, Biology)**
-   - Ideal for students aspiring towards Medicine (MBBS, BDS, BAMS, BHMS), Veterinary Sciences, Biotechnology, Agricultural Sciences, Pharmacy, as well as Engineering.
-2. **PCMC (Physics, Chemistry, Mathematics, Computer Science)**
-   - Ideal for students targeting Computer Science Engineering, Information Technology, AI/Data Science, Electronics, Robotics, and Architecture.
+Supporting features listed on the Why Choose Us page: structured study material for competitive exams (JEE, NEET & KCET), crash courses and weekly mock tests, individual attention and performance monitoring, and regular Parent-Teacher Meetings (PTMs).
 
-### Integrated Competitive Coaching:
-- **NEET Preparation (for PCMB):** Deep conceptual clarity, NCERT-line-by-line coverage, regular chapter-wise mock tests, error analysis, and time-management strategies for medical entrance.
-- **JEE Main & Advanced Coaching (for PCMB & PCMC):** Rigorous problem-solving, advanced mathematical techniques, numerical reasoning, and national-level test series for IIT/NIT admissions.
-- **KCET Coaching (for PCMB & PCMC):** Focused shortcut techniques, high-speed problem solving, and previous-year Karnataka CET question analysis for top state engineering ranks.
-- **Academic Support:** Daily practice papers (DPPs), remedial classes for doubt resolution, crash courses before board/competitive exams, and performance tracking via regular PTMs.
+## Commerce Stream
+The Commerce stream at Gopalan Pre-University College equips students with strong foundations in business concepts, analytical reasoning, and numerical accuracy. It is designed for careers in commerce, management, accounting, and economics. The programme emphasises conceptual clarity, disciplined study, and practical application for academic and professional success.
 
----
+Course combinations:
+- CEBA – Computer Science, Economics, Business Studies, Accountancy
+- SEBA – Statistics, Economics, Business Studies, Accountancy
+- MEBA – Mathematics, Economics, Business Studies, Accountancy
 
-## 2. Commerce Stream
+## CA Foundation Coaching
+CA Foundation – structured preparation in accounting, economics, and business laws for aspiring Chartered Accountants. Offered alongside the Commerce stream.
 
-The Commerce stream provides students with deep insight into business structures, commercial legislation, economic systems, corporate accounting, and quantitative techniques.
+## Languages Offered
+Same for Science and Commerce:
+- I Language – English (Mandatory)
+- II Language – Kannada / Hindi / Sanskrit / French
 
-### Combinations Offered:
-1. **CEBA (Computer Science, Economics, Business Studies, Accountancy)**
-   - Merges modern IT skills and programming fundamentals with core financial accounting and business management.
-2. **SEBA (Statistics, Economics, Business Studies, Accountancy)**
-   - Emphasizes quantitative analysis, statistical models, economic theory, and commercial accounting.
-3. **MEBA (Mathematics, Economics, Business Studies, Accountancy)**
-   - High-rigor mathematical foundation suited for actuarial science, financial engineering, data economics, and quantitative finance.
+## Value Added Courses
+Designed to complement the core curriculum, these programmes equip students with practical skills, early-career exposure, and a competitive edge in higher education and professional pathways.
+- **NATA Coaching:** Focused preparation for the National Aptitude Test in Architecture, building foundational skills in drawing, spatial reasoning, and architectural aptitude.
+- **Data Analytics with Advanced Excel:** Hands-on training in spreadsheet analysis, data organisation, and reporting skills essential for commerce, management, and analytical roles.
+- **Tally:** Practical exposure to accounting software fundamentals, enabling students to understand financial records, bookkeeping, and business accounting processes.
+- **Introduction to Data Science:** An entry-level programme introducing data concepts, basic analytics, and logical thinking, preparing students for technology and data-driven fields.
+- **Coursera (Online Certification Courses):** Curated online certification courses from leading universities and industry experts, helping students build global skills, explore diverse domains, and enhance academic and career readiness. The home page adds: "Learn from 350+ top universities and companies".
 
-### CA Foundation Coaching:
-- Integrated, structured coaching for the ICAI Chartered Accountancy Foundation examination.
-- Modules: Principles and Practice of Accounting, Business Laws, Business Mathematics, Logical Reasoning & Statistics, Business Economics.
-
----
-
-## 3. Language Structure
-
-Students are required to study two languages in accordance with the Karnataka Pre-University Board regulations:
-
-### Part I (Compulsory):
-- **English** (Focus on literary analysis, comprehensive reading, and professional communication).
-
-### Part II (Elective Choice of One):
-- **Kannada** (State regional language)
-- **Hindi** (National language)
-- **Sanskrit** (Classical scoring language)
-- **French** (Global European language, widely preferred by international and CBSE/ICSE students)
-
----
-
-## 4. Value-Added Career Programs
-
-In addition to the mandatory board curriculum, Gopalan PU College offers enrichment programs to give students early professional skills and a competitive edge:
-
-1. **NATA Coaching (National Aptitude Test in Architecture):**
-   - Architectural drawing, 2D/3D visualization, perspective drawing, spatial reasoning, aesthetic sensitivity, and architectural aptitude.
-2. **Data Analytics with Advanced Excel:**
-   - Spreadsheet functions, financial modeling, dynamic pivot tables, VLOOKUP/XLOOKUP, macros, and commercial reporting.
-3. **Tally Accounting Software:**
-   - Hands-on corporate bookkeeping, ledger accounting, voucher creation, inventory management, and GST fundamentals.
-4. **Introduction to Data Science:**
-   - Entry-level concepts in data manipulation, algorithmic thinking, and introductory data science workflows.
-5. **Coursera Global Certifications:**
-   - Curated online learning modules from prestigious global universities allowing students to earn international credentials in technology, business, humanities, and sciences.
+## Choosing a Combination
+- NEET coaching is offered only for PCMB students; JEE and KCET coaching are offered for both PCMB and PCMC students.
+- The Commerce combinations differ in one subject: CEBA (Computer Science), SEBA (Statistics) or MEBA (Mathematics), each with Economics, Business Studies and Accountancy. CA Foundation coaching is available for aspiring Chartered Accountants.
+- The website does not publish course fees, batch sizes or timetables. For these, contact the admissions desk at +91 96069 41908 / (080) 41280227 or admission_gpuc@gopalanpucollege.com.

@@ -51,7 +51,7 @@ export default function GpucWebsite({ onOpenChatWithQuery }: GpucWebsiteProps) {
           <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '20px', marginBottom: '32px' }}>
             <div>
               <span className="badge badge-gold" style={{ marginBottom: '8px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                <Sparkles size={13} /> Official Admissions Desk 2026–27
+                <Sparkles size={13} /> Official Admissions Desk 2027–28
               </span>
               <h2 style={{ fontSize: '1.8rem', color: '#fff', fontWeight: 800 }}>
                 Karnataka PU Board Recognized Programs
@@ -154,11 +154,11 @@ export default function GpucWebsite({ onOpenChatWithQuery }: GpucWebsiteProps) {
               GOPALAN PRE-UNIVERSITY COLLEGE
             </div>
             <p style={{ fontSize: '0.85rem', color: '#94A3B8', maxWidth: '460px', lineHeight: 1.5, marginBottom: '12px' }}>
-              <strong>North Campus (Yelahanka):</strong> No. 79, Mavallipura Kondashettihalli Road, Hesaragatta Hobli, Yelahanka, Bengaluru – 560089.
+              <strong>South Campus (Whitefield):</strong> 181/1, 182/1, Behind SAP Labs, Seetharam Palya, Basavanagar, Hoodi, Whitefield, Bengaluru – 560048.
             </p>
             <div style={{ fontSize: '0.82rem', color: '#CBD5E1', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <span>Admissions & Enquiry Help Desk: +91 81053 88193 / +91 81230 40418 / +91 96320 70209</span>
-              <span>Email: gpuc.north@gopalanpucollege.com</span>
+              <span>Admissions Helpline: +91 96069 41908 / +91 96069 41907 / (080) 41280227 | WhatsApp: +91 8105131098</span>
+              <span>Email: admission_gpuc@gopalanpucollege.com</span>
             </div>
           </div>
 
@@ -169,7 +169,7 @@ export default function GpucWebsite({ onOpenChatWithQuery }: GpucWebsiteProps) {
                 onClick={() => onOpenChatWithQuery?.('What is the admission eligibility for 2026?')}
                 style={{ background: 'none', border: 'none', color: '#94A3B8', textAlign: 'left', cursor: 'pointer' }}
               >
-                &bull; Admission Eligibility 2026–27
+                &bull; Admission Eligibility 2027–28
               </button>
               <button
                 onClick={() => onOpenChatWithQuery?.('Which documents are needed for admission?')}

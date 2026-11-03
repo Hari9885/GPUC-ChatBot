@@ -1,0 +1,20 @@
+[
+  {
+    "analysisId": "ANL-2026-1001",
+    "inquiryId": "GPUC-2026-INQ-1001",
+    "timestamp": "2026-10-30T03:15:32.086Z",
+    "studentName": "reddy",
+    "parentName": "reddy",
+    "mobile": "+91 8123456789",
+    "location": "hoodi 560067",
+    "admissionClass": "12th Class (2nd PU) / 11th Class",
+    "totalQueries": 1,
+    "queries": [
+      {
+        "query": "What is the admission process at Gopalan PU College Yelahanka?",
+        "timestamp": "2026-10-30T03:15:08.717Z"
+      }
+    ],
+    "leadSource": "onboarding_step_2"
+  }
+]

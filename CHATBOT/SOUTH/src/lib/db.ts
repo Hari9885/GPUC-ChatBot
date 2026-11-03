@@ -77,7 +77,7 @@ interface DatabaseSchema {
   messages: MessageLog[];
 }
 
-const DB_FILE = path.join(process.cwd(), 'data', 'db.json');
+const dataFile = (name: string) => path.join(process.cwd(), 'data', name);
 
 export const ADMISSION_TIMES = [
   '09:00 AM',
@@ -175,70 +175,20 @@ export function ensureSlots(db: DatabaseSchema): boolean {
 }
 
 function getInitialData(): DatabaseSchema {
-  return {
-    inquiries: [
-      {
-        id: 'GPUC-2026-INQ-1001',
-        name: 'Suresh Kumar',
-        mobile: '+91 98450 12345',
-        userType: 'parent',
-        courseInterest: 'Science (PCMC)',
-        intendedYear: '2026-2027',
-        category: 'ADMISSION_PROCESS',
-        preferredContact: 'phone',
-        summary: 'Enquiring about PCMC combination, laboratory facilities, and admission requirements for daughter.',
-        assignedTeam: 'Admissions',
-        assignedStaff: 'Mr. Aravind J',
-        status: 'ASSIGNED',
-        consentGiven: true,
-        consentPurpose: 'Inquiry response and admission guidance',
-        consentTimestamp: new Date().toISOString(),
-        createdAt: new Date(Date.now() - 3600000 * 24).toISOString(),
-        updatedAt: new Date(Date.now() - 3600000 * 12).toISOString(),
-      },
-    ],
-    appointments: [
-      {
-        id: 'GPUC-2026-APT-501',
-        inquiryId: 'GPUC-2026-INQ-1001',
-        name: 'Suresh Kumar',
-        mobile: '+91 98450 12345',
-        mode: 'campus_visit',
-        date: new Date(Date.now() + 86400000 * 2).toISOString().split('T')[0],
-        timeSlot: '11:30 AM',
-        purpose: 'Campus tour and laboratory inspection',
-        assignedStaff: 'Admissions Office',
-        assignedDepartment: 'Admissions',
-        status: 'CONFIRMED',
-        meetingLinkOrVenue: 'GPUC Campus Administrative Block, 181/1, Hoodi, Bengaluru',
-        createdAt: new Date().toISOString(),
-      },
-    ],
-    slots: initializeSlots(),
-    feedback: [
-      {
-        id: 'FB-01',
-        inquiryId: 'GPUC-2026-INQ-1001',
-        rating: 5,
-        comment: 'Very helpful and polite assistant!',
-        createdAt: new Date().toISOString(),
-      },
-    ],
-    messages: [
-      {
-        id: 'MSG-001',
-        type: 'whatsapp',
-        recipient: '+91 98450 12345',
-        templateId: 'appointment_confirmation',
-        content: 'Dear Suresh Kumar, your Campus Visit at Gopalan PU College is confirmed for 11:30 AM. Ref: GPUC-2026-APT-501.',
-        status: 'DELIVERED',
-        timestamp: new Date().toISOString(),
-      },
-    ],
-  };
+  return { inquiries: [], appointments: [], slots: initializeSlots(), feedback: [], messages: [] };
+}
+
+// Write a temp file then rename it, so a reader never sees a half-written file
+// (a half-written db.json would read as empty and the next save would wipe every lead).
+// ponytail: two processes saving at once still means last write wins; move to SQLite if traffic grows.
+function writeJsonAtomic(file: string, data: unknown) {
+  const tmp = `${file}.${process.pid}.tmp`;
+  fs.writeFileSync(tmp, JSON.stringify(data, null, 2), 'utf8');
+  fs.renameSync(tmp, file);
 }
 
 export function readDB(): DatabaseSchema {
+  const DB_FILE = dataFile('db.json');
   try {
     const dir = path.dirname(DB_FILE);
     if (!fs.existsSync(dir)) {
@@ -246,7 +196,7 @@ export function readDB(): DatabaseSchema {
     }
     if (!fs.existsSync(DB_FILE)) {
       const initial = getInitialData();
-      fs.writeFileSync(DB_FILE, JSON.stringify(initial, null, 2), 'utf8');
+      writeJsonAtomic(DB_FILE, initial);
       return initial;
     }
     const raw = fs.readFileSync(DB_FILE, 'utf8');
@@ -263,12 +213,13 @@ export function readDB(): DatabaseSchema {
 }
 
 export function writeDB(data: DatabaseSchema): void {
+  const DB_FILE = dataFile('db.json');
   try {
     const dir = path.dirname(DB_FILE);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
-    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf8');
+    writeJsonAtomic(DB_FILE, data);
   } catch (err) {
     console.error('Error writing to db.json:', err);
   }
@@ -387,14 +338,14 @@ export function bookAppointment(
 ): { success: boolean; appointment: Appointment; slot?: TimeSlot } {
   const refNum = (500 + (db.appointments?.length || 0) + 1).toString();
   const finalDate = params.date || getTomorrowDateString();
-  const finalTime = params.timeSlot ? normalizeTime(params.timeSlot) : (params.mode === 'online_meeting' ? '09:00 AM' : '8:30 AM - 5:00 PM');
+  const finalTime = params.timeSlot ? normalizeTime(params.timeSlot) : (params.mode === 'online_meeting' ? '09:00 AM' : 'To be confirmed by the help desk');
 
   let meetingLinkOrVenue = '';
   let id = '';
 
   if (params.mode === 'campus_visit') {
     id = `GPUC-VISIT-2026-${refNum}`;
-    meetingLinkOrVenue = 'Gopalan Pre-University College, North Campus, No. 79 Mavallipura, Hesaragatta Hobli, Yelahanka, Bengaluru - 560089';
+    meetingLinkOrVenue = 'Gopalan Pre-University College, South Campus, 181/1, 182/1, Behind SAP Labs, Seetharam Palya, Hoodi, Whitefield, Bengaluru - 560048';
   } else {
     id = `GPUC-2026-APT-${refNum}`;
     meetingLinkOrVenue = 'Online Consultation (Admissions Team)';
@@ -440,7 +391,7 @@ export function bookAppointment(
     recipient: params.mobile,
     templateId: params.mode === 'campus_visit' ? 'visit_ticket_confirmation' : 'appointment_confirmation',
     content: params.mode === 'campus_visit'
-      ? `Dear ${params.name}, your Campus Visit ticket ${id} is confirmed. Visiting hours: Monday to Friday 8:30 AM to 5:00 PM.`
+      ? `Dear ${params.name}, your Campus Visit ticket ${id} is confirmed. Our Admissions Help Desk will call you to confirm the visit timing.`
       : `Dear ${params.name}, your online consultation ${id} with Admissions is confirmed for ${finalDate} at ${finalTime}. Our Admissions team will contact you 1 minute before the allocated time and you will receive a WhatsApp notification confirming your ticket initiation and request.`,
     status: 'DELIVERED',
     timestamp: new Date().toISOString(),
@@ -470,14 +421,10 @@ export interface LeadChatAnalysis {
   leadSource: string;
 }
 
-const ANALYSIS_FILE = path.join(process.cwd(), 'data', 'leads_chat_analysis.json');
-
 export function readAnalysisDB(): LeadChatAnalysis[] {
+  const ANALYSIS_FILE = dataFile('leads_chat_analysis.json');
   try {
-    if (!fs.existsSync(ANALYSIS_FILE)) {
-      fs.writeFileSync(ANALYSIS_FILE, JSON.stringify([], null, 2), 'utf-8');
-      return [];
-    }
+    if (!fs.existsSync(ANALYSIS_FILE)) return [];
     const data = fs.readFileSync(ANALYSIS_FILE, 'utf-8');
     return JSON.parse(data) || [];
   } catch (err) {
@@ -487,10 +434,12 @@ export function readAnalysisDB(): LeadChatAnalysis[] {
 }
 
 export function writeAnalysisDB(entry: LeadChatAnalysis) {
+  const ANALYSIS_FILE = dataFile('leads_chat_analysis.json');
   try {
     const list = readAnalysisDB();
     list.unshift(entry);
-    fs.writeFileSync(ANALYSIS_FILE, JSON.stringify(list, null, 2), 'utf-8');
+    fs.mkdirSync(path.dirname(ANALYSIS_FILE), { recursive: true });
+    writeJsonAtomic(ANALYSIS_FILE, list);
   } catch (err) {
     console.error('Error writing leads_chat_analysis.json:', err);
   }

@@ -150,8 +150,8 @@ function getTopicOverview(text: string): { overview: string; followUp: string } 
       overview: `Science Streams Available:
 • PCMB: Physics, Chemistry, Mathematics, Biology
 • PCMC: Physics, Chemistry, Mathematics, Computer Science
-• Integrated Coaching: NEET, JEE & KCET
-• Languages: English + Kannada / Hindi`,
+• Integrated Coaching: NEET (PCMB), JEE & KCET
+• Languages: English + Kannada / Hindi / Sanskrit / French`,
       followUp: `To apply or receive syllabus details, enter student name:`,
     };
   }
@@ -159,9 +159,9 @@ function getTopicOverview(text: string): { overview: string; followUp: string } 
   if (q.includes('commerce') || q.includes('ceba')) {
     return {
       overview: `Commerce Stream Available:
-• CEBA: Computer Science, Economics, Business Studies, Accountancy
-• Focus: CA Foundation, CS & B.Com career pathways
-• Languages: English + Kannada / Hindi`,
+• CEBA, SEBA & MEBA (with Economics, Business Studies, Accountancy)
+• Integrated CA Foundation coaching
+• Languages: English + Kannada / Hindi / Sanskrit / French`,
       followUp: `To apply or receive course details, enter student name:`,
     };
   }
@@ -169,9 +169,9 @@ function getTopicOverview(text: string): { overview: string; followUp: string } 
   if (q.includes('fee') || q.includes('cost') || q.includes('scholarship') || q.includes('tuition')) {
     return {
       overview: `Official Fee & Help Desk:
-• Helpline: +91 81053 88193 / +91 81230 40418 / +91 96320 70209
-• Email: gpuc.north@gopalanpucollege.com
-• Timings: Mon–Sat, 8:30 AM to 5:00 PM`,
+• Helpline: +91 96069 41908 / +91 96069 41907 / (080) 41280227
+• Email: admission_gpuc@gopalanpucollege.com
+• Fee details are shared directly by the help desk`,
       followUp: `Please let us know which stream or facility you would like to explore:`,
     };
   }
@@ -179,9 +179,9 @@ function getTopicOverview(text: string): { overview: string; followUp: string } 
   if (q.includes('document') || q.includes('certif') || q.includes('marks card') || q.includes('tc')) {
     return {
       overview: `Required Admission Documents:
-• 10th / SSLC Marks Card (original + 3 copies)
-• Transfer Certificate (TC) & Conduct Certificate
-• Migration Certificate (for CBSE / ICSE boards)
+• 10th Original TC + attested 10th Marks Card & Hall Ticket
+• Study Certificate, Caste & Income Certificate
+• Migration Certificate (other boards / NRI)
 • Student & Parent Aadhaar + 5 Photos`,
       followUp: `To start document verification, enter student name (or skip):`,
     };
@@ -190,28 +190,28 @@ function getTopicOverview(text: string): { overview: string; followUp: string } 
   if (q.includes('visit') || q.includes('tour') || q.includes('consult') || q.includes('appointment')) {
     return {
       overview: `Campus Visit & Counseling:
-• Location: North Campus, Yelahanka (No. 79, Mavallipura)
-• Timings: Monday – Saturday, 8:30 AM to 5:00 PM
-• Campus: Science/CS Labs, Library, Sports grounds & Hostel`,
+• Location: South Campus, Whitefield (Behind SAP Labs, Hoodi)
+• Call +91 96069 41908 to fix a visit time
+• Campus: Science Labs, Library, Sports grounds & Girls' Hostel`,
       followUp: `To book a visit or counseling slot, enter student name (or skip):`,
     };
   }
 
   if (q.includes('admission') || q.includes('apply') || q.includes('2026') || q.includes('process') || q.includes('eligib')) {
     return {
-      overview: `Admissions 2026–27 (1st & 2nd PU):
-• Streams: Science (PCMB, PCMC) & Commerce (CEBA)
-• Eligibility: 10th / SSLC Pass (State Board, CBSE, ICSE)
+      overview: `Admissions 2027–28 (1st & 2nd PU):
+• Streams: Science (PCMB, PCMC) & Commerce (CEBA, SEBA, MEBA + CA Foundation)
+• Eligibility: Karnataka SSLC or equivalent (CBSE, ICSE)
 • Mode: Direct Merit & Counseling`,
       followUp: `To register your admission inquiry, enter student name (or skip):`,
     };
   }
 
   return {
-    overview: `Available Courses (North Campus):
+    overview: `Available Courses (Whitefield Campus):
 • Science: PCMB & PCMC (with NEET/JEE/KCET)
-• Commerce: CEBA (Computer Science, Economics, Business, Accountancy)
-• Timings: Mon–Sat, 8:30 AM–5:00 PM`,
+• Commerce: CEBA, SEBA & MEBA (with integrated CA Foundation)
+• Help Desk: +91 96069 41908`,
     followUp: `To register an inquiry, enter student name (or skip):`,
   };
 }
@@ -243,7 +243,7 @@ function getTopicFromQuery(query: string): string {
     return 'College Contact & Admissions Desk';
   }
   if (q.includes('admission') || q.includes('apply') || q.includes('2026') || q.includes('process') || q.includes('eligib')) {
-    return 'Admissions for Academic Year 2026–27';
+    return 'Admissions for Academic Year 2027–28';
   }
   return 'Admissions & College Information';
 }
@@ -252,38 +252,38 @@ const FAQ_PRESETS = [
   {
     icon: '🎓',
     title: 'Admissions',
-    label: '🎓 Admissions 2026–27',
-    query: 'What is the admission process for academic year 2026-2027 at North Campus?',
+    label: '🎓 Admissions 2027–28',
+    query: 'What is the admission process for academic year 2027-2028 at Whitefield Campus?',
   },
   {
     icon: '🔬',
     title: 'Science',
     label: '🔬 Science (PCMB / PCMC)',
-    query: 'What Science combinations are offered at Gopalan PU College North Campus?',
+    query: 'What Science combinations are offered at Gopalan PU College Whitefield?',
   },
   {
     icon: '📊',
     title: 'Commerce',
-    label: '📊 Commerce (CEBA)',
-    query: 'What Commerce combinations are offered at Gopalan PU College North Campus?',
+    label: '📊 Commerce (CEBA / SEBA / MEBA)',
+    query: 'What Commerce combinations are offered at Gopalan PU College Whitefield?',
   },
   {
     icon: '📅',
     title: 'Campus Visit',
     label: '📅 Book a Campus Visit',
-    query: 'How can I book a campus visit to the North Campus in Yelahanka?',
+    query: 'How can I book a campus visit to the Whitefield Campus behind SAP Labs?',
   },
   {
     icon: '📄',
     title: 'Documents',
     label: '📄 Required Documents',
-    query: 'Which documents are required for admission at North Campus?',
+    query: 'Which documents are required for admission at Whitefield Campus?',
   },
 ];
 
 const INITIAL_GREETING: Message = {
   role: 'assistant',
-  content: `Hello! Welcome to Gopalan Pre-University College, North Campus (Yelahanka). 👋
+  content: `Hello! Welcome to Gopalan Pre-University College, South Campus (Whitefield). 👋
 
 How can I help you today? Please choose an option below or type your question:`,
 };
@@ -474,8 +474,8 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
     if (!rawText) return null;
     const cleaned = stripStarsAndAsterisks(rawText);
 
-    // Regex matching Indian phone numbers: +91 81053 88193, 81053 88193, +91 81230 40418, +91 96320 70209, etc.
-    const phoneRegex = /((?:\+91[\s\u00A0]?)?(?:81053[\s\u00A0]?88193|81230[\s\u00A0]?40418|96320[\s\u00A0]?70209|96069[\s\u00A0]?41908|[6-9]\d{4}[\s\u00A0]?\d{5}|[6-9]\d{9}))/g;
+    // Regex matching Indian phone numbers: +91 96069 41908, +91 96069 41907, +91 81051 31098, etc.
+    const phoneRegex = /((?:\+91[\s\u00A0]?)?(?:96069[\s\u00A0]?41908|96069[\s\u00A0]?41907|81051[\s\u00A0]?31098|63621[\s\u00A0]?66945|[6-9]\d{4}[\s\u00A0]?\d{5}|[6-9]\d{9}))/g;
 
     const parts = cleaned.split(phoneRegex);
 
@@ -483,7 +483,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
       <>
         {parts.map((part, idx) => {
           if (!part) return null;
-          const isPhone = /^(?:\+91[\s\u00A0]?)?(?:81053[\s\u00A0]?88193|81230[\s\u00A0]?40418|96320[\s\u00A0]?70209|96069[\s\u00A0]?41908|[6-9]\d{4}[\s\u00A0]?\d{5}|[6-9]\d{9})$/.test(part.trim());
+          const isPhone = /^(?:\+91[\s\u00A0]?)?(?:96069[\s\u00A0]?41908|96069[\s\u00A0]?41907|81051[\s\u00A0]?31098|63621[\s\u00A0]?66945|[6-9]\d{4}[\s\u00A0]?\d{5}|[6-9]\d{9})$/.test(part.trim());
           if (isPhone) {
             const rawDigits = part.replace(/\D/g, '');
             const telDigits = rawDigits.startsWith('91') && rawDigits.length === 12 ? rawDigits : `91${rawDigits.slice(-10)}`;
@@ -727,7 +727,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
         mobile: cleanMob,
         location: loc,
         admissionClass: '12th Class (2nd PU) / 11th Class',
-        inquiryType: 'Admissions 2026-27',
+        inquiryType: 'Admissions 2027-28',
         queryTopic: pendingTopic || 'College Admissions',
         chatNotes: `Captured via Step 2 Contact Form. Pending query: ${pendingQuery}`,
         leadSource: 'onboarding_step_2',
@@ -745,7 +745,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
             mobile: cleanMob,
             location: loc,
             admissionClass: '12th Class (2nd PU) / 11th Class',
-            inquiryType: 'Admissions 2026-27',
+            inquiryType: 'Admissions 2027-28',
           });
         }
       })
@@ -777,7 +777,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
   const handleAdmissionSubmit = async (admClass: string, inqType: string) => {
     setStepError('');
     const chosenClass = admClass || '12th Class (2nd PU)';
-    const chosenType = inqType || 'Admissions 2026-27';
+    const chosenType = inqType || 'Admissions 2027-28';
 
     const userMsg: Message = {
       role: 'user',
@@ -801,6 +801,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
             body: JSON.stringify({
               id: activeInquiryIdRef.current,
               notes: `Admission choice: ${chosenClass} • ${chosenType}`,
+              admissionClass: chosenClass, // the class picked here replaces the placeholder saved at step 2
             }),
           }).then((r) => r.json())
         : fetch('/api/inquiries', {
@@ -820,7 +821,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
             }),
           }).then((r) => r.json());
 
-      // 2. Fetch AI answer from Gemini for the user's specific question
+      // 2. Fetch AI answer from Claude for the user's specific question
       const chatPromise = fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -881,7 +882,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
         ...prev,
         {
           role: 'assistant',
-          content: `Thank you, ${leadStudentName}! I have noted your details.\n\nFor immediate assistance, please call our Admissions & Enquiry Help Desk at +91 81053 88193 / +91 81230 40418 / +91 96320 70209 or email gpuc.north@gopalanpucollege.com.`,
+          content: `Thank you, ${leadStudentName}! I have noted your details.\n\nFor immediate assistance, please call our Admissions & Enquiry Help Desk at +91 96069 41908 / +91 96069 41907 / (080) 41280227 or email admission_gpuc@gopalanpucollege.com.`,
         },
       ]);
     } finally {
@@ -926,7 +927,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
           mobile: mob,
           admissionClass: '12th Class (2nd PU) / 11th Class',
           inquiryType: 'Immediate Callback Request',
-          queryTopic: 'North Campus Admissions Guidance',
+          queryTopic: 'Whitefield Campus Admissions Guidance',
           chatNotes: 'Requested immediate callback after 4th general query',
           leadSource: 'proactive_immediate_callback',
           sessionQueries: sessionQueriesRef.current,
@@ -951,7 +952,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
         ...prev,
         {
           role: 'assistant',
-          content: `Thank you, ${name}! Your callback request has been prioritized with our Admissions & Enquiry Help Desk (+91 81053 88193 / +91 81230 40418 / +91 96320 70209). An admissions counselor will call you shortly on ${mob}.`,
+          content: `Thank you, ${name}! Your callback request has been prioritized with our Admissions & Enquiry Help Desk (+91 96069 41908 / +91 96069 41907 / (080) 41280227). An admissions counselor will call you shortly on ${mob}.`,
         },
       ]);
     } catch (err) {
@@ -1041,14 +1042,14 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
         ...prev,
         {
           role: 'assistant',
-          content: `Your consultation and campus visit has been scheduled for ${chosenSlot}.\n\nReference: ${ticketId}. Our Admissions & Enquiry Help Desk (+91 81053 88193 / +91 81230 40418 / +91 96320 70209) looks forward to meeting you.`,
+          content: `Your consultation and campus visit has been scheduled for ${chosenSlot}.\n\nReference: ${ticketId}. Our Admissions & Enquiry Help Desk (+91 96069 41908 / +91 96069 41907 / (080) 41280227) looks forward to meeting you.`,
           step: 'completed',
           ticketData: {
             id: ticketId,
             mode: 'campus_visit',
             date: 'Next Working Day',
             timeSlot: chosenSlot,
-            venue: 'Gopalan Pre-University College, North Campus (Yelahanka)',
+            venue: 'Gopalan Pre-University College, South Campus (Whitefield)',
             studentName: name,
             mobile: mob,
             instructions: 'Present this reference or phone number at Admissions Desk on arrival.',
@@ -1099,14 +1100,14 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
       const apt = data.appointment || {
         id: `GPUC-VISIT-2026-${Date.now().toString().slice(-4)}`,
         mode: 'campus_visit',
-        date: 'Monday to Saturday',
-        timeSlot: '8:30 AM - 5:00 PM',
-        meetingLinkOrVenue: 'Gopalan Pre-University College, North Campus (No. 79 Mavallipura, Hesaragatta Hobli, Yelahanka)',
+        date: 'To be confirmed',
+        timeSlot: 'Help desk will call to confirm',
+        meetingLinkOrVenue: 'Gopalan Pre-University College, South Campus (181/1, 182/1 Behind SAP Labs, Seetharam Palya, Hoodi, Whitefield)',
       };
 
       setBookingFlowState('completed');
 
-      const replyContent = `Your campus visit ticket has been generated and recorded with Reference ${apt.id}.\n\nVisiting hours are Monday to Saturday from 8:30 AM to 5:00 PM. Admissions Help Desk: +91 81053 88193 / +91 81230 40418 / +91 96320 70209.`;
+      const replyContent = `Your campus visit ticket has been generated and recorded with Reference ${apt.id}.\n\nOur Admissions Help Desk will call you to confirm the visit timing: +91 96069 41908 / +91 96069 41907 / (080) 41280227.`;
 
       setMessages((prev) => [
         ...prev,
@@ -1117,8 +1118,8 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
           ticketData: {
             id: apt.id,
             mode: 'campus_visit',
-            date: apt.date || 'Monday to Saturday',
-            timeSlot: apt.timeSlot || '8:30 AM - 5:00 PM',
+            date: apt.date || 'To be confirmed',
+            timeSlot: apt.timeSlot || 'Help desk will call to confirm',
             venue: apt.meetingLinkOrVenue,
             studentName: currentLead.studentName,
             parentName: currentLead.parentName,
@@ -1134,7 +1135,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
         ...prev,
         {
           role: 'assistant',
-          content: `Your campus visit has been noted! Please visit our North Campus from Monday to Saturday between 8:30 AM and 5:00 PM.\n\nYou may contact the Admissions & Enquiry Help Desk directly at +91 81053 88193 / +91 81230 40418 / +91 96320 70209.`,
+          content: `Your campus visit has been noted! Our Admissions Help Desk will call you to confirm the timing.\n\nYou may also contact the Admissions & Enquiry Help Desk directly at +91 96069 41908 / +91 96069 41907 / (080) 41280227.`,
           step: 'completed',
         },
       ]);
@@ -1314,7 +1315,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
     setIsTyping(false);
     setLoading(false);
 
-    const genericReply = `You can reach our Admissions & Enquiry Help Desk directly at +91 81053 88193 / +91 81230 40418 / +91 96320 70209 from 8:30 AM to 5:00 PM (Monday to Saturday).\n\nOur counseling team will be happy to assist you in coordinating your visit or scheduling a custom meeting slot.`;
+    const genericReply = `You can reach our Admissions & Enquiry Help Desk directly at +91 96069 41908 / +91 96069 41907 / (080) 41280227.\n\nOur counseling team will be happy to assist you in coordinating your visit or scheduling a custom meeting slot.`;
 
     setMessages((prev) => [
       ...prev,
@@ -1408,7 +1409,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
         return;
       }
       let chosenClass = '11th Class (1st PU)';
-      let chosenType = 'Admissions 2026-27';
+      let chosenType = 'Admissions 2027-28';
 
       if (lower.includes('12') || lower.includes('2nd')) {
         chosenClass = '12th Class (2nd PU)';
@@ -1419,7 +1420,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
         chosenType = 'Campus Visit';
       } else {
         chosenClass = 'General PU';
-        chosenType = 'Admissions 2026-27';
+        chosenType = 'Admissions 2027-28';
       }
 
       setInput('');
@@ -1633,7 +1634,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                 studentName: leadStudentName || 'Prospective Student',
                 mobile: leadMobile || '8989898989',
                 admissionClass: '11th Class (1st PU)',
-                inquiryType: 'Admissions 2026-27',
+                inquiryType: 'Admissions 2027-28',
               }),
               inquiryId: inqCall.result.inquiry_id,
             }));
@@ -1662,7 +1663,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
         ...prev,
         {
           role: 'assistant',
-          content: `Sure, I will help you with your query about Gopalan PU College.\n\nYou may also contact our Admissions & Enquiry Help Desk directly at +91 81053 88193 / +91 81230 40418 / +91 96320 70209 or email gpuc.north@gopalanpucollege.com.`,
+          content: `Sure, I will help you with your query about Gopalan PU College.\n\nYou may also contact our Admissions & Enquiry Help Desk directly at +91 96069 41908 / +91 96069 41907 / (080) 41280227 or email admission_gpuc@gopalanpucollege.com.`,
         },
       ]);
     } finally {
@@ -2104,9 +2105,9 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                       textOverflow: 'ellipsis',
                       lineHeight: 1.2,
                     }}
-                    title="GPUC — North Campus (Yelahanka)"
+                    title="GPUC — South Campus (Whitefield)"
                   >
-                    GPUC North Campus
+                    GPUC South Campus
                   </div>
                   <div
                     className="widget-header-subtitle"
@@ -2123,7 +2124,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                     }}
                   >
                     <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#4ade80', flexShrink: 0 }}></span>
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>Yelahanka • Admissions 2026–27</span>
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>Whitefield • Admissions 2027–28</span>
                   </div>
                 </div>
               </div>
@@ -2832,7 +2833,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                             <button
                               type="button"
                               disabled={isSubmittingLead}
-                              onClick={() => handleAdmissionSubmit('11th Class (1st PU)', 'Admissions 2026-27')}
+                              onClick={() => handleAdmissionSubmit('11th Class (1st PU)', 'Admissions 2027-28')}
                               style={{
                                 padding: isMobile ? '7px 6px' : '10px 8px',
                                 textAlign: 'center',
@@ -2860,7 +2861,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                             <button
                               type="button"
                               disabled={isSubmittingLead}
-                              onClick={() => handleAdmissionSubmit('12th Class (2nd PU)', 'Admissions 2026-27')}
+                              onClick={() => handleAdmissionSubmit('12th Class (2nd PU)', 'Admissions 2027-28')}
                               style={{
                                 padding: isMobile ? '7px 6px' : '10px 8px',
                                 textAlign: 'center',
@@ -2915,7 +2916,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                             <button
                               type="button"
                               disabled={isSubmittingLead}
-                              onClick={() => handleAdmissionSubmit('General PU', 'Admissions 2026-27')}
+                              onClick={() => handleAdmissionSubmit('General PU', 'Admissions 2027-28')}
                               style={{
                                 padding: isMobile ? '6px 5px' : '8px 6px',
                                 textAlign: 'center',
@@ -3003,7 +3004,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                     Book a Campus Visit (Offline)
                                   </div>
                                   <div style={{ fontSize: isMobile ? '0.66rem' : '0.72rem', color: '#78350F' }}>
-                                    Tour North Campus (Yelahanka) &bull; Instant ticket
+                                    Tour South Campus (Whitefield) &bull; Instant ticket
                                   </div>
                                 </div>
                               </div>
@@ -3503,7 +3504,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                         >
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                             <span style={{ fontSize: '0.76rem', fontWeight: 800, color: '#92400E', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                              <PhoneCall size={13} color="#D97706" /> GPUC NORTH ADMISSIONS HELP
+                              <PhoneCall size={13} color="#D97706" /> GPUC WHITEFIELD ADMISSIONS HELP
                             </span>
                             <button
                               type="button"
@@ -3525,7 +3526,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                           </div>
 
                           <div style={{ fontSize: '0.80rem', fontWeight: 650, color: '#78350F', lineHeight: 1.45, marginBottom: '10px' }}>
-                            Can we request an immediate callback to help you out with GPUC North, or would you like to schedule a call / campus visit from our available time slots?
+                            Can we request an immediate callback to help you out with GPUC Whitefield, or would you like to schedule a call / campus visit from our available time slots?
                           </div>
 
                           {proactiveCardMode === 'idle' && (
@@ -3864,7 +3865,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                                 <Check size={14} color="#16A34A" /> Request Successfully Confirmed!
                               </div>
                               <div>
-                                Our Admissions Help Desk (+91 81053 88193) will connect with you on <strong>{proactiveMobile}</strong>.
+                                Our Admissions Help Desk (+91 96069 41908) will connect with you on <strong>{proactiveMobile}</strong>.
                               </div>
                             </div>
                           )}
@@ -3872,7 +3873,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                       )}
 
                       {/* Admissions Help Desk Contact Card */}
-                      {msg.step === 'completed' && (msg.content.includes('+91 81053 88193') || msg.content.includes('+91 81230 40418') || msg.content.includes('+91 96320 70209') || msg.content.includes('+91 96069 41908')) && !msg.ticketData && (
+                      {msg.step === 'completed' && (msg.content.includes('+91 96069 41908') || msg.content.includes('+91 96069 41907') || msg.content.includes('41280227')) && !msg.ticketData && (
                         <div
                           style={{
                             marginTop: '10px',
@@ -3890,15 +3891,15 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                               <Phone size={13} color="#D97706" /> ADMISSIONS &amp; ENQUIRY HELP DESK
                             </span>
                             <span style={{ fontSize: '0.68rem', padding: '2px 6px', borderRadius: '4px', background: '#FEF3C7', color: '#92400E', fontWeight: 700 }}>
-                              NORTH CAMPUS
+                              WHITEFIELD CAMPUS
                             </span>
                           </div>
 
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '8px' }}>
                             {[
-                              { label: 'Help Desk 1', number: '+91 81053 88193', tel: '+918105388193' },
-                              { label: 'Help Desk 2', number: '+91 81230 40418', tel: '+918123040418' },
-                              { label: 'Help Desk 3', number: '+91 96320 70209', tel: '+919632070209' },
+                              { label: 'Help Desk 1', number: '+91 96069 41908', tel: '+919606941908' },
+                              { label: 'Help Desk 2', number: '+91 96069 41907', tel: '+919606941907' },
+                              { label: 'Landline', number: '(080) 41280227', tel: '+918041280227' },
                             ].map((h, hIdx) => (
                               <div
                                 key={hIdx}
@@ -3938,9 +3939,8 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                           </div>
 
                           <div style={{ fontSize: '0.72rem', color: '#78350F', lineHeight: 1.45 }}>
-                            🕒 <strong>Working Hours:</strong> Monday &ndash; Saturday, 8:30 AM &ndash; 5:00 PM<br />
-                            📍 <strong>Campus:</strong> No. 79 Mavallipura, Hesaragatta Hobli, Yelahanka<br />
-                            ✉️ <strong>Email:</strong> gpuc.north@gopalanpucollege.com
+                            📍 <strong>Campus:</strong> 181/1, 182/1, Behind SAP Labs, Seetharam Palya, Hoodi, Whitefield, Bengaluru - 560048<br />
+                            ✉️ <strong>Email:</strong> admission_gpuc@gopalanpucollege.com
                           </div>
                         </div>
                       )}

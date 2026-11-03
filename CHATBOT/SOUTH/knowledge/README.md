@@ -1,83 +1,63 @@
-# GPUC-SOUTH — Gopalan Pre-University College (Whitefield Campus) Knowledge & Data Extraction Repository
+# CHATBOT/SOUTH — Gopalan Pre-University College (Whitefield Campus) Knowledge Files
 
-This repository contains the complete extracted data, institutional ground truths, academic rules, curriculum details, faculty directory, event archives, and chatbot guardrails for **Gopalan Pre-University College (GPUC), Whitefield Campus (South)**.
+Knowledge files for the **Gopalan Pre-University College, Whitefield (Hoodi) campus** chatbot.
+All content is taken only from the official campus website https://www.gopalancolleges.com/gpuc/ (re-crawled 28 October 2026).
 
 > [!IMPORTANT]
-> **Complete North Campus Isolation:**  
-> This directory (`GPUC-SOUTH`) is entirely self-contained and **does not affect or modify** any files of the North Campus (`GPUC-NORTH`, `src/`, `data/`, or `Gopalan_PU_Chatbot_Sources 2`). Both campus datasets remain clean, segregated, and independent.
+> **Strict campus boundary:** This chatbot covers the Whitefield campus only. These files must not contain facts about any other Gopalan campus or institution.
 
 ---
 
-## 1. Quick Campus Comparison (North vs. South/Whitefield)
+## 1. Campus Snapshot (from the live website)
 
-| Feature / Detail | North Campus (Yelahanka) | South Campus (Whitefield) |
-| :--- | :--- | :--- |
-| **Location** | No. 79, Mavallipura, Hesaragatta Hobli, Yelahanka | 181/1, 182/1, Behind SAP Labs, Seetharam Palya, Hoodi, Whitefield |
-| **Primary Region** | Bengaluru North | Bengaluru East |
-| **Principal** | Mr. M. Mahesh | Dr. Kanchana A S |
-| **Academic Head** | — | Mr. Mahesh (Chemistry, MSc, MPhil, BEd - 21 Years) |
-| **Science Coordinator** | — | Mr. Krishna Murthy Goud (Chemistry, MSc, SET - 14 Years) |
-| **Admin SPOC** | Help Desk Team | Mr. Aravind (+91 63621 66945 / admin@gopalanpucollege.com) |
-| **Admissions Helpline**| +91 81053 88193 / +91 81230 40418 / +91 96320 70209 | +91 96069 41908 / +91 96069 41907 / (080) 41280227 |
-| **Admissions WhatsApp**| North Campus Support | +91 8105131098 |
-| **Admissions Email** | `gpuc.north@gopalanpucollege.com` | `admission_gpuc@gopalanpucollege.com` |
-| **Website** | `https://gopalanpucnorth.com/` | `https://www.gopalancolleges.com/gpuc/` |
-| **Science Streams** | PCMB, PCMC | PCMB, PCMC |
-| **Integrated Coaching**| NEET, JEE (Main & Adv), KCET | NEET, JEE (Main & Adv), KCET |
-| **Commerce Streams** | CEBA | **CEBA, SEBA, MEBA** |
-| **CA Preparation** | Referral / External | **Integrated CA Foundation Coaching** |
-| **Languages Offered** | English + Kannada, Hindi | English + **Kannada, Hindi, Sanskrit, French** |
-| **Value-Added Courses**| Standard Campus Enrichment | **NATA, Advanced Excel Data Analytics, Tally, Data Science, Coursera** |
-| **Sports Arena** | Sports Field & Courts | **Dedicated Football Ground, Cricket Ground, Lawn Tennis, Badminton, Table Tennis** |
-| **Cell Phone Policy** | Strict Campus Prohibition | **Confiscation until course end OR Rs. 1,000 fine** |
-| **Vehicle Policy** | No student vehicles permitted | **Two-wheelers and four-wheelers strictly prohibited for PUC students** |
-| **Late Attendance** | Regular PU Board Rules | **Late reporting recorded as ABSENT for the day** |
+| Detail | Whitefield Campus |
+| :--- | :--- |
+| **Address** | 181/1, 182/1, Behind SAP Labs, Seetharam Palya, Basavanagar, Hoodi, Bangalore - 560 048 |
+| **Director** | Mrs. Sunita Prabhakar (Director, Gopalan Foundation) |
+| **Principal** | Dr. Kanchana A S |
+| **Academic Head** | Mr. Mahesh (Chemistry; MSc, MPhil, BEd; 21 years) |
+| **Admissions phone** | +91 96069 41908 / (080) 41280227 |
+| **Header phone** | +91 96069 41907 |
+| **WhatsApp** | +91 81051 31098 |
+| **SPOC** | Mr. Aravind, +91 63621 66945, admin@gopalanpucollege.com |
+| **Admissions email** | admission_gpuc@gopalanpucollege.com |
+| **Office hours** | Not published on the website |
+| **Science** | PCMB, PCMC + NEET (PCMB), JEE and KCET (PCMB & PCMC) coaching |
+| **Commerce** | CEBA, SEBA, MEBA + CA Foundation coaching |
+| **Languages** | English (I, mandatory) + Kannada / Hindi / Sanskrit / French (II) |
+| **Value-added** | NATA, Data Analytics with Advanced Excel, Tally, Introduction to Data Science, Coursera |
+| **Hostel** | Girls only |
+| **Transport** | GPS-enabled, key city routes (routes not published) |
+| **Fees** | Not published — contact the admissions desk |
 
 ---
 
-## 2. Directory Structure & Extracted Artifacts
+## 2. Files
 
 ```
-GPUC-SOUTH/
-├── README.md                           <- Master overview, campus comparison, and integration guide (this file)
-├── college_knowledge_base.md           <- Comprehensive verified knowledge base (leadership, streams, infrastructure)
-├── chatbot_guardrails.md               <- Chatbot behavioral rules, domain boundaries, refusal logic & privacy
-├── rules_and_regulations.md            <- Verbatim code of conduct, cell phone confiscation/fine, attendance, vehicles
-├── courses_and_curriculum.md           <- In-depth syllabus breakdown: Science, Commerce, CA Foundation, Languages
-├── faculty_directory.csv               <- Complete CSV directory of 38 verified faculty & leadership staff
-├── event_archive.csv                   <- CSV archive of 18 campus events, orientations, ceremonies, and fests
-├── faq_seed.json                       <- 18 production-ready JSON Q&A pairs tailored for Whitefield chatbot
-├── source_registry.csv                 <- Registry of all 20 crawled pages, URLs, byte counts, and HTTP codes
-├── web_link_and_control_audit.csv      <- Audit of 108 internal/external links, emails, and phone channels
-├── data_gaps_and_verification.md       <- Analysis of web template noise (discarding "GoFly"), shared degree college links
-└── raw_pages/                          <- 20 raw HTML snapshots downloaded directly from gopalancolleges.com/gpuc/
-    ├── index.html
-    ├── about-us.html
-    ├── admission.html
-    ├── campus-life.html
-    ├── commerce-courses.html
-    ├── contact-us.html
-    ├── contact.html
-    ├── director-message.html
-    ├── events.html
-    ├── facilities.html
-    ├── faculty.html
-    ├── gallery.html
-    ├── placement.html
-    ├── principal-message.html
-    ├── rules-regulations.html
-    ├── science-courses.html
-    ├── testimonial.html
-    ├── value-added-courses.html
-    ├── vision-mission.html
-    └── why-choose-us.html
+CHATBOT/SOUTH/knowledge/
+├── README.md                       <- This overview
+├── college_knowledge_base.md       <- Main knowledge base ("## " sections, parsed by src/lib/knowledge.ts)
+├── courses_and_curriculum.md       <- Science, Commerce, coaching, languages, value-added courses
+├── rules_and_regulations.md        <- Rules & regulations page, section by section
+├── faq_seed.json                   <- 29 FAQ entries (ids used by src/lib/claude.ts)
+├── faculty_directory.csv           <- 38 staff from the Faculty page
+├── event_archive.csv               <- 18 events from the Events page
+├── source_registry.csv             <- Every URL crawled, fetch result and notes
+├── web_link_and_control_audit.csv  <- Links, phone and email channels found on the site
+├── chatbot_guardrails.md           <- Behaviour rules, scope boundary, refusals, privacy
+└── data_gaps_and_verification.md   <- What the website does not say, template noise, items for staff to confirm
 ```
+
+Format notes for the app:
+- Markdown files are split on `\n## `; a section whose body contains "verify" or "hold" is marked as unverified, so those words are avoided in the parsed markdown files unless a fact truly needs staff confirmation.
+- `faculty_directory.csv` header: `Name,Designation,Department,Qualification,Experience,Campus`.
+- `event_archive.csv` header: `Event_Name,Category,Campus,Status`.
 
 ---
 
-## 3. Next Steps & Ready-for-Integration
-When the user provides the index page and additional frontend/backend files:
-1. The **Knowledge Base** (`college_knowledge_base.md`) and **FAQ Seed** (`faq_seed.json`) can be loaded directly into the AI retrieval layer.
-2. The **Guardrails** (`chatbot_guardrails.md`) can be plugged into the system prompt.
-3. The **Lead Capture** and appointment booking endpoints can route to Whitefield SPOC (`admin@gopalanpucollege.com` / `+91 96069 41908`).
-4. All contact channels, phone numbers, and location details are verified and pre-formatted for click-to-call and click-to-chat links.
+## 3. Crawl Notes
+- 19 content pages and 18 event pages fetched successfully (HTTP 200).
+- campus-life.html, contact.html, placement.html, testimonial.html, travel-package-01.html and travel-package-details.html redirect (HTTP 302) to the group home page and contain no college content.
+- leadership-message.html and how-to-apply.html exist but are not linked from the site menu and contain outdated or other-institution content; they were not used. See `data_gaps_and_verification.md`.
+- Raw HTML was saved outside the repo (`/tmp/south_crawl/`); a local mirror also exists at `GPUC-SOUTH/gpuc/` but was not needed.

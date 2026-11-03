@@ -1,72 +1,68 @@
 # Gopalan PU College (Whitefield) — Data Gaps & Verification Audit
 
-**Audited Website:** https://www.gopalancolleges.com/gpuc/  
-**Audit Date:** Current Session  
-**Objective:** Document verified ground truths, resolve cross-domain template artifacts, and highlight data points requiring operational verification.
+**Audited Website:** https://www.gopalancolleges.com/gpuc/
+**Audit Date:** 28 October 2026 (live re-crawl)
+**Objective:** Record the facts confirmed on the live site, what the site does not publish, template noise to ignore, and items that need staff confirmation.
 
 ---
 
-## 1. Verified Core Ground Truths (Approved for Chatbot)
-The following facts are verified across multiple live pages and institutional documents:
+## 1. Facts Confirmed on the Live Website
 
-| Category | Verified Ground Truth |
-| :--- | :--- |
-| **Institution Name** | Gopalan Pre-University College (GPUC), Whitefield Campus |
-| **Address** | 181/1, 182/1, Behind SAP Labs, Seetharam Palya, Basavanagar, Hoodi Village, Sonnenahalli, K.R. Puram, Whitefield, Bengaluru - 560048 |
-| **Landmark** | Behind SAP Labs / Near Hoodi Junction |
-| **Principal** | Dr. Kanchana A S |
-| **Academic Head** | Mr. Mahesh (MSc, MPhil, BEd - Chemistry, 21+ Years Experience) |
-| **Science Coordinator** | Mr. Krishna Murthy Goud (MSc, SET - Chemistry, 14+ Years Experience) |
-| **Admin SPOC** | Mr. Aravind (+91 63621 66945 / admin@gopalanpucollege.com) |
-| **Admissions Helpline** | +91 96069 41908 / +91 96069 41907 / (080) 41280227 |
-| **Admissions WhatsApp** | +91 8105131098 |
-| **Admissions Email** | admission_gpuc@gopalanpucollege.com |
-| **Science Streams** | PCMB, PCMC (with integrated NEET, JEE Main/Advanced, KCET coaching) |
-| **Commerce Streams** | CEBA, SEBA, MEBA (with CA Foundation coaching) |
-| **Languages** | Part I: English (Mandatory) \| Part II: Kannada, Hindi, Sanskrit, French |
-| **Value-Added Courses** | NATA Coaching, Data Analytics with Advanced Excel, Tally, Introduction to Data Science, Coursera |
-| **Eligibility** | 10th Standard / SSLC / CBSE / ICSE pass |
-| **Cell Phone Policy** | Strictly prohibited in academic areas; confiscation or Rs. 1,000 fine |
-| **Vehicle Policy** | Two-wheelers and four-wheelers strictly NOT permitted for PUC students |
-| **Late Attendance** | Late reporting recorded as ABSENT for the day |
-| **Sports Arena** | Football Ground, Cricket Ground, Lawn Tennis, Badminton, Table Tennis |
-
----
-
-## 2. Template Artifacts & Noise to Discard (CRITICAL)
-
-During the website extraction, several residue elements from a commercial WordPress/HTML travel agency template ("GoFly") were identified in the source code of `about-us.html`, `director-message.html`, and `principal-message.html`.
-
-### Elements to STRICTLY Exclude & Reject:
-1. **"GoFly Travel Agency" / "Robert Harringson"**:
-   - Residue text: *"Welcome to GoFly Travel Agency... Robert Harringson Founder at GoFly... Skyline Plaza, 5th Floor, 123 Main Street Los Angeles, CA 90001, USA"*.
-   - **Resolution:** This is commercial web template placeholder dummy text. The chatbot must strictly never mention or confirm travel agency services.
-2. **"Flat 30% Discounts All Packages" / "1986 Thomas Cook History"**:
-   - Residue text in `about-us.html` describing travel agency milestones.
-   - **Resolution:** Discard completely.
-3. **London UK Address Placeholder**:
-   - `contact-us.html` contains: *"3rd Floor, 15 Bedford Street Covent Garden, London, WC2E 9HE, UK"*.
-   - **Resolution:** Discard. The only physical campus is in Hoodi, Whitefield, Bengaluru.
+| Category | Value | Source page |
+| :--- | :--- | :--- |
+| **Institution Name** | Gopalan Pre-University College, Whitefield, Bangalore | about-us.html |
+| **Address** | 181/1, 182/1, Behind SAP Labs, Seetharam Palya, Basavanagar, Hoodi, Bangalore - 560 048 | contact-us.html |
+| **Footer Address** | 181/1, 182/1, Hoodi Village, Sonnenahalli, K.R. Puram, Bangalore - 560 048 | all pages |
+| **Director** | Mrs. Sunita Prabhakar, Director, Gopalan Foundation | director-message.html |
+| **Principal** | Dr. Kanchana A S | principal-message.html, faculty.html |
+| **Academic Head** | Mr. Mahesh (MSc, MPhil, BEd — Chemistry, 21 years) | faculty.html |
+| **Science Coordinator** | Mr. Krishna Murthy Goud (MSc, SET — Chemistry, 14 years) | faculty.html |
+| **Commerce Co-ordinator** | Ms. Lekha K S (M.Com, B.Ed — Business Studies, 8 years) | faculty.html |
+| **SPOC** | Mr. Aravind, +91 63621 66945, admin@gopalanpucollege.com | contact-us.html |
+| **Admissions Phone** | +91 96069 41908, (080) 41280227 | contact-us.html |
+| **Header Phone** | +91 96069 41907 | all pages |
+| **WhatsApp** | +91 81051 31098 | floating button, all pages |
+| **Admissions Email** | admission_gpuc@gopalanpucollege.com | email icon, all pages |
+| **Careers Email** | careers@gopalancolleges.com | career.html |
+| **Science** | PCMB, PCMC; NEET (PCMB), JEE & KCET (PCMB & PCMC) coaching | science-courses.html |
+| **Commerce** | CEBA, SEBA, MEBA; CA Foundation coaching | commerce-courses.html |
+| **Languages** | I: English (mandatory); II: Kannada / Hindi / Sanskrit / French | course pages |
+| **Value-Added Courses** | NATA, Data Analytics with Advanced Excel, Tally, Introduction to Data Science, Coursera | value-added-courses.html |
+| **Eligibility** | Karnataka SSLC or equivalent recognised by the Department of PU Education, Karnataka | admission.html |
+| **Facilities** | Football, cricket, cafeteria, table tennis, lawn tennis, badminton, science labs, library, gymnastics, girls-only hostel, amphitheatre, GPS transport | facilities.html |
+| **Admissions Cycle** | "Admissions Open for the Academic Year 2027-2028" | index.html |
 
 ---
 
-## 3. Cross-Institutional Linkages & Shared Campus Resources
-- **Co-Located Degree College (Gopalan College of Commerce - GCC):**
-  - Gopalan College of Commerce operates on the same Whitefield educational enclave.
-  - The website footer references `gccprincipal@gopalancolleges.com` and `We are Gopalan College of Commerce`.
-  - **Resolution:** When answering queries regarding Pre-University College admissions, always cite the dedicated PU admissions email `admission_gpuc@gopalanpucollege.com` and phone numbers `+91 96069 41908` / `+91 96069 41907`.
+## 2. Not Published on the Website (do not invent)
+- **Office / visiting hours** — none on any page. Earlier files stated "Monday to Saturday, 8:30 AM to 5:00 PM"; this is not on the site and was removed. VERIFY with the college before publishing any hours.
+- **Fee amounts** (tuition, coaching, transport, hostel) — none published. Merit-based scholarships are mentioned without criteria.
+- **Bus routes, stops and timings** — the site only says "GPS-enabled transport ... across key city routes". Earlier files listed specific localities; these were not on the site and were removed.
+- **Hostel fees / capacity** — only "exclusively for girls" is published.
+- **Principal's qualification and experience** — present only inside an HTML comment on faculty.html (M.Sc, M.Ed; Biology/Chemistry; 12 years); not shown to visitors, so not used. VERIFY before using.
+- **Event dates and descriptions** — event pages are photo galleries only.
+- **Affiliation / recognition statement, seat counts, results, admission dates** — not published.
 
 ---
 
-## 4. Fee Data Policy
-- The official website does not publish static rupee figures for tuition fees, as fees depend on the subject combination, integrated coaching options (NEET/JEE/KCET/CA Foundation), and second language choices (e.g., French/Sanskrit).
-- **Resolution:** The chatbot must never invent fee amounts or installment numbers. It must always direct parents to contact the Admissions Desk directly:
-  - Phone: `+91 96069 41908` / `+91 96069 41907`
-  - Email: `admission_gpuc@gopalanpucollege.com`
-  - Visiting Hours: Monday to Saturday, 8:30 AM to 5:00 PM.
+## 3. Template Artifacts & Noise to Discard
+- **Travel-agency template text** ("GoFly Travel Agency", "Robert Harringson", "Thomas Cook", "Flat 30% Discounts", London address) remains inside HTML comments ("GoFly" on almost every page; "Robert Harringson" on about-us, director-message and principal-message; "Thomas Cook" / "Flat 30%" on about-us; the London address on contact-us and index). It is not visible to visitors and must never be used.
+- **Facilities page, Football Ground caption** reads "Nature, Culture & Thrill: Travel Stories Inspire is a collection of experiences from explorers." — visible template text; ignore.
+- **tripadvisor.com / trustpilot.com links** in the theme — not GPUC channels.
+- **Redirecting links:** campus-life.html, contact.html, placement.html, testimonial.html, travel-package-01.html, travel-package-details.html all redirect (HTTP 302) to the group home page.
 
 ---
 
-## 5. Transportation Logistics
-- The college operates dedicated GPS-tracked buses across Whitefield, Hoodi, K.R. Puram, Mahadevapura, Marathahalli, CV Raman Nagar, Indiranagar, and Kadugodi.
-- Exact stop-by-stop fee stages and pickup timings are allocated via the official Transportation Application Form submitted during formal admission.
+## 4. Conflicting or Out-of-Place Pages (not used)
+- **leadership-message.html** — not linked from the site menu (the "Leadership Message" menu item opens director-message.html and principal-message.html). It shows an older principal's message signed "Mrs. Sangeeta Upadhyaya, Principal". The linked principal page and the faculty page both name **Dr. Kanchana A S**, which is used. VERIFY that the orphan page is retired.
+- **how-to-apply.html** — not linked from the menu (the "How to Apply" link goes to admission.html). Its content is for Gopalan College of Commerce degree admissions (Class 12 eligibility, NRI/PIO documents), not for PU admissions. Not used.
+- **Pop-up footer text** says "We are Gopalan College of Commerce..." on most pages and shows **gccprincipal@gopalancolleges.com**. This is the degree college's email, not a PU contact; the bot should use admission_gpuc@gopalanpucollege.com instead.
+- **Fee Payment link** points to https://gcc.pupilpod.net/home.php (a shared Gopalan portal).
+
+---
+
+## 5. Items for Staff to Confirm
+1. VERIFY official office/visiting hours so they can be added.
+2. VERIFY whether +91 96069 41907 (header) and +91 96069 41908 (contact page) are both admissions lines.
+3. VERIFY transport routes and hostel details if the bot should give more than the website states.
+4. VERIFY that leadership-message.html and how-to-apply.html can be removed from the live site.

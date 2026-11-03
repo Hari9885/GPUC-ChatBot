@@ -1,5 +1,233 @@
 [
   {
+    "analysisId": "ANL-2026-1054",
+    "inquiryId": "GPUC-2026-INQ-1054",
+    "timestamp": "2026-10-31T06:31:45.273Z",
+    "studentName": "Course Test Two",
+    "parentName": "Test Parent",
+    "mobile": "+91 9876501299",
+    "location": "Whitefield 560066",
+    "admissionClass": "12th Class (2nd PU) / 11th Class",
+    "totalQueries": 1,
+    "queries": [
+      {
+        "query": "What is the admission process for academic year 2027-2028 at Whitefield Campus?",
+        "timestamp": "2026-10-31T06:31:40.119Z"
+      }
+    ],
+    "leadSource": "onboarding_step_2"
+  },
+  {
+    "analysisId": "ANL-2026-1053",
+    "inquiryId": "GPUC-2026-INQ-1053",
+    "timestamp": "2026-10-31T06:30:26.316Z",
+    "studentName": "tryuiop",
+    "parentName": "jstr",
+    "mobile": "+91 8123456789",
+    "location": "SDG 565656",
+    "admissionClass": "12th Class (2nd PU) / 11th Class",
+    "totalQueries": 1,
+    "queries": [
+      {
+        "query": "What is the admission process for academic year 2027-2028 at Whitefield Campus?",
+        "timestamp": "2026-10-31T06:30:04.507Z"
+      }
+    ],
+    "leadSource": "onboarding_step_2"
+  },
+  {
+    "analysisId": "ANL-2026-1052",
+    "inquiryId": "GPUC-2026-INQ-1052",
+    "timestamp": "2026-10-31T06:29:54.888Z",
+    "studentName": "Course Test",
+    "parentName": "Test Parent",
+    "mobile": "+91 9876501234",
+    "location": "Whitefield 560066",
+    "admissionClass": "12th Class (2nd PU) / 11th Class",
+    "totalQueries": 1,
+    "queries": [
+      {
+        "query": "What is the admission process for academic year 2027-2028 at Whitefield Campus?",
+        "timestamp": "2026-10-31T06:29:35.848Z"
+      }
+    ],
+    "leadSource": "onboarding_step_2"
+  },
+  {
+    "analysisId": "ANL-2026-1051",
+    "inquiryId": "GPUC-2026-INQ-1051",
+    "timestamp": "2026-10-30T12:25:48.138Z",
+    "studentName": "jhgdsfaADSfsdgfhcg",
+    "parentName": "whteragsdAFC",
+    "mobile": "+91 8712345678",
+    "location": "afgdsnfb. 234e5r6t7y8",
+    "admissionClass": "12th Class (2nd PU) / 11th Class",
+    "totalQueries": 1,
+    "queries": [
+      {
+        "query": "What is the admission process for academic year 2027-2028 at Whitefield Campus?",
+        "timestamp": "2026-10-30T12:25:23.895Z"
+      }
+    ],
+    "leadSource": "onboarding_step_2"
+  },
+  {
+    "analysisId": "ANL-2026-1050",
+    "inquiryId": "GPUC-2026-INQ-1050",
+    "timestamp": "2026-10-30T04:00:29.878Z",
+    "studentName": "ggggg",
+    "parentName": "kjjkjj",
+    "mobile": "+91 8123456789",
+    "location": "hjhh 77777",
+    "admissionClass": "12th Class (2nd PU) / 11th Class",
+    "totalQueries": 1,
+    "queries": [
+      {
+        "query": "What is the admission process for academic year 2027-2028 at Whitefield Campus?",
+        "timestamp": "2026-10-30T04:00:11.779Z"
+      }
+    ],
+    "leadSource": "onboarding_step_2"
+  },
+  {
+    "analysisId": "ANL-2026-1049",
+    "inquiryId": "GPUC-2026-INQ-1049",
+    "timestamp": "2026-10-30T03:12:05.395Z",
+    "studentName": "hari kumar",
+    "parentName": "polireddy",
+    "mobile": "+91 6362965650",
+    "location": "whitefield 560066",
+    "admissionClass": "12th Class (2nd PU) / 11th Class",
+    "totalQueries": 1,
+    "queries": [
+      {
+        "query": "What is the admission process for academic year 2027-2028 at Whitefield Campus?",
+        "timestamp": "2026-10-30T03:11:32.687Z"
+      }
+    ],
+    "leadSource": "onboarding_step_2"
+  },
+  {
+    "analysisId": "ANL-2026-1048",
+    "inquiryId": "GPUC-2026-INQ-1048",
+    "timestamp": "2026-10-27T12:16:05.753Z",
+    "studentName": "hari",
+    "parentName": "kumar",
+    "mobile": "+91 8123456789",
+    "location": "whitefield 560066",
+    "admissionClass": "12th Class (2nd PU) / 11th Class",
+    "totalQueries": 1,
+    "queries": [
+      {
+        "query": "What is the admission process for academic year 2026-2027 at Whitefield Campus?",
+        "timestamp": "2026-10-27T12:15:46.470Z"
+      }
+    ],
+    "leadSource": "onboarding_step_2"
+  },
+  {
+    "analysisId": "ANL-2026-1047",
+    "inquiryId": "GPUC-2026-INQ-1047",
+    "timestamp": "2026-10-27T11:46:12.103Z",
+    "studentName": "qwertyui",
+    "parentName": "qwertyuio",
+    "mobile": "+91 9123456789",
+    "location": "asdfgh 56789",
+    "admissionClass": "12th Class (2nd PU) / 11th Class",
+    "totalQueries": 1,
+    "queries": [
+      {
+        "query": "What Science combinations are offered at Gopalan PU College Whitefield?",
+        "timestamp": "2026-10-27T11:45:33.542Z"
+      }
+    ],
+    "leadSource": "onboarding_step_2"
+  },
+  {
+    "analysisId": "ANL-2026-1046",
+    "inquiryId": "GPUC-2026-INQ-1046",
+    "timestamp": "2026-10-27T11:43:18.906Z",
+    "studentName": "Aarav Sharma",
+    "parentName": "Rajesh Sharma",
+    "mobile": "9876543210",
+    "admissionClass": "12th Class (2nd PU) / 11th Class",
+    "totalQueries": 0,
+    "queries": [],
+    "leadSource": "chatbot_inquiry_wizard"
+  },
+  {
+    "analysisId": "ANL-2026-1045",
+    "inquiryId": "GPUC-2026-INQ-1045",
+    "timestamp": "2026-10-24T05:27:50.350Z",
+    "studentName": "efef",
+    "parentName": "rgfgbfg",
+    "mobile": "+91 9535318630",
+    "location": "scee",
+    "admissionClass": "12th Class (2nd PU) / 11th Class",
+    "totalQueries": 1,
+    "queries": [
+      {
+        "query": "What is the admission process for academic year 2026-2027 at North Campus?",
+        "timestamp": "2026-10-24T05:27:33.907Z"
+      }
+    ],
+    "leadSource": "onboarding_step_2"
+  },
+  {
+    "analysisId": "ANL-2026-1044",
+    "inquiryId": "GPUC-2026-INQ-1044",
+    "timestamp": "2026-10-24T05:27:11.976Z",
+    "studentName": "regerger",
+    "parentName": "trtrh",
+    "mobile": "+91 9535318630",
+    "location": "whitefiled",
+    "admissionClass": "12th Class (2nd PU) / 11th Class",
+    "totalQueries": 1,
+    "queries": [
+      {
+        "query": "What is the admission process for academic year 2026-2027 at North Campus?",
+        "timestamp": "2026-10-24T05:26:54.051Z"
+      }
+    ],
+    "leadSource": "onboarding_step_2"
+  },
+  {
+    "analysisId": "ANL-2026-1043",
+    "inquiryId": "GPUC-2026-INQ-1043",
+    "timestamp": "2026-10-24T05:25:02.381Z",
+    "studentName": "madan",
+    "parentName": "gasfgq",
+    "mobile": "+91 9876789878",
+    "location": "siddapura",
+    "admissionClass": "12th Class (2nd PU) / 11th Class",
+    "totalQueries": 1,
+    "queries": [
+      {
+        "query": "What Science combinations are offered at Gopalan PU College North Campus?",
+        "timestamp": "2026-10-24T05:24:16.767Z"
+      }
+    ],
+    "leadSource": "onboarding_step_2"
+  },
+  {
+    "analysisId": "ANL-2026-1042",
+    "inquiryId": "GPUC-2026-INQ-1042",
+    "timestamp": "2026-10-24T05:22:06.695Z",
+    "studentName": "madan",
+    "parentName": "raj",
+    "mobile": "+91 8550001201",
+    "location": "siddapura",
+    "admissionClass": "12th Class (2nd PU) / 11th Class",
+    "totalQueries": 1,
+    "queries": [
+      {
+        "query": "What is the admission process for academic year 2026-2027 at North Campus?",
+        "timestamp": "2026-10-24T05:21:04.792Z"
+      }
+    ],
+    "leadSource": "onboarding_step_2"
+  },
+  {
     "analysisId": "ANL-2026-1041",
     "inquiryId": "GPUC-2026-INQ-1041",
     "timestamp": "2026-10-16T10:11:49.416Z",

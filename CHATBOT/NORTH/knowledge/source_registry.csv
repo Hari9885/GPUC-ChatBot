@@ -1,41 +1,26 @@
-﻿source_name,url_or_target,access_status,observations
-Home,https://www.gopalancolleges.com/gpuc/,Accessed; text reviewed,"Admissions banner, highlights, CTA, external link, form and footer; footer data contamination"
-Overview,https://www.gopalancolleges.com/gpuc/about-us.html,Accessed; text reviewed,Institution overview; footer Commerce College copy
-Vision & Mission,https://www.gopalancolleges.com/gpuc/vision-mission.html,Accessed; text reviewed,Vision and mission
-Why Choose Us,https://www.gopalancolleges.com/gpuc/why-choose-us.html,Accessed; text reviewed,Strengths/benefits and campus experience; competitive-exam wording hold
-Director's Message,https://www.gopalancolleges.com/gpuc/director-message.html,Accessed; text reviewed,Message body; name not clearly exposed in parsed text
-Principal's Message,https://www.gopalancolleges.com/gpuc/principal-message.html,Accessed; text reviewed,Currently signs Dr. Kanchana A S; prior cached version reportedly differed
-Faculty,https://www.gopalancolleges.com/gpuc/faculty.html,Accessed; text reviewed,Roster transcribed to CSV; staff photos are separate linked image assets
-Facilities,https://www.gopalancolleges.com/gpuc/facilities.html,Accessed; text reviewed,Facility descriptions; probable unrelated football caption
-Rules & Regulations,https://www.gopalancolleges.com/gpuc/rules-regulations.html,Accessed; text reviewed,"Conduct, attendance, mobile policy and penalties; requires approval"
-Science Courses,https://www.gopalancolleges.com/gpuc/science-courses.html,Accessed; text reviewed,"PCMB, PCMC, languages, exam-coaching claims"
-Commerce Courses,https://www.gopalancolleges.com/gpuc/commerce-courses.html,Accessed; text reviewed,"CEBA, SEBA, MEBA, CA Foundation, languages"
-Value Added Courses,https://www.gopalancolleges.com/gpuc/value-added-courses.html,Accessed; text reviewed,"NATA, Data Analytics, Tally, Data Science, Coursera"
-Admission,https://www.gopalancolleges.com/gpuc/admission.html,Accessed; text reviewed,Eligibility and document list; no fees/deadlines
-Gallery,https://www.gopalancolleges.com/gpuc/gallery.html,Accessed; text reviewed,Image gallery; no verified 360 tour URL in parsed text
-Events,https://www.gopalancolleges.com/gpuc/events.html,Accessed; text and 18 title links reviewed,"Detail pages opened; mostly template/footer, no live calendar"
-Contact Us,https://www.gopalancolleges.com/gpuc/contact-us.html,Accessed; text reviewed,"Contact numbers, form and Google Maps iframe; form not submitted"
-Legacy application-form PDF,https://www.gopalancolleges.com/gpuc/pdf/application-form.pdf,Search-index text found; open attempt redirected to root,Legacy/old course codes and sensitive fields; not authoritative
-Explore CTA,https://www.gopalancolleges.com/gpuc/contact.html,Opened; redirects to https://www.gopalancolleges.com/,Destination appears broken/misrouted
-E-Brochure,YouTube-domain link shown on GPUC homepage,Click attempt failed in available reader,Need college-provided canonical link
-Download Now,Visible CTA on GPUC homepage,Destination not surfaced by page reader,Need inspect in a normal browser/site source
-Fee Payment,Link host label gcc.pupilpod.net,Target inaccessible to reader,Likely GCC portal; do not point GPUC users there without confirmation
-Google Maps iframe,Google Maps embed titled Gopalan Pre University College,Opened; no map text content,"Approximate embed coordinates 12.9860799, 77.714677"
-Event detail: Investiture Ceremony 2026,https://www.gopalancolleges.com/gpuc/event-investiture-ceremony-2026.html,2026,Linked detail page opened; no substantive event description exposed
-Event detail: Yoga Day 2026,https://www.gopalancolleges.com/gpuc/event-yoga-day-2026.html,2026,Linked detail page opened; no substantive event description exposed
-Event detail: Drug Awareness Program 2026,https://www.gopalancolleges.com/gpuc/event-drug-awareness-program-2026.html,2026,Linked detail page opened; no substantive event description exposed
-Event detail: Freshers Day 2026,https://www.gopalancolleges.com/gpuc/event-freshers-day-2026.html,2026,Linked detail page opened; no substantive event description exposed
-Event detail: Felicitation & Orientation Ceremony 2026,https://www.gopalancolleges.com/gpuc/event-felicitation-orientation-ceremony-2026.html,2026,Linked detail page opened; no substantive event description exposed
-Event detail: Ice Breaking Session 2026,https://www.gopalancolleges.com/gpuc/event-ice-breaking-session-2026.html,2026,Linked detail page opened; no substantive event description exposed
-Event detail: Environment Day 2026,https://www.gopalancolleges.com/gpuc/event-environment-day-2026.html,2026,Linked detail page opened; no substantive event description exposed
-Event detail: Felicitation Ceremony,https://www.gopalancolleges.com/gpuc/event-felicitation-ceremony-2025.html,2025,Linked detail page opened; no substantive event description exposed
-Event detail: Field Trips,https://www.gopalancolleges.com/gpuc/event-field-trips-2025.html,2025,Linked detail page opened; no substantive event description exposed
-Event detail: Orientation Program,https://www.gopalancolleges.com/gpuc/event-orientation-day-2025.html,2025,Linked detail page opened; no substantive event description exposed
-Event detail: Yoga Day,https://www.gopalancolleges.com/gpuc/event-yoga-day-2025.html,2025,Linked detail page opened; no substantive event description exposed
-Event detail: Environment Day,https://www.gopalancolleges.com/gpuc/event-environment-day-2025.html,2025,Linked detail page opened; page title was inconsistently rendered
-Event detail: Drawing Competition,https://www.gopalancolleges.com/gpuc/event-drawing-competition-2025.html,2025,Linked detail page opened; no substantive event description exposed
-Event detail: Anti Drug Day,https://www.gopalancolleges.com/gpuc/event-anti-drug-day.html,Undated,Linked detail page opened; no substantive event description exposed
-Event detail: Talents Day,https://www.gopalancolleges.com/gpuc/event-talents-day-2025.html,2025,Linked detail page opened; no substantive event description exposed
-Event detail: Statistics Day,https://www.gopalancolleges.com/gpuc/event-statistics-day-2025.html,2025,Linked detail page opened; no substantive event description exposed
-Event detail: Saraswathi Puja,https://www.gopalancolleges.com/gpuc/event-saraswathi-puja-2025.html,2025,Linked detail page opened; no substantive event description exposed
-Event detail: Mothers Day,https://www.gopalancolleges.com/gpuc/event-mothers-day-2025.html,2025,Linked detail page opened; no substantive event description exposed
+url,page_title,fetched_ok,notes
+https://gopalanpucnorth.com/,Home,yes,"Highlights, about summary, why choose us, vision, mission, course tiles (PCMB, PCMC, CEBA), Director and Principal messages, footer contact info, Innovation Challenge 2026 and Admissions Open 2027-2028 banners"
+https://gopalanpucnorth.com/about/,About Us,yes,"Campus introduction, approval by Govt of Karnataka, vision, mission, Director's and Principal's messages"
+https://gopalanpucnorth.com/courses-offered/,Science & Commerce Courses in Yelahanka,yes,"PCMB, PCMC, CEBA; JEE, NEET, CET and CA Foundation integrated programmes; Inspire Award training"
+https://gopalanpucnorth.com/courses/,Science & Commerce Courses in Yelahanka,yes,Redirects to /courses-offered/ (same content)
+https://gopalanpucnorth.com/science-courses/,Science-Courses,yes,"PCMB, PCMC; NEET/JEE/KCET coaching; languages English + Kannada/Hindi/Sanskrit"
+https://gopalanpucnorth.com/commerce-courses/,Commerce-Courses,yes,"CEBA and MEBA; CA Foundation coaching; languages English + Kannada/Hindi/Sanskrit"
+https://gopalanpucnorth.com/faqs/,FAQs,yes,"Streams, combinations (lists CEBA and SEBA), board alignment, labs, teaching method, career options"
+https://gopalanpucnorth.com/our-faculties/,Our Faculties,yes,Principal plus 9 lecturers (one listed twice) and 2 administrative staff
+https://gopalanpucnorth.com/facilities/,Facilities,yes,"Smart boards, library, Wi-Fi, transport, teaching aids, labs, sports; no hostel or cafeteria section"
+https://gopalanpucnorth.com/how-to-apply/,Admissions Open 2026-27 | Gopalan PU College Yelahanka,yes,Eligibility and admission process; lower half of page is unedited template placeholder text
+https://gopalanpucnorth.com/rules-and-regulations/,Rules-and-Regulations,yes,"Code of conduct, phone policy, attendance, functions, campus use, admission document note"
+https://gopalanpucnorth.com/contact-us/,Contact Us,yes,"Phones, email, map link, SPOC/Admission Mrs. Johnsemey Anthony, enquiry form"
+https://gopalanpucnorth.com/events/,Events,yes,9 photo cards all titled Sports Day; Load More button
+https://gopalanpucnorth.com/gallery/,Gallery,yes,Uncaptioned campus and student photos only
+https://gopalanpucnorth.com/career/,Career,yes,Join Our Team; CVs to careers@gopalancolleges.com / careers@gopalanfoundation.com
+https://gopalanpucnorth.com/thank-you/,Thank you,yes,Enquiry form confirmation page
+https://gopalanpucnorth.com/hello-world/,Hello world!,yes,Default WordPress post; no college content
+https://gopalanpucnorth.com/homie/,Homie,yes,Empty page; no college content
+https://gopalanpucnorth.com/sample-page/,Sample Page,yes,Default WordPress sample page; no college content
+https://gopalanpucnorth.com/category/uncategorized/,Category: Uncategorized,yes,Lists only the default Hello world post
+https://gopalanpucnorth.com/faculties/,Page Not Found,no,404 (listed in sitemap.xml; real page is /our-faculties/)
+https://gopalanpucnorth.com/admissions/,Page Not Found,no,404 (listed in sitemap.xml; real page is /how-to-apply/)
+https://gopalanpucnorth.com/sitemap.xml,Sitemap,yes,Older static sitemap (9 URLs)
+https://gopalanpucnorth.com/sitemap_index.xml,Sitemap index,yes,/wp-sitemap.xml redirects here; links post/page/category sitemaps
+https://gopalanpucnorth.com/page-sitemap.xml,Page sitemap,yes,17 page URLs

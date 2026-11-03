@@ -41,48 +41,81 @@ let cachedFAQs: FAQItem[] | null = null;
 let cachedFaculty: FacultyMember[] | null = null;
 let cachedEvents: CollegeEvent[] | null = null;
 
-export function loadKnowledgeBase(): KnowledgeItem[] {
-  if (cachedKnowledge) return cachedKnowledge;
-
+function parseMarkdownSections(filePath: string, sourceUrl: string, prefix: string): KnowledgeItem[] {
   const items: KnowledgeItem[] = [];
-  const baseDir = path.join(process.cwd(), 'Gopalan_PU_Chatbot_Sources 2');
-
   try {
-    const kbPath = path.join(baseDir, 'college_knowledge_base.md');
-    if (fs.existsSync(kbPath)) {
-      const content = fs.readFileSync(kbPath, 'utf8');
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, 'utf8');
       const sections = content.split(/\n##\s+/);
 
       sections.forEach((sec, idx) => {
         if (!sec.trim()) return;
         const lines = sec.split('\n');
-        const title = lines[0].trim();
+        const title = lines[0].replace(/^#+\s*/, '').trim();
         const body = lines.slice(1).join('\n').trim();
 
-        items.push({
-          id: `kb_sec_${idx}`,
-          category: title.toLowerCase().replace(/[^a-z0-9]/g, '_'),
-          title: title,
-          content: body,
-          sourceUrl: 'https://www.gopalancolleges.com/gpuc/',
-          status: body.toLowerCase().includes('hold') || body.toLowerCase().includes('verify') ? 'draft_verify' : 'approved',
-        });
-      });
-    }
-
-    const events = loadEvents();
-    if (events.length > 0) {
-      items.push({
-        id: 'kb_sec_events',
-        category: 'events_and_activities',
-        title: 'College Events & Activities',
-        content: `Gopalan Pre-University College organises numerous academic, cultural, and sports events including: ${events.map((e) => e.title).join(', ')}.`,
-        sourceUrl: 'https://www.gopalancolleges.com/gpuc/events.html',
-        status: 'approved',
+        if (title && body) {
+          items.push({
+            id: `${prefix}_${idx}`,
+            category: title.toLowerCase().replace(/[^a-z0-9]/g, '_'),
+            title: title,
+            content: body,
+            sourceUrl: sourceUrl,
+            status: body.toLowerCase().includes('hold') || body.toLowerCase().includes('verify') ? 'draft_verify' : 'approved',
+          });
+        }
       });
     }
   } catch (err) {
-    console.error('Error loading college_knowledge_base.md:', err);
+    console.error(`Error loading ${filePath}:`, err);
+  }
+  return items;
+}
+
+export function loadKnowledgeBase(): KnowledgeItem[] {
+  if (cachedKnowledge) return cachedKnowledge;
+
+  const items: KnowledgeItem[] = [];
+  const knowledgeDir = path.join(process.cwd(), 'knowledge');
+
+  // 1. College Knowledge Base (Whitefield Campus)
+  items.push(
+    ...parseMarkdownSections(
+      path.join(knowledgeDir, 'college_knowledge_base.md'),
+      'https://www.gopalancolleges.com/gpuc/',
+      'kb_south'
+    )
+  );
+
+  // 2. Courses & Curriculum
+  items.push(
+    ...parseMarkdownSections(
+      path.join(knowledgeDir, 'courses_and_curriculum.md'),
+      'https://www.gopalancolleges.com/gpuc/science-courses.html',
+      'curriculum'
+    )
+  );
+
+  // 3. Rules & Regulations
+  items.push(
+    ...parseMarkdownSections(
+      path.join(knowledgeDir, 'rules_and_regulations.md'),
+      'https://www.gopalancolleges.com/gpuc/rules-regulations.html',
+      'rules'
+    )
+  );
+
+  // 4. College Events & Activities
+  const events = loadEvents();
+  if (events.length > 0) {
+    items.push({
+      id: 'kb_sec_events',
+      category: 'events_and_activities',
+      title: 'College Events & Activities',
+      content: `Gopalan Pre-University College (Whitefield Campus) organises numerous academic, cultural, and sports events including: ${events.map((e) => e.title).join(', ')}.`,
+      sourceUrl: 'https://www.gopalancolleges.com/gpuc/events.html',
+      status: 'approved',
+    });
   }
 
   cachedKnowledge = items;
@@ -92,8 +125,8 @@ export function loadKnowledgeBase(): KnowledgeItem[] {
 export function loadFAQs(): FAQItem[] {
   if (cachedFAQs) return cachedFAQs;
 
-  const baseDir = path.join(process.cwd(), 'Gopalan_PU_Chatbot_Sources 2');
-  const faqPath = path.join(baseDir, 'faq_seed.json');
+  const knowledgeDir = path.join(process.cwd(), 'knowledge');
+  const faqPath = path.join(knowledgeDir, 'faq_seed.json');
 
   try {
     if (fs.existsSync(faqPath)) {
@@ -111,19 +144,17 @@ export function loadFAQs(): FAQItem[] {
 export function loadFaculty(): FacultyMember[] {
   if (cachedFaculty) return cachedFaculty;
 
-  const baseDir = path.join(process.cwd(), 'Gopalan_PU_Chatbot_Sources 2');
-  const facultyPath = path.join(baseDir, 'faculty_directory.csv');
+  const knowledgeDir = path.join(process.cwd(), 'knowledge');
+  const facultyPath = path.join(knowledgeDir, 'faculty_directory.csv');
   const list: FacultyMember[] = [];
 
   try {
     if (fs.existsSync(facultyPath)) {
       const raw = fs.readFileSync(facultyPath, 'utf8');
       const lines = raw.split('\n').filter((l) => l.trim().length > 0);
-      // Skip header: name_as_published,role_as_published,department_as_published,qualification_as_published,experience_as_published,source_url,status
+      // Header: Name,Designation,Department,Qualification,Experience,Campus
       for (let i = 1; i < lines.length; i++) {
-        // Parse CSV handling quotes
-        const match = lines[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
-        const parts = lines[i].split(',').map((p) => p.replace(/^"|"$/g, '').trim());
+        const parts = lines[i].split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map((p) => p.replace(/^"|"$/g, '').trim());
         if (parts.length >= 2) {
           list.push({
             name: parts[0] || '',
@@ -131,7 +162,7 @@ export function loadFaculty(): FacultyMember[] {
             department: parts[2] || 'Academics',
             qualification: parts[3] || '',
             experience: parts[4] || '',
-            status: parts[6] || 'draft_transcription',
+            status: 'approved',
           });
         }
       }
@@ -147,22 +178,23 @@ export function loadFaculty(): FacultyMember[] {
 export function loadEvents(): CollegeEvent[] {
   if (cachedEvents) return cachedEvents;
 
-  const baseDir = path.join(process.cwd(), 'Gopalan_PU_Chatbot_Sources 2');
-  const eventsPath = path.join(baseDir, 'event_archive.csv');
+  const knowledgeDir = path.join(process.cwd(), 'knowledge');
+  const eventsPath = path.join(knowledgeDir, 'event_archive.csv');
   const list: CollegeEvent[] = [];
 
   try {
     if (fs.existsSync(eventsPath)) {
       const raw = fs.readFileSync(eventsPath, 'utf8');
       const lines = raw.split('\n').filter((l) => l.trim().length > 0);
+      // Header: Event_Name,Category,Campus,Status
       for (let i = 1; i < lines.length; i++) {
-        const parts = lines[i].split(',').map((p) => p.replace(/^"|"$/g, '').trim());
+        const parts = lines[i].split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map((p) => p.replace(/^"|"$/g, '').trim());
         if (parts.length >= 2) {
           list.push({
             title: parts[0] || '',
-            url: parts[1] || '',
-            year: parts[2] || '',
-            status: parts[4] || 'archive_only',
+            url: 'https://www.gopalancolleges.com/gpuc/events.html',
+            year: '2025-2026',
+            status: parts[3] || 'approved',
           });
         }
       }

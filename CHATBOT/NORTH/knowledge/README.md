@@ -1,27 +1,24 @@
-# Gopalan Pre-University College — Website Crawl Source Pack
+# Gopalan Pre-University College, Yelahanka (North Campus): Chatbot Source Pack
 
-**Crawl date:** 14 October 2026  
-**Primary scope:** https://www.gopalancolleges.com/gpuc/  
-**Chatbot target:** English-first, college-only assistant for parents and prospective/current students.
+Crawl date: 28 October 2026
+Scope: https://gopalanpucnorth.com/ only. This pack is for the North Campus (Yelahanka) chatbot. It must not contain or be mixed with facts about any other Gopalan campus or institution.
 
 ## Contents
-- `full_site_content_snapshot.md` — page-by-page accessible content notes and link/control observations.
-- `college_knowledge_base.md` — normalized topic-based knowledge base.
-- `faculty_directory.csv` — faculty and non-teaching staff as listed on the accessible Faculty page.
-- `event_archive.csv` — all event cards linked from the Events page and the linked detail-page URLs.
-- `source_registry.csv` — source URLs and status/review notes.
-- `web_link_and_control_audit.csv` — navigation, CTA, form, iframe, payment, brochure and event-link audit.
-- `faq_seed.json` — initial FAQ intents, grounded draft answers, source URLs and release status.
-- `chatbot_guardrails.md` — chatbot scope, grounding, action and privacy rules.
-- `data_gaps_and_verification.md` — facts that must be confirmed by college staff.
-- `legacy_application_form_extract.md` — search-indexed content from an older PDF; not authoritative for current admissions.
+- `college_knowledge_base.md`: topic-based knowledge base (institution, contacts, courses, facilities, transport, hostel, admissions, fees policy, leadership, events, vision and mission, campus visits). Parsed by the app on `## ` headings.
+- `courses_and_curriculum.md`: detailed Science and Commerce course content, integrated coaching, languages and career paths. Parsed on `## ` headings.
+- `rules_and_regulations.md`: rules published on the North website. Parsed on `## ` headings.
+- `faq_seed.json`: approved FAQ answers looked up by id (campus "Yelahanka").
+- `faculty_directory.csv`: leadership, faculty and administrative staff from the Our Faculties and About pages.
+- `event_archive.csv`: events published on the North website.
+- `source_registry.csv`: every North page crawled, with fetch status and notes.
+- `full_site_content_snapshot.md`: page-by-page notes of the North website.
+- `chatbot_guardrails.md`: scope, grounding and campus-boundary rules for the bot.
+- `data_gaps_and_verification.md`: open gaps and inconsistencies on the North website that staff should resolve.
 
-## Method and limitations
-The site was reviewed page-by-page using the accessible rendered/indexed text, by opening page sections and following the event-card links, the contact map iframe, the image links sampled on the faculty/facilities pages, and the visible CTA destinations. Search was also used to locate the indexed legacy application-form PDF. The accessible page reader exposes rendered content rather than the original HTML/JavaScript source. Some dynamic form dropdown options and hidden destinations were not exposed. Public forms were not submitted; no contact details were entered; no payments were attempted.
+## Method
+Pages were discovered from the site navigation, /sitemap.xml, /sitemap_index.xml and /page-sitemap.xml, downloaded as HTML and converted to text. Banner images on the home page were viewed to read their text. Forms were not submitted. Only facts present on the North website were used; where the site gives no information (fees, office hours, transport routes, hostel, document checklist), the files say so and direct users to the North help desk.
 
-This is a detailed crawl snapshot, not a guarantee that every hidden DOM element, script-generated URL, blocked external page, or site asset has been captured. Links whose destinations were inaccessible are explicitly marked. The live website may change after the crawl.
-
-## Release warning
-This pack is a draft source-of-truth for implementation, not an official institution-approved publication. The website has data-quality issues: generic Commerce College footer copy on GPUC pages, duplicate admission-banner text, differing phone numbers/emails, a football-facility caption that appears unrelated, and a legacy form that differs from current course information. Entries flagged `VERIFY` or `HOLD` must not be used as definitive answers until approved by an authorized college owner.
-
-Do not use this pack as the live store for leads or appointments. Those require a secure database and working integrations.
+## Format notes for editors
+- In the three `.md` knowledge files, any section whose body contains the word "verify" or "hold" (any case) is treated by the app as unconfirmed. Use VERIFY only for facts that genuinely need staff confirmation.
+- `faculty_directory.csv` header: Name,Designation,Department,Qualification,Experience,Campus. Quote fields that contain commas.
+- `event_archive.csv` header: Event_Name,Category,Campus,Status.

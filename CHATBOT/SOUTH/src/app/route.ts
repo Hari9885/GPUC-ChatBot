@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const filePath = path.join(process.cwd(), 'public', 'gpuc-north.html');
+  const filePath = path.join(process.cwd(), 'public', 'gpuc-south.html');
   const html = fs.readFileSync(filePath, 'utf-8');
   return new NextResponse(html, {
     status: 200,

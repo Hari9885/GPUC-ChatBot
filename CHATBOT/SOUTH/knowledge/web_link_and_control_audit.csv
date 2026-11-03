@@ -28,26 +28,24 @@ admission.html,Internal Navigation,about-us.html,Active,Verified GPUC Whitefield
 gallery.html,Internal Navigation,about-us.html,Active,Verified GPUC Whitefield asset/channel
 events.html,Internal Navigation,about-us.html,Active,Verified GPUC Whitefield asset/channel
 contact-us.html,Internal Navigation,about-us.html,Active,Verified GPUC Whitefield asset/channel
-tel:919606941907,Telephone Dial Link,about-us.html,Active,Verified GPUC Whitefield asset/channel
-travel-package-01.html,Internal Navigation,about-us.html,Active,Verified GPUC Whitefield asset/channel
+tel:919606941907,Telephone Dial Link,about-us.html,Active,Header phone link (missing + prefix); number +91 96069 41907
+travel-package-01.html,Internal Navigation,about-us.html,Redirect (HTTP 302),Redirects to https://www.gopalancolleges.com/ group home page; no GPUC content
 https://www.youtube.com/watch?v=u31qwQUeGuM,Social Media Channel,about-us.html,Active,Verified GPUC Whitefield asset/channel
 https://www.youtube.com/watch?v=MLpWrANjFbI,Social Media Channel,about-us.html,Active,Verified GPUC Whitefield asset/channel
-https://www.tripadvisor.com/,External Group Link,about-us.html,Active,Verified GPUC Whitefield asset/channel
-http://trustpilot.com/,External Group Link,about-us.html,Active,Verified GPUC Whitefield asset/channel
+https://www.tripadvisor.com/,External Group Link,about-us.html,Active,Template residue link; not a GPUC channel
+http://trustpilot.com/,External Group Link,about-us.html,Active,Template residue link; not a GPUC channel
 https://www.facebook.com/Gopalanstudents.pucollege/,Social Media Channel,about-us.html,Active,Verified GPUC Whitefield asset/channel
 https://www.youtube.com/channel/UCk5YG1IQatFo5zNj6z4fyQw,Social Media Channel,about-us.html,Active,Verified GPUC Whitefield asset/channel
 https://www.instagram.com/gopalan.gpuc?igsh=NjUzaHd0Z3ppeDBw,Social Media Channel,about-us.html,Active,Verified GPUC Whitefield asset/channel
-campus-life.html,Internal Navigation,about-us.html,Active,Verified GPUC Whitefield asset/channel
-placement.html,Internal Navigation,about-us.html,Active,Verified GPUC Whitefield asset/channel
-testimonial.html,Internal Navigation,about-us.html,Active,Verified GPUC Whitefield asset/channel
+campus-life.html,Internal Navigation,about-us.html,Redirect (HTTP 302),Redirects to https://www.gopalancolleges.com/ group home page; no GPUC content
+placement.html,Internal Navigation,about-us.html,Redirect (HTTP 302),Redirects to https://www.gopalancolleges.com/ group home page; no GPUC content
+testimonial.html,Internal Navigation,about-us.html,Redirect (HTTP 302),Redirects to https://www.gopalancolleges.com/ group home page; no GPUC content
 https://www.gopalancolleges.com/gpuc/,External Group Link,about-us.html,Active,Verified GPUC Whitefield asset/channel
-https://gopalanpucnorth.com/,External Group Link,about-us.html,Active,Verified GPUC Whitefield asset/channel
 https://www.gopalancolleges.com/gsap/,External Group Link,about-us.html,Active,Verified GPUC Whitefield asset/channel
 https://www.gopalancolleges.com/gcem/,External Group Link,about-us.html,Active,Verified GPUC Whitefield asset/channel
 https://www.gopalanskillacademy.in/,External Group Link,about-us.html,Active,Verified GPUC Whitefield asset/channel
 https://www.gopalanschool.com/international/,External Group Link,about-us.html,Active,Verified GPUC Whitefield asset/channel
 https://www.gopalanschool.com/national/,External Group Link,about-us.html,Active,Verified GPUC Whitefield asset/channel
-https://gopalannationalschoolnorth.com/,External Group Link,about-us.html,Active,Verified GPUC Whitefield asset/channel
 https://gopalanschool.com/gns-south/,External Group Link,about-us.html,Active,Verified GPUC Whitefield asset/channel
 https://gopalanschool.com/twinklers/,External Group Link,about-us.html,Active,Verified GPUC Whitefield asset/channel
 https://wa.me/918105131098,WhatsApp Direct Link,about-us.html,Active,Verified GPUC Whitefield asset/channel
@@ -65,7 +63,7 @@ https://www.facebook.com/share/1Epiiymyv1/,Social Media Channel,campus-life.html
 https://www.instagram.com/gopalan_group_of_institution?igsi=Z243aXpmMTY2cTY4,Social Media Channel,campus-life.html,Active,Verified GPUC Whitefield asset/channel
 https://www.linkedin.com/company/gopalan-group-of-institutions/?viewAsMember=true,External Group Link,campus-life.html,Active,Verified GPUC Whitefield asset/channel
 https://www.gopalancolleges.com/gcc/,External Group Link,campus-life.html,Active,Shared Gopalan Commerce domain link
-travel-package-details.html,Internal Navigation,commerce-courses.html,Active,Verified GPUC Whitefield asset/channel
+travel-package-details.html,Internal Navigation,commerce-courses.html,Redirect (HTTP 302),Redirects to https://www.gopalancolleges.com/ group home page; no GPUC content
 assets/css/nice-select.css,Asset / Resource,contact-us.html,Active,Verified GPUC Whitefield asset/channel
 tel:+919606941908,Telephone Dial Link,contact-us.html,Active,Verified GPUC Whitefield asset/channel
 tel:+916362166945,Telephone Dial Link,contact-us.html,Active,Verified GPUC Whitefield asset/channel
@@ -105,5 +103,5 @@ assets/img/gallery/013.jpg,Asset / Resource,gallery.html,Active,Verified GPUC Wh
 assets/img/gallery/014.jpg,Asset / Resource,gallery.html,Active,Verified GPUC Whitefield asset/channel
 assets/img/gallery/015.jpg,Asset / Resource,gallery.html,Active,Verified GPUC Whitefield asset/channel
 assets/css/accordion.css,Asset / Resource,index.html,Active,Verified GPUC Whitefield asset/channel
-contact.html,Internal Navigation,index.html,Active,Verified GPUC Whitefield asset/channel
-https://trustpilot.com/,External Group Link,index.html,Active,Verified GPUC Whitefield asset/channel
+contact.html,Internal Navigation,index.html,Redirect (HTTP 302),Redirects to https://www.gopalancolleges.com/ group home page; no GPUC content
+https://trustpilot.com/,External Group Link,index.html,Active,Template residue link; not a GPUC channel

@@ -20,88 +20,52 @@ The **GPUC AI Assistant** provides parents and prospective students with real-ti
 
 ---
 
-## 🏛️ Official Academic Offerings
+## 🗂️ Repository Layout
 
-### Science Stream
-- **PCMB**: Physics, Chemistry, Mathematics, Biology
-- **PCMC**: Physics, Chemistry, Mathematics, Computer Science
-- **Integrated Coaching**:
-  - NEET Coaching (for PCMB students)
-  - JEE & KCET Coaching (for PCMB & PCMC students)
+North and South are separate colleges, so each has its own self-contained chatbot app. Each app knows only its own campus.
 
-### Commerce Stream
-- **CEBA**: Computer Science, Economics, Business Studies, Accountancy
-- **SEBA**: Statistics, Economics, Business Studies, Accountancy
-- **MEBA**: Mathematics, Economics, Business Studies, Accountancy
-- **Professional Preparation**: Integrated CA Foundation coaching
+```
+CHATBOT/
+  SOUTH/        Whitefield campus chatbot (port 3000), source site: https://www.gopalancolleges.com/gpuc/
+  NORTH/        Yelahanka campus chatbot (port 3002), source site: https://gopalanpucnorth.com/
+GPUC-SOUTH/     South website copy (loads the widget from localhost:3000)
+GPUC-NORTH/     North WordPress site (mu-plugin loads the widget from localhost:3002)
+```
 
-### Languages
-- **Mandatory I Language**: English
-- **Elective II Language**: Kannada, Hindi, Sanskrit, or French
+Inside each app:
+- `src/`, `public/`, `package.json`: the Next.js app (chat widget, Claude bot, API routes)
+- `knowledge/`: campus knowledge the bot reads (`college_knowledge_base.md`, `courses_and_curriculum.md`, `rules_and_regulations.md`, `faq_seed.json`, `faculty_directory.csv`, `event_archive.csv`), crawled from that campus's website only
+- `data/db.json`: leads (`inquiries`), `appointments`, `slots`, `feedback` and `messages` for that campus; `data/leads_chat_analysis.json` holds the questions each lead asked
 
----
-
-## 📞 Admissions & Contact Details
-
-- **Campus Address**: 181/1, 182/1, Behind SAP Labs, Seetharam Palya, Basavanagar, Hoodi, Bengaluru – 560048
-- **Admissions Help Desk**: `+91 96069 41908`
-- **Help Desk Working Hours**: Monday to Friday, 8:30 AM to 5:00 PM
-- **Campus Visiting Hours**: Monday to Saturday, 9:00 AM to 4:00 PM
-- **Official Email**: `admin@gopalanpucollege.com`
-
----
-
-## 🗄️ Database & Knowledge Base Architecture
-
-### 1. School Data & Sources (`Gopalan_PU_Chatbot_Sources 2/`)
-- `college_knowledge_base.md`: Grounded factual information about GPUC vision, streams, eligibility, and facilities.
-- `faq_seed.json`: Approved institutional FAQs with verified responses.
-- `faculty_directory.csv`: Directory of faculty members, departments, qualifications, and experience.
-- `event_archive.csv`: Archive of college events, ceremonies, and co-curricular activities.
-- `chatbot_guardrails.md`: Institutional policy and truth hierarchy guardrails.
-
-### 2. CRM Database (`data/db.json`)
-- **`inquiries`**: Lead records including student name, parent contact, class preference, and interaction notes.
-- **`appointments`**: Confirmed campus visit and consultation bookings.
-- **`slots`**: Real-time availability for admission and academic consultation slots.
-- **`feedback`**: User feedback ratings and comments.
-- **`messages`**: Log of dispatched SMS/WhatsApp and email notifications.
+Code is duplicated on purpose: a fix or feature must be applied to both apps.
 
 ---
 
 ## 🚀 Getting Started
 
-### Prerequisites
-- Node.js 18+
-- npm or yarn
+Prerequisites: Node.js 18+.
 
-### Installation
 ```bash
 git clone https://github.com/Hari9885/GPUC-ChatBot.git
-cd GPUC-ChatBot
+cd GPUC-ChatBot/CHATBOT/SOUTH   # or CHATBOT/NORTH
 npm install
 ```
 
-### Environment Setup
-Create a `.env.local` file in the root directory:
+Create `.env.local` in the app folder (see `.env.example`):
 ```env
-GEMINI_API_KEY=your_gemini_api_key_here
-NEXT_PUBLIC_COLLEGE_NAME="Gopalan Pre-University College"
-NEXT_PUBLIC_COLLEGE_CODE="GPUC"
-NEXT_PUBLIC_CAMPUS_LOCATION="Hoodi, Whitefield, Bengaluru"
+ANTHROPIC_API_KEY=your_anthropic_api_key_here
 ```
 
-### Run Locally
 ```bash
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) to view the college portal and chat widget.
+South opens at [http://localhost:3000](http://localhost:3000), North at [http://localhost:3002](http://localhost:3002).
 
 ---
 
 ## 🛠️ Tech Stack
-- **Framework**: Next.js 14 (App Router)
+- **Framework**: Next.js 15 (App Router)
 - **Language**: TypeScript
 - **Styling**: Vanilla CSS (High-contrast, responsive, glassmorphic design)
-- **AI / LLM**: Google Gemini API (`gemini-flash-lite-latest`, `gemini-3.5-flash-lite`, `gemini-3.8-flash`) with Hybrid RAG & Tool Calling
+- **AI / LLM**: Anthropic Claude API (`claude-haiku-5-5`) with Hybrid RAG & Tool Calling
 - **Icons**: Lucide React

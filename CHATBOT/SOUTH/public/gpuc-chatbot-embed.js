@@ -1,6 +1,6 @@
 /**
  * Gopalan Pre-University College (GPUC) - Embeddable AI Admissions Chatbot
- * Bottom-Right Floating Widget for GPUC North & WordPress websites
+ * Bottom-Right Floating Widget for GPUC South websites
  */
 (function () {
   'use strict';
@@ -20,7 +20,7 @@
     return null;
   })();
 
-  let baseUrl = window.GPUC_CHATBOT_URL || 'http://localhost:3000';
+  let baseUrl = window.GPUC_CHATBOT_URL || 'https://chat.gopalancolleges.com';
   if (scriptTag && scriptTag.src) {
     try {
       const url = new URL(scriptTag.src);
@@ -315,7 +315,7 @@
   tooltipEl.id = 'gpuc-widget-tooltip';
   tooltipEl.innerHTML = `
     <span style="width:8px;height:8px;border-radius:50%;background:#22C55E;display:inline-block;"></span>
-    <span>GPUC North Campus &bull; Admissions 2026–27</span>
+    <span>GPUC South (Whitefield) &bull; Admissions 2027–28</span>
   `;
   document.body.appendChild(tooltipEl);
 
@@ -343,7 +343,7 @@
   const iframeEl = document.createElement('iframe');
   iframeEl.id = 'gpuc-widget-iframe';
   iframeEl.src = baseUrl + '/embed';
-  iframeEl.title = 'Gopalan Pre-University College North Campus AI Admissions Assistant';
+  iframeEl.title = 'Gopalan Pre-University College AI Admissions Assistant';
   iframeEl.allow = 'clipboard-write; autoplay; microphone';
 
   iframeWrapper.appendChild(iframeEl);

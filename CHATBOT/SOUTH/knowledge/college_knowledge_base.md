@@ -1,155 +1,167 @@
-# Gopalan PU College — South / Whitefield Campus Knowledge Base
+# Gopalan Pre-University College, Whitefield (Hoodi) Campus — Knowledge Base
 
-**Institution:** Gopalan Pre-University College (GPUC), Whitefield (Hoodi) Campus, Bengaluru.  
-**Affiliation:** Recognized by the Department of Pre-University Education, Government of Karnataka.  
-**Parent Group:** Gopalan Group of Institutions (Gopalan Foundation).  
-**Official Portal:** https://www.gopalancolleges.com/gpuc/  
-**Campus Location:** Whitefield / Hoodi, Bengaluru East.
+Source: official South campus website https://www.gopalancolleges.com/gpuc/ (crawled 28 October 2026). Only facts published on that website are included.
 
----
+## Institution Overview
+- **Name:** Gopalan Pre-University College (Gopalan PU College), Whitefield, Bangalore.
+- **Group:** Part of the Gopalan Group of Institutions.
+- **Address (Contact Us page):** 181/1, 182/1, Behind SAP Labs, Seetharam Palya, Basavanagar, Hoodi, Bangalore - 560 048.
+- **Address (website footer):** 181/1, 182/1, Hoodi Village, Sonnenahalli, K.R. Puram, Bangalore - 560 048.
+- **Landmark:** Behind SAP Labs.
+- **Website:** https://www.gopalancolleges.com/gpuc/
+- **Track record:** The home page states "20+ Years of Academic Excellence".
+- **Admissions:** The website announces "Admissions Open for the Academic Year 2027-2028".
+- **Director:** Mrs. Sunita Prabhakar, Director, Gopalan Foundation.
+- **Principal:** Dr. Kanchana A S.
+- **Streams:** Science (PCMB, PCMC) and Commerce (CEBA, SEBA, MEBA, plus CA Foundation coaching).
+- The college describes itself as committed to a dynamic and progressive learning environment that prepares students for academic excellence and responsible citizenship, valuing knowledge, discipline, and character.
 
-## 1. Campus Identity & Location
-- **Full Address:** 181/1, 182/1, Behind SAP Labs, Seetharam Palya, Basavanagar, Hoodi Village, Sonnenahalli, K.R. Puram, Whitefield, Bengaluru, Karnataka - 560048.
-- **Landmark:** Behind SAP Labs / Near Hoodi Junction & ITPL corridor.
-- **Geographical Focus:** Bengaluru East / Whitefield / K.R. Puram / Mahadevapura / Marathahalli / Brookefield.
-- **Key Distinctions from North Campus (Yelahanka):**
-  - **Campus:** South / Whitefield is situated in the primary tech hub of Hoodi/Whitefield.
-  - **Principal:** Dr. Kanchana A S.
-  - **Academic Head:** Mr. Mahesh (Chemistry, MSc, MPhil, BEd, 21+ Years Experience).
-  - **Science Coordinator:** Mr. Krishna Murthy Goud (Chemistry, MSc, SET, 14+ Years Experience).
-  - **Commerce Offerings:** CEBA, SEBA, and MEBA (plus CA Foundation coaching).
-  - **Languages:** English (Mandatory I Language) + Kannada, Hindi, Sanskrit, or French (II Language).
-  - **Value-Added Programs:** NATA Coaching, Data Analytics with Advanced Excel, Tally, Introduction to Data Science, Coursera Global Certifications.
-  - **Sports Infrastructure:** Full dedicated Football ground, dedicated Cricket ground, Lawn Tennis courts, Badminton courts, indoor Table Tennis arena.
+## Admissions and Contact Help Desk
+- **College campus contact:** +91 96069 41908
+- **For admissions:** +91 96069 41908 and landline (080) 41280227
+- **Website header / call button number:** +91 96069 41907
+- **WhatsApp:** +91 81051 31098 (https://wa.me/918105131098)
+- **Admissions email:** admission_gpuc@gopalanpucollege.com
+- **SPOC (single point of contact):** Mr. Aravind, +91 63621 66945, admin@gopalanpucollege.com
+- **Careers / job applications:** careers@gopalancolleges.com
+- **Address:** 181/1, 182/1, Behind SAP Labs, Seetharam Palya, Basavanagar, Hoodi, Bangalore - 560 048.
+- **Office hours:** The website does not publish office or visiting hours. Please call +91 96069 41908 before visiting.
+- **Online enquiry:** The website has an "Admissions Open 2027-28" enquiry form (student's name, email, phone, gender and course: PCMB, PCMC, CEBA, SEBA or MEBA) and a "Get in Touch" form on the Contact Us page.
+- **Social media:** Facebook (facebook.com/Gopalanstudents.pucollege), Instagram (@gopalan.gpuc), YouTube channel linked from the website.
 
----
+## Courses Offered
+**Science stream**
+- PCMB – Physics, Chemistry, Mathematics, Biology
+- PCMC – Physics, Chemistry, Mathematics, Computer Science
 
-## 2. Leadership & Administration
-- **Director (Gopalan Foundation):** Mrs. Sunita Prabhakar
-  - Message: *"With over four decades of experience in real estate and more than two decades in education, we firmly believe that strong foundations shape meaningful futures... Education today must inspire critical thinking, creativity, and a deep sense of responsibility towards society."*
-- **Principal:** Dr. Kanchana A S
-  - Message: *"At Gopalan PU College, we believe that true education goes beyond academic achievement. It is about nurturing young minds with knowledge, values, confidence, and a sense of responsibility... Through dedicated faculty, innovative teaching practices, individual guidance, and a strong focus on discipline and character, we strive to prepare our students for higher education."*
-- **Academic Head:** Mr. Mahesh (MSc, MPhil, BEd - 21 Years Experience)
-- **Science Coordinator:** Mr. Krishna Murthy Goud (MSc, SET - 14 Years Experience)
-- **Administration SPOC:** Mr. Aravind (Phone: +91 63621 66945 / Email: admin@gopalanpucollege.com)
+**Integrated coaching (Science)**, designed to complement the PU curriculum:
+- NEET coaching (for PCMB students)
+- JEE coaching (for PCMB and PCMC students)
+- KCET coaching (for PCMB and PCMC students)
+- Structured study material for JEE, NEET and KCET, crash courses and weekly mock tests.
 
----
+**Commerce stream**
+- CEBA – Computer Science, Economics, Business Studies, Accountancy
+- SEBA – Statistics, Economics, Business Studies, Accountancy
+- MEBA – Mathematics, Economics, Business Studies, Accountancy
+- CA Foundation – structured preparation in accounting, economics and business laws for aspiring Chartered Accountants.
 
-## 3. Official Contact & Admissions Help Desk
-- **Admissions Helpline:**
-  - Phone: `+91 96069 41908` / `+91 96069 41907`
-  - Landline: `(080) 41280227`
-  - WhatsApp: `+91 8105131098`
-- **Administrative Desk / SPOC:**
-  - Phone: `+91 63621 66945` (Mr. Aravind)
-  - Email: `admin@gopalanpucollege.com`
-- **Admissions Email:** `admission_gpuc@gopalanpucollege.com`
-- **College Office / Visiting Hours:** Monday to Saturday, 8:30 AM to 5:00 PM.
+**Languages (both streams)**
+- I Language: English (mandatory)
+- II Language: Kannada / Hindi / Sanskrit / French
 
----
+**Value-added courses**
+- NATA Coaching (National Aptitude Test in Architecture)
+- Data Analytics with Advanced Excel
+- Tally
+- Introduction to Data Science
+- Coursera online certification courses ("Learn from 350+ top universities and companies")
 
-## 4. Academic Programs & Subject Combinations
+## Facilities
+Listed on the Facilities page:
+- **Football Ground**
+- **Cricket Ground** – a dedicated ground to train, practise and compete.
+- **Cafeteria** – hygienic and welcoming, with nutritious meals.
+- **Table Tennis** – indoor facility.
+- **Lawn Tennis** – dedicated courts.
+- **Badminton** – well-maintained courts.
+- **Science Labs** – modern laboratories for hands-on experimentation.
+- **Library** – well-stocked, with a quiet study environment.
+- **Gymnastics** – facilities for fitness, flexibility and athletic development.
+- **Hostel** – residential facility exclusively for girls.
+- **Amphitheatre** – for academic events, cultural programmes and student performances.
+- **Transport** – GPS-enabled transport services.
 
-### A. Science Stream
-Designed for students aiming for Engineering, Medicine, Pure Sciences, and Technology careers. Combines rigorous Karnataka PU Board curriculum with integrated national competitive entrance training.
+Also highlighted on the Why Choose Us page: spacious, well-ventilated and digital classrooms; high-tech laboratories and well-equipped library; indoor and outdoor sports arena; 24/7 CCTV surveillance across campus.
 
-1. **PCMB:** Physics, Chemistry, Mathematics, Biology
-2. **PCMC:** Physics, Chemistry, Mathematics, Computer Science
+## Transport
+- The college provides GPS-enabled transport services for convenient and secure travel for students across key city routes.
+- Students who need the bus submit a Transportation Application at the time of admission.
+- The website does not list specific routes, stops, timings or transport fees. For route details, contact the admissions desk at +91 96069 41908.
 
-#### Integrated Competitive Entrance Coaching:
-- **NEET Coaching:** Structured for PCMB students targeting medical admissions.
-- **JEE (Main & Advanced) Coaching:** Tailored for PCMB & PCMC students pursuing engineering admissions (IITs/NITs/premier institutions).
-- **KCET Coaching:** Intensive preparation for Karnataka Common Entrance Test engineering/pharmacy/veterinary ranks.
-- **Pedagogy:** Structured daily study material, regular doubt-clearing sessions, crash courses, and weekly mock exams.
+## Hostel
+- A safe and well-supervised residential facility exclusively for girls, providing a supportive environment for academic focus and well-being.
+- The website does not publish hostel fees or capacity. For hostel details, contact +91 96069 41908 or admission_gpuc@gopalanpucollege.com.
 
----
+## Admission Eligibility
+Applicants must have passed the Karnataka SSLC Examination or any equivalent examination recognised by the Department of Pre-University Education, Karnataka, and must meet all prescribed eligibility criteria.
 
-### B. Commerce Stream
-Equips students with solid foundations in business dynamics, economic policies, financial accounting, and analytics.
+## Admission Documents
+Documents to be submitted at the time of admission (two sets of photocopies):
+1. 10th Std Original TC
+2. Attested photocopy of 10th Std / SSLC / ICSE / CBSE Marks Card
+3. Photocopy of Hall Ticket (10th Std)
+4. Photocopy of Caste & Income Certificate
+5. Original Eligibility Certificate, if applicable (students from outside Karnataka / NRI)
+6. Original Migration Certificate, if applicable (CBSE / ICSE / other state boards / NRI)
+7. Photocopy of Study Certificate
+8. Photocopy of Aadhaar Card (student and parents)
+9. 5 recent passport-size photographs (white background)
+10. PU Board Application Form
+11. Enrollment Form
+12. Transportation Application, if required
+13. Medical Certificate, if applicable
 
-1. **CEBA:** Computer Science, Economics, Business Studies, Accountancy
-2. **SEBA:** Statistics, Economics, Business Studies, Accountancy
-3. **MEBA:** Mathematics, Economics, Business Studies, Accountancy
-4. **CA Foundation Coaching:** Structured preparatory program covering core principles of Accounting, Mercantile Laws, Business Mathematics, and Business Economics for aspiring Chartered Accountants.
+Note: All photocopies must be produced at the time of admission, and original documents must be furnished if demanded by the institution for office purposes. As per PU norms, failure to submit any of the required documents will result in cancellation of admission.
 
----
+## Admission Process
+1. Submit the "Admissions Open 2027-28" enquiry form on the website, or call the admissions desk at +91 96069 41908 / (080) 41280227.
+2. Choose the stream and combination (PCMB, PCMC, CEBA, SEBA or MEBA) and the second language.
+3. Submit the required documents (two sets of photocopies) at the time of admission.
+The website does not publish admission dates, entrance tests or seat counts; contact the admissions desk for these.
 
-### C. Languages Offered
-- **Part I (Mandatory):** English
-- **Part II (Choice):**
-  - Kannada
-  - Hindi
-  - Sanskrit
-  - French
+## Fees and Scholarships
+- The website does not publish fee amounts for any course, coaching programme, transport or hostel.
+- The Why Choose Us page mentions merit-based scholarships; criteria are not published.
+- For fee details and scholarships, contact the admissions desk: +91 96069 41908 / (080) 41280227, admission_gpuc@gopalanpucollege.com.
+- The website footer has a "Fee Payment" link to an online fee portal (https://gcc.pupilpod.net/home.php).
 
----
+## Leadership
+- **Director:** Mrs. Sunita Prabhakar, Director, Gopalan Foundation. Her message: "A building, they say, is only as strong as its foundation. With over four decades of experience in real estate and more than two decades in education, we firmly believe that strong foundations shape meaningful futures." She stresses values, sound learning, modern technology, critical thinking, creativity and responsibility towards society.
+- **Principal:** Dr. Kanchana A S. Her message: "At Gopalan PU College, we believe that true education goes beyond academic achievement. It is about nurturing young minds with knowledge, values, confidence, and a sense of responsibility." She highlights dedicated faculty, innovative teaching, individual guidance, and a strong focus on discipline and character.
+- **Academic Head:** Mr. Mahesh (Chemistry; MSc, MPhil, BEd; 21 years of experience).
+- **Science Coordinator:** Mr. Krishna Murthy Goud (Chemistry; MSc, SET; 14 years).
+- **Commerce Co-ordinator:** Ms. Lekha K S (Business Studies; M.Com, B.Ed; 8 years).
+- **Event Coordinator:** Ms. Praneetha K (English; M.A, Ph.D pursuing; 7 years).
 
-### D. Value-Added Courses
-Skill-enhancement certifications taught alongside standard PU academics:
-1. **NATA Coaching:** Comprehensive preparation for the National Aptitude Test in Architecture (drawing, spatial reasoning, architectural design aptitude).
-2. **Data Analytics with Advanced Excel:** Practical spreadsheet mastery, data modeling, automated reporting, and pivot analytics.
-3. **Tally Accounting:** Hands-on training in financial bookkeeping, GST compliance, and corporate accounting fundamentals.
-4. **Introduction to Data Science:** Foundational exposure to data concepts, programming logic, and quantitative thinking.
-5. **Coursera Global Certifications:** Guided access to world-class online courses and verified credentials from leading international universities.
+## Faculty Summary
+- The Faculty page lists 38 people: Principal, Academic Head, 17 in the Department of Science, 6 in the Department of Commerce, 8 in the Language Department and 5 non-teaching staff.
+- **Science:** Physics (Mr. K V Thomas, Ms. Veena A N, Ms. Priyanka V Priyesh), Chemistry (Mr. Krishna Murthy Goud, Ms. Vishnu Vandana Madala, Mr. Maddela Karthik, Ms. Shruti Suresh Gowda), Mathematics (Mr. Yashantha Kumar T S, Ms. Shreyanka M K, Mr. Rajeevan V, Ms. D Sujatha), Biology (Ms. Felcida Shalini A, Ms. Bharathi Shivakumar, Mr. S. Chiranjeevi, Lab Instructor Ms. Keerthana G), Computer Science (Mr. Imran Ahmed, Mr. Konduru Satish Kumar Raju).
+- **Commerce:** Ms. Lekha K S (Business Studies), Ms. M. Nachiar Thanga Lakshmi (Statistics), Ms. Jeevitha N (Economics), Mr. Mohammed Munawar (Commerce), Mr. Yashwantha Kumar V and Ms. Shilpa Mohanty (Accountancy).
+- **Languages:** English (Ms. Praneetha K, Mr. V. P. Ashok, Ms. Shweta), Kannada (Mr. Ravi S M, Mr. Gangappa. C), Hindi (Ms. G Jyotsana, Ms. Nisha Kumar), Sanskrit (Ms. Manasa M Prabhu).
+- **Non-teaching:** Mr. Aravind J (Admin Executive), Mr. Adharsha G S (Librarian), Ms. Pavithra H S (Data Entry Operator), Ms. Haritha G M (Front Desk Executive), Mr. Manjunath (Facility Manager).
+- The Why Choose Us page describes the faculty as highly experienced and KTET/CTET-qualified.
 
----
+## Why Choose Gopalan PU College
+- Academic excellence with strong foundations; holistic growth and all-round development.
+- Integrated coaching for NEET, JEE and KCET aligned with the PU curriculum; structured study material, crash courses and weekly mock tests.
+- CA Foundation coaching; merit-based scholarships.
+- Individual attention and performance monitoring; regular Parent-Teacher Meetings (PTMs).
+- Technology-enhanced learning; digital classrooms; high-tech labs; well-equipped library.
+- GPS-enabled transport; indoor and outdoor sports arena; 24/7 CCTV surveillance.
+- Industrial visits, career counselling, personality development and soft-skill training, eminent guest lectures.
+- Value-added programmes: NATA coaching, Data Analytics, Tally, Data Science and Coursera certifications.
 
-## 5. Admission Eligibility & Required Documents
+## Events and Student Life
+Events published on the Events page: Investiture Ceremony 2026, Yoga Day 2026, Drug Awareness Program 2026, Freshers Day 2026, Felicitation & Orientation Ceremony 2026, Ice Breaking Session 2026, Environment Day 2026, Felicitation Ceremony, Field Trips, Orientation Program, Yoga Day, Environment Day, Drawing Competition, Anti Drug Day, Talents Day, Statistics Day, Saraswathi Puja, Mothers Day.
+Event pages are photo galleries; the website does not give event dates or descriptions. A photo Gallery page is also available.
 
-### Eligibility:
-- Must have passed the **Karnataka SSLC Examination** or any equivalent 10th Standard examination recognized by the Department of Pre-University Education, Karnataka (CBSE, ICSE, Other State Boards, or International / NRI boards).
+## Vision and Mission
+- **Vision:** To emerge as a centre of academic excellence that nurtures confident, competent, and value-driven individuals. Rooted in the legacy of the Gopalan Group of Institutions, the college is committed to fostering intellectual curiosity, ethical leadership, and lifelong learning through a balanced focus on academic rigour, personal growth, and character development, preparing students for higher education and future professional challenges.
+- **Mission:** To deliver a rigorous, future-focused education that integrates academic excellence with experiential learning. Through contemporary pedagogy, strong mentorship, and holistic development, the college nurtures intellectually curious, ethical, and self-reliant learners, equipping them with the knowledge, skills, and values required for higher education, lifelong success, and responsible global citizenship.
 
-### Document Submission Checklist (2 sets of self-attested photocopies + originals for verification):
-1. 10th Standard Original Transfer Certificate (TC)
-2. Attested copy of 10th Std / SSLC / CBSE / ICSE Marks Card
-3. Photocopy of 10th Standard Hall Ticket
-4. Photocopy of Study / Conduct Certificate
-5. Photocopy of Aadhaar Card (both Student and Parents)
-6. Photocopy of Caste & Income Certificate (if applicable for reservation/concessions)
-7. Original Eligibility Certificate (mandatory for students from outside Karnataka or NRI categories)
-8. Original Migration Certificate (for CBSE, ICSE, Other State Boards, and NRI students)
-9. 5 Recent Passport-Size Photographs (with formal white background)
-10. Duly filled PU Board Application Form & College Enrollment Form
-11. Transportation Application Form (if opting for college bus service)
-12. Medical Fitness Certificate (if applicable)
+## Rules Summary
+- Cell phones are strictly prohibited in all academic areas; a confiscated phone is returned only at the end of the course or after a fine of Rs. 1,000.
+- Students reporting late are recorded as ABSENT for the day; leaving during working hours needs written permission of the mentor/HOD and Principal.
+- Two-wheelers and four-wheelers are not permitted to PUC students.
+- ID cards must always be carried; students must be dressed neatly and decently.
+- Attendance at Independence Day, Republic Day and Annual Day functions is compulsory.
+Full rules: https://www.gopalancolleges.com/gpuc/rules-regulations.html
 
-*Note: All original certificates must be produced at the time of admission for institutional verification. Failure to furnish mandatory board documents results in cancellation of admission as per PU Department norms.*
+## Campus Visits
+- Parents and students are welcome to contact the college to arrange a campus visit.
+- The website does not publish visiting days or hours, so please call +91 96069 41908 or (080) 41280227 (or WhatsApp +91 81051 31098) to fix a time before coming.
+- Campus address: 181/1, 182/1, Behind SAP Labs, Seetharam Palya, Basavanagar, Hoodi, Bangalore - 560 048.
 
----
-
-## 6. Campus Infrastructure & Facilities
-- **Science Laboratories:** State-of-the-art, fully equipped practical labs for Physics, Chemistry, and Biology complying with PU Board and competitive test protocols.
-- **Computer Science Lab:** High-performance systems equipped with high-speed internet, coding IDEs, and digital resources.
-- **Digital Smart Classrooms:** Ergonomic, spacious, well-ventilated classrooms with smart interactive displays.
-- **Central Library:** Comprehensive repository of curriculum textbooks, competitive exam reference volumes (JEE/NEET/KCET/CA), academic journals, and a quiet self-study reading arena.
-- **Sports & Athletics Arena:**
-  - Dedicated **Football Ground**
-  - Dedicated **Cricket Ground**
-  - **Lawn Tennis Courts**
-  - **Badminton Courts**
-  - Indoor **Table Tennis** Arena
-- **Student Cafeteria:** Clean, hygienic dining facility serving healthy vegetarian meals, snacks, and beverages.
-- **Transportation:** Fleet of modern, GPS-enabled buses covering major routes across Bengaluru East (Whitefield, Hoodi, K.R. Puram, Marathahalli, Mahadevapura, CV Raman Nagar, Indiranagar, Kadugodi, Varthur).
-- **Safety & Security:** 24/7 CCTV surveillance, biometric/manned campus checkpoints, and strict anti-ragging protocols.
-
----
-
-## 7. Institutional Rules & Code of Conduct
-1. **Decorum & Respect:** Courteous and disciplined behavior expected towards faculty, staff, peers, and visitors at all times.
-2. **Strict Cell Phone Prohibition:** Cell phones are strictly forbidden in all academic areas. Unauthorized usage results in confiscation until the end of the academic year or return only upon payment of a **Rs. 1,000 fine**.
-3. **Attendance & Punctuality:** Strict adherence to PU Board minimum attendance rules. Late arrival is recorded as **ABSENT** for the day. Leaving campus during college hours without prior written consent from the Mentor/HOD and Principal is strictly prohibited.
-4. **Vehicles:** PUC students are strictly **NOT permitted** to bring two-wheelers or four-wheelers to campus.
-5. **Canteen Timings:** Canteen access is permitted only during designated short breaks and lunch hours.
-6. **Dress Code & ID Cards:** Neat, formal dress code is mandatory. College identity cards must be worn and displayed at all times.
-7. **National & College Celebrations:** Mandatory student attendance for Independence Day, Republic Day, and Annual Day celebrations.
-8. **Disciplinary Actions:** Progressive two-warning system for academic negligence before formal expulsion proceedings.
-9. **Sports Facilities:** Ground and sports arenas must be utilized strictly under the supervision of the Physical Education Instructor/faculty.
-
----
-
-## 8. Fee Policies & Scholarships
-- Official fee schedules vary by stream (Science with integrated coaching vs. Commerce with CA Foundation) and elective language.
-- Parents/guardians must consult the Admissions & Accounts Office directly for official fee structures, payment installment options, and merit-based scholarship evaluations:
-  - Phone: `+91 96069 41908` / `+91 96069 41907` / `(080) 41280227`
-  - Email: `admission_gpuc@gopalanpucollege.com`
-  - Campus Office: Monday to Saturday, 8:30 AM to 5:00 PM.
+## Careers at Gopalan
+The Careers page invites passionate educators, administrators and professionals to apply. Resumes can be mailed to careers@gopalancolleges.com.
