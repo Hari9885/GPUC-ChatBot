@@ -42,6 +42,17 @@ import {
   INCOMPREHENSIBLE_RESPONSE,
 } from '@/lib/textUtils';
 
+// I PU streams offered on this campus; the codes match the hub's programmes (lib/hub.ts reads them back).
+// Subjects and coaching from knowledge/courses_and_curriculum.md.
+const PU1_STREAMS = [
+  { code: 'PCMB', stream: 'Science', subjects: 'Physics, Chemistry, Mathematics, Biology', extra: 'NEET & KCET coaching' },
+  { code: 'PCMC', stream: 'Science', subjects: 'Physics, Chemistry, Mathematics, Computer Science', extra: 'JEE & KCET coaching' },
+  { code: 'CEBA', stream: 'Commerce', subjects: 'Computer Science, Economics, Business Studies, Accountancy', extra: 'CA Foundation coaching' },
+];
+const PU1_STREAM_NAMES = Array.from(new Set(PU1_STREAMS.map((s) => s.stream)));
+const PU1_CLASS = '11th Class (1st PU)';
+const pu1WithStream = (s: { code: string; stream: string }) => `${PU1_CLASS} · ${s.stream} ${s.code}`;
+
 const ADMISSION_TIME_OPTIONS = [
   '09:00 AM',
   '09:20 AM',
@@ -306,6 +317,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
   const [leadStep, setLeadStep] = useState<
     'idle' | 'ask_student_name' | 'ask_contact' | 'ask_admission' | 'completed'
   >('idle');
+  const [streamPick, setStreamPick] = useState<string | null>(null); // step 3 after 1st PU: null = off, '' = pick Science/Commerce, else pick that stream's combination
   const [pendingQuery, setPendingQuery] = useState('');
   const [pendingTopic, setPendingTopic] = useState('');
 
@@ -637,6 +649,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
   const handleCloseLead = () => {
     setHasSkippedLead(true);
     setLeadStep('idle');
+    setStreamPick(null);
     setStepError('');
     setStepStudentName('');
     setStepParentName('');
@@ -775,6 +788,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
   // Step 3: Choose Admission Class / Purpose and Submit to Server CRM
   const handleAdmissionSubmit = async (admClass: string, inqType: string) => {
     setStepError('');
+    setStreamPick(null);
     const chosenClass = admClass || '12th Class (2nd PU)';
     const chosenType = inqType || 'Admissions 2027-28';
 
@@ -800,7 +814,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
             body: JSON.stringify({
               id: activeInquiryIdRef.current,
               notes: `Admission choice: ${chosenClass} • ${chosenType}`,
-              admissionClass: chosenClass, // the class picked here replaces the placeholder saved at step 2
+              admissionClass: chosenClass,
             }),
           }).then((r) => r.json())
         : fetch('/api/inquiries', {
@@ -1409,11 +1423,30 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
       }
       let chosenClass = '11th Class (1st PU)';
       let chosenType = 'Admissions 2027-28';
+      const typedStream = PU1_STREAMS.find((s) => lower.includes(s.code.toLowerCase()));
+      const typedStreamName = PU1_STREAM_NAMES.find((n) => lower.includes(n.toLowerCase()));
 
-      if (lower.includes('12') || lower.includes('2nd')) {
+      if (typedStream) {
+        chosenClass = pu1WithStream(typedStream);
+      } else if (streamPick !== null && /not decided|not sure|undecided|later|don'?t know/.test(lower)) {
+        chosenClass = streamPick ? `${PU1_CLASS} · ${streamPick}` : PU1_CLASS;
+      } else if (streamPick !== null && typedStreamName) {
+        setInput('');
+        setStepError('');
+        setStreamPick(typedStreamName);
+        return;
+      } else if (streamPick !== null) {
+        const options = streamPick
+          ? PU1_STREAMS.filter((s) => s.stream === streamPick).map((s) => s.code)
+          : PU1_STREAM_NAMES;
+        setStepError(`Please choose ${options.join(', ')}, or "Not decided yet".`);
+        return;
+      } else if (lower.includes('12') || lower.includes('2nd')) {
         chosenClass = '12th Class (2nd PU)';
       } else if (lower.includes('11') || lower.includes('1st')) {
-        chosenClass = '11th Class (1st PU)';
+        setInput('');
+        setStreamPick(''); // the card switches to the stream buttons
+        return;
       } else if (lower.includes('visit') || lower.includes('campus') || lower.includes('tour')) {
         chosenClass = '11th/12th PU';
         chosenType = 'Campus Visit';
@@ -2817,9 +2850,119 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                           </div>
 
                           <div style={{ fontSize: isMobile ? '0.68rem' : '0.74rem', color: '#475569', marginBottom: isMobile ? '6px' : '8px' }}>
-                            Tap an option below to register:
+                            {streamPick === null
+                              ? 'Tap an option below to register:'
+                              : streamPick
+                                ? `11th Class (1st PU) · ${streamPick}: which combination?`
+                                : '11th Class (1st PU): Science or Commerce?'}
                           </div>
 
+                          {(streamPick !== null) ? (
+                          <div
+                            style={{
+                              display: 'grid',
+                              gridTemplateColumns: streamPick ? 'minmax(0, 1fr)' : 'repeat(2, minmax(0, 1fr))',
+                              gap: isMobile ? '5px' : '6px',
+                              width: '100%',
+                              boxSizing: 'border-box',
+                            }}
+                          >
+                            {!streamPick && PU1_STREAM_NAMES.map((name) => (
+                              <button
+                                key={name}
+                                type="button"
+                                disabled={isSubmittingLead}
+                                onClick={() => { setStreamPick(name); setStepError(''); }}
+                                style={{
+                                  padding: isMobile ? '7px 6px' : '10px 8px',
+                                  textAlign: 'center',
+                                  background: name === 'Science' ? '#EFF6FF' : '#FEF3C7',
+                                  border: `1.5px solid ${name === 'Science' ? '#3B82F6' : '#F59E0B'}`,
+                                  color: name === 'Science' ? '#1E40AF' : '#92400E',
+                                  fontWeight: 700,
+                                  fontSize: isMobile ? '0.74rem' : '0.78rem',
+                                  borderRadius: isMobile ? '7px' : '8px',
+                                  cursor: isSubmittingLead ? 'not-allowed' : 'pointer',
+                                  lineHeight: 1.2,
+                                  width: '100%',
+                                  boxSizing: 'border-box',
+                                }}
+                              >
+                                {name === 'Science' ? '🔬' : '📊'} {name}
+                                <div style={{ fontSize: isMobile ? '0.62rem' : '0.66rem', fontWeight: 500 }}>
+                                  {PU1_STREAMS.filter((s) => s.stream === name).map((s) => s.code).join(' · ')}
+                                </div>
+                              </button>
+                            ))}
+                            {streamPick && PU1_STREAMS.filter((s) => s.stream === streamPick).map((s) => (
+                              <button
+                                key={s.code}
+                                type="button"
+                                disabled={isSubmittingLead}
+                                onClick={() => handleAdmissionSubmit(pu1WithStream(s), 'Admissions 2027-28')}
+                                style={{
+                                  padding: isMobile ? '7px 8px' : '9px 10px',
+                                  textAlign: 'left',
+                                  background: s.stream === 'Science' ? '#EFF6FF' : '#FEF3C7',
+                                  border: `1.5px solid ${s.stream === 'Science' ? '#3B82F6' : '#F59E0B'}`,
+                                  color: s.stream === 'Science' ? '#1E40AF' : '#92400E',
+                                  fontWeight: 700,
+                                  fontSize: isMobile ? '0.74rem' : '0.78rem',
+                                  borderRadius: isMobile ? '7px' : '8px',
+                                  cursor: isSubmittingLead ? 'not-allowed' : 'pointer',
+                                  lineHeight: 1.25,
+                                  width: '100%',
+                                  boxSizing: 'border-box',
+                                }}
+                              >
+                                {s.code}
+                                <div style={{ fontSize: isMobile ? '0.64rem' : '0.7rem', fontWeight: 500, color: '#334155' }}>{s.subjects}</div>
+                                <div style={{ fontSize: isMobile ? '0.6rem' : '0.66rem', fontWeight: 600 }}>+ {s.extra}</div>
+                              </button>
+                            ))}
+                            <button
+                              type="button"
+                              disabled={isSubmittingLead}
+                              onClick={() => handleAdmissionSubmit(streamPick ? `${PU1_CLASS} · ${streamPick}` : PU1_CLASS, 'Admissions 2027-28')}
+                              style={{
+                                padding: isMobile ? '6px 5px' : '8px 6px',
+                                textAlign: 'center',
+                                background: '#F1F5F9',
+                                border: '1px solid #94A3B8',
+                                color: '#334155',
+                                fontWeight: 700,
+                                fontSize: isMobile ? '0.72rem' : '0.76rem',
+                                borderRadius: isMobile ? '7px' : '8px',
+                                cursor: isSubmittingLead ? 'not-allowed' : 'pointer',
+                                lineHeight: 1.2,
+                                width: '100%',
+                                boxSizing: 'border-box',
+                              }}
+                            >
+                              🤔 Not decided yet
+                            </button>
+                            <button
+                              type="button"
+                              disabled={isSubmittingLead}
+                              onClick={() => { setStreamPick(streamPick ? '' : null); setStepError(''); }}
+                              style={{
+                                padding: isMobile ? '6px 5px' : '8px 6px',
+                                textAlign: 'center',
+                                background: 'transparent',
+                                border: '1px dashed #94A3B8',
+                                color: '#475569',
+                                fontWeight: 600,
+                                fontSize: isMobile ? '0.72rem' : '0.76rem',
+                                borderRadius: isMobile ? '7px' : '8px',
+                                cursor: isSubmittingLead ? 'not-allowed' : 'pointer',
+                                width: '100%',
+                                boxSizing: 'border-box',
+                              }}
+                            >
+                              ← Back
+                            </button>
+                          </div>
+                          ) : (
                           <div
                             style={{
                               display: 'grid',
@@ -2832,7 +2975,7 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                             <button
                               type="button"
                               disabled={isSubmittingLead}
-                              onClick={() => handleAdmissionSubmit('11th Class (1st PU)', 'Admissions 2027-28')}
+                              onClick={() => setStreamPick('')}
                               style={{
                                 padding: isMobile ? '7px 6px' : '10px 8px',
                                 textAlign: 'center',
@@ -2940,6 +3083,14 @@ export default function ChatWidget({ initialEmbedded = false }: { initialEmbedde
                               📋 General Inquiry
                             </button>
                           </div>
+                          )}
+
+                          {(streamPick !== null) && stepError && (
+                            <div style={{ marginTop: '6px', padding: isMobile ? '4px 8px' : '6px 10px', borderRadius: '6px', background: '#FEF2F2', border: '1px solid #FCA5A5', color: '#B91C1C', fontSize: isMobile ? '0.70rem' : '0.76rem', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                              <AlertCircle size={12} />
+                              <span>{stepError}</span>
+                            </div>
+                          )}
 
                           {isSubmittingLead && (
                             <div style={{ marginTop: '6px', fontSize: isMobile ? '0.68rem' : '0.74rem', color: '#D97706', textAlign: 'center', fontWeight: 600 }}>

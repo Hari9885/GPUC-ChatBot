@@ -48,6 +48,13 @@ function splitName(fullName: string): { student: string; parent: string } {
   return m ? { student: m[1].trim(), parent: m[2].trim() } : { student: (fullName || '').trim(), parent: '' };
 }
 
+// The widget stores a chosen I PU stream inside the class, e.g. "11th Class (1st PU) · Science PCMB".
+// The code picks the matching hub programme; the hub creates a programme for a code it has not seen.
+function streamOf(courseInterest = ''): { stream_combination?: string; stream_type?: string } {
+  const m = courseInterest.match(/\b(Science|Commerce)\s+([A-Z]{4})\b/);
+  return m ? { stream_type: m[1], stream_combination: m[2] } : {};
+}
+
 export function hubEventFor(inquiry: Inquiry): Record<string, unknown> {
   const { student, parent } = splitName(inquiry.name);
   return {
@@ -65,6 +72,7 @@ export function hubEventFor(inquiry: Inquiry): Record<string, unknown> {
       updated_at: inquiry.updatedAt,
       city: inquiry.location,
       course_interest: inquiry.courseInterest,
+      ...streamOf(inquiry.courseInterest),
       intended_year: inquiry.intendedYear,
       inquiry_category: inquiry.category,
       consent: !!inquiry.consentGiven, // the wizard records consent when the parent submits details

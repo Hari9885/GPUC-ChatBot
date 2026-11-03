@@ -175,9 +175,8 @@ export async function PATCH(req: NextRequest) {
     }
 
     if (notes) inq.summary += ` | Note: ${notes}`;
-    // The class chosen after the contact step (1st or 2nd PU) replaces the placeholder saved with the contact details.
-    if (typeof admissionClass === 'string' && admissionClass.trim()) inq.courseInterest = admissionClass.trim().slice(0, 60);
     if (chatInfo) inq.summary += ` | Chat update: ${chatInfo}`;
+    if (typeof admissionClass === 'string' && admissionClass.trim()) inq.courseInterest = admissionClass.trim().slice(0, 80); // step 3 class choice
     inq.updatedAt = new Date().toISOString();
 
     writeDB(db);
